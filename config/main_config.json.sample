@@ -1,0 +1,13 @@
+{
+    "logger_name": "Main",
+    "logger_file_path": "logs/output_main.log",
+    "logger_level": 2,
+    "logger_max_files": 7,
+
+    "api_key_hmac": "",
+    "secret_key_hmac": "",
+    "api_key_ed25519": "",
+    "secret_key_ed25519": "-----BEGIN PRIVATE KEY-----\n\n-----END PRIVATE KEY-----"
+
+    "zmq_ipc": "tcp://127.0.0.1:15555"
+}

@@ -1,0 +1,3 @@
+[submodule "3rdparty/binancecpp"]
+	path = 3rdparty/binancecpp
+	url = https://github.com/dictxwang/binancecpp.git

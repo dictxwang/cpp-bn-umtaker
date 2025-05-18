@@ -1,0 +1,13 @@
+{
+    "logger_name": "Main",
+    "logger_file_path": "logs/output_main.log",
+    "logger_level": 2,
+    "logger_max_files": 7,
+
+    "api_key_hmac": "W1B4Y5dBdMeApEDJ2VC7DyVSDlrOh0BKeXLt3Sm55rR93a974iWcFxb8NAFIy49W",
+    "secret_key_hmac": "PlbCGpLdAA7OMjl5tYRM0RCqBObSRYwW9DvBGfU2k3JLmMWvo4Q65JW2hXDZw0aV",
+    "api_key_ed25519": "6h0agic0BQTEmj3TIDtQrCdqqmYFZFaK4SEzAsz7X2lW5EyBnZv80SixR77i6TnQ",
+    "secret_key_ed25519": "-----BEGIN PRIVATE KEY-----\nMC4CAQAwBQYDK2VwBCIEIJ26hUfGX7rnt+wA+4bdj9oyam2XMLBbB7BVhRjdH6ca\n-----END PRIVATE KEY-----",
+
+    "zmq_ipc": "tcp://127.0.0.1:15555"
+}
