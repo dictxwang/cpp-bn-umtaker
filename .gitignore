@@ -30,3 +30,15 @@
 *.exe
 *.out
 *.app
+
+
+*.log
+.DS_Store
+.git/
+.vscode
+
+build/
+# bin/
+logs/
+*.json
+ticker_info.pb.*
