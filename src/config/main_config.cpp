@@ -1,4 +1,4 @@
-#include "config_main.h"
+#include "main_config.h"
 
 bool MainConfig::loadMainConfig(const char* inputfile) {
     bool loadFileResult = Config::load_config(inputfile);

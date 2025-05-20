@@ -9,7 +9,7 @@
 #include "binancecpp/binance_ws_spot.h"
 #include "binancecpp/binance_ws_futures.h"
 #include "binancecpp/json/json.h"
-#include "config/config_main.h"
+#include "config/main_config.h"
 #include "logger/logger.h"
 #include "zmq/zmq_client.h"
 #include "protocol/ticker_info.pb.h"

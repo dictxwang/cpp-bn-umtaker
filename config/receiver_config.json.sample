@@ -1,0 +1,27 @@
+{
+    "logger_name": "Main",
+    "logger_file_path": "logs/output_receiver.log",
+    "logger_level": 2,
+    "logger_max_files": 7,
+
+    "use_normal_ticker": true,
+    "normal_ticker_use_intranet": false,
+    "normal_ticker_local_ip": "",
+
+    "use_best_ticker": false,
+    "ticker_zmq_ipcs": [
+        "127.0.0.1:12345",
+        "127.0.0.1:12346"
+    ],
+    
+    "ticker_validity_period_seconds": 300,
+
+    "benchmark_quote_asset": "USDT",
+    "follower_quote_asset": "USDC",
+
+    "base_asset_list": [
+        "IP",
+        "NEO"
+    ],
+
+}
