@@ -42,6 +42,11 @@ FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/config/*")
 add_library(config ${LIB_CONFIG_SRC})
 
+# receiver
+FILE(GLOB_RECURSE LIB_RECEIVER_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/receiver/*")
+add_library(lib_receiver ${LIB_RECEIVER_SRC})
+
 
 add_executable(${PROCESS_MAIN} "src/main.cpp")
 target_link_libraries(${PROCESS_MAIN}
@@ -69,6 +74,8 @@ target_link_libraries(${PROCESS_TICKER_RECEIVER}
     ${_PROTOBUF_LIBPROTOBUF}
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
+    config
+    lib_receiver
 )
 
 add_executable(${PROCESS_OPPORTUNITY_CALCULATOR} "src/bn_umtaker_calculator.cpp")

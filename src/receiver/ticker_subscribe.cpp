@@ -3,21 +3,58 @@
 #include "ticker_subscribe.h"
 #include "binancecpp/binance_ws_futures.h"
 #include "logger/logger.h"
+#include "common/common.h"
 
 namespace receiver {
 
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context) {
 
-        std::thread sub_benchmark(subscribe_normal_ticker, config, context, context.get_benchmark_inst_ids());
-        std::thread sub_follower(subscribe_normal_ticker, config, context, context.get_follower_inst_ids());
+        std::thread process_benchmark(process_normal_ticker_message, std::ref(context), TickerRole::Benchmark);
+        std::thread process_follower(process_normal_ticker_message, std::ref(context), TickerRole::Follower);
+
+        std::thread subscribe_benchmark(subscribe_normal_ticker, std::ref(config), std::ref(context), std::ref(context.get_benchmark_inst_ids()), TickerRole::Benchmark);
+        std::thread subscribe_follower(subscribe_normal_ticker, std::ref(config), std::ref(context), std::ref(context.get_follower_inst_ids()), TickerRole::Follower);
     }
 
     void start_subscribe_best_ticker(ReceiverConfig& config, GlobalContext& context) {
 
     }
 
+    void process_normal_ticker_message(GlobalContext &context, TickerRole role) {
+        moodycamel::ConcurrentQueue<string> *channel;
+        if (role == TickerRole::Benchmark) {
+            channel = context.get_benchmark_ticker_channel();
+        } else {
+            channel = context.get_follower_ticker_channel();
+        }
 
-    void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids) {
+        while (true) {
+            std::string messageJson;
+            while (!channel->try_dequeue(messageJson)) {
+                // Retry if the queue is empty
+            }
+
+            try {
+                // process message
+                Json::Value json_result;
+                Json::Reader reader;
+                json_result.clear();
+                reader.parse(messageJson.c_str(), json_result);
+
+                if (json_result.isMember("data")) {
+                    json_result = json_result["data"];
+                }
+                binance::WsFuturesBookTickerEvent event = binance::convertJsonToWsFuturesBookTickerEvent(json_result);
+
+                // TODO
+                std::cout << event.symbol << ", bid" << event.bestBidPrice << std::endl;
+            } catch (std::exception &exp) {
+                //err_log("fail to process normal ticker message: {}", std::string( exp.what()));
+            }
+        }
+    }
+
+    void subscribe_normal_ticker(ReceiverConfig &config, GlobalContext& context, vector<string> &inst_ids, TickerRole role) {
 
         while (true) {
             binance::BinanceFuturesWsClient futuresWsClient;
@@ -26,9 +63,14 @@ namespace receiver {
             }
             futuresWsClient.initBookTickerV1(config.normal_ticker_use_intranet, false);
             try {
-                futuresWsClient.startBookTickerV1(processFuturesTickerMessage, inst_ids);
+                if (role == TickerRole::Benchmark) {
+                    futuresWsClient.setMessageChannel(context.get_benchmark_ticker_channel());
+                } else {
+                    futuresWsClient.setMessageChannel(context.get_follower_ticker_channel());
+                }
+                futuresWsClient.startBookTickerV1(inst_ids);
             } catch (std::exception &exp) {
-                err_log("error occur while book ticker: {}", exp.what());
+                //err_log("error occur while book ticker: {}", std::string(exp.what()));
             }
 
             // wait for a while after exception

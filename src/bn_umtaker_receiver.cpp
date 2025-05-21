@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "config/receiver_config.h"
+#include "receiver/global_context.h"
+#include "receiver/ticker_subscribe.h"
 #include "logger/logger.h"
 
 /*
@@ -14,7 +16,7 @@ int main(int argc, char const *argv[]) {
         return 0;
     }
 
-    ReceiverConfig config;
+    receiver::ReceiverConfig config;
     if (!config.loadReceiverConfig(argv[1])) {
         std::cerr << "Load config error : " << argv[1] << std::endl;
         return 1;
@@ -24,9 +26,13 @@ int main(int argc, char const *argv[]) {
     spdlog::level::level_enum logger_level = static_cast<spdlog::level::level_enum>(config.logger_level);
     init_daily_file_log(config.logger_name, config.logger_file_path, logger_level, config.logger_max_files);
 
+    receiver::GlobalContext context;
+    context.init(config);
+    
     // subscribe ticker message
     if (config.use_normal_ticker) {
-        
+        start_subscribe_normal_ticker(config, context);
+        info_log("start subscribe normal ticker");
     } else if (config.use_best_ticker) {
 
     }

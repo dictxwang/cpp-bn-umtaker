@@ -25,7 +25,7 @@ namespace receiver {
         shared_mutex rw_lock;
 
         void update_ticker(UmTickerInfo ticker, uint64_t remain_senconds);
-        optional<UmTickerInfo&> get_lastest_ticker();
+        optional<UmTickerInfo> get_lastest_ticker();
     };
 
     class TickerComposite {
@@ -41,7 +41,7 @@ namespace receiver {
     public:
         void init(string& quote_asset, vector<string>& base_assets, uint64_t remain_senconds);
         void update_ticker(string inst_id, UmTickerInfo &ticker);
-        optional<UmTickerInfo&> get_lastest_ticker(string &inst_id);
+        optional<UmTickerInfo> get_lastest_ticker(string &inst_id);
     private:
         void init_wrapper(string inst_id);
     };

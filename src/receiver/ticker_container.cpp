@@ -21,7 +21,7 @@ namespace receiver {
         rw_lock.unlock();
     }
 
-    optional<UmTickerInfo&> TickerWrapper::get_lastest_ticker() {
+    optional<UmTickerInfo> TickerWrapper::get_lastest_ticker() {
 
         // automatically released when `lock` goes out of scope
         std::shared_lock<std::shared_mutex> lock(rw_lock);
@@ -65,7 +65,7 @@ namespace receiver {
         rw_lock.lock();
     }
 
-    optional<UmTickerInfo&> TickerComposite::get_lastest_ticker(string &inst_id) {
+    optional<UmTickerInfo> TickerComposite::get_lastest_ticker(string &inst_id) {
         rw_lock.lock_shared();
         auto wrapper = this->wrapper_map.find(inst_id);
         rw_lock.unlock_shared();

@@ -3,8 +3,8 @@
 namespace receiver {
     
     void GlobalContext::init(ReceiverConfig& config) {
-        this -> benchmark_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
-        this -> follower_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
+        this->benchmark_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
+        this->follower_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
 
         for (string base : config.base_asset_list) {
             string benchmark_inst = base + config.benchmark_quote_asset;
@@ -34,5 +34,12 @@ namespace receiver {
 
     set<string>& GlobalContext::get_inst_ids_set() {
         return this->inst_ids_set;
+    }
+    
+    moodycamel::ConcurrentQueue<string> *GlobalContext::get_benchmark_ticker_channel() {
+        return &(this->benchmark_ticker_channel);
+    }
+    moodycamel::ConcurrentQueue<string> *GlobalContext::get_follower_ticker_channel() {
+        return &(this->follower_ticker_channel);
     }
 }

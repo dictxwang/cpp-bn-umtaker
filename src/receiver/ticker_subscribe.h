@@ -3,10 +3,12 @@
 
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
+#include "common/common.h"
 
 namespace receiver {
 
-    void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids);
+    void process_normal_ticker_message(GlobalContext &context, TickerRole role);
+    void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids, TickerRole role);
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context);
 
     void subscribe_best_ticker(GlobalContext& context, string &ipc);
