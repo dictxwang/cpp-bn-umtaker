@@ -37,7 +37,14 @@ int main(int argc, char const *argv[]) {
 
     }
 
-    std::cout << "<< this is main process >>" << std::endl;
+    std::cout << "<< this is receiver process >>" << std::endl;
+    info_log("receiver processor started.");
+    
+    while(true) {
+        // std::cout << "Keep Running..." << std::endl;
+        // info_log("Process Keep Running...");
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+    }
 
     return 0;
 }

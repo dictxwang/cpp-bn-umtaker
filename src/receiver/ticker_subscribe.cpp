@@ -2,25 +2,31 @@
 #include <chrono>
 #include "ticker_subscribe.h"
 #include "binancecpp/binance_ws_futures.h"
+#include "binancecpp/util/string_helper.h"
 #include "logger/logger.h"
 #include "common/common.h"
+#include "common/tools.h"
 
 namespace receiver {
 
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context) {
 
-        std::thread process_benchmark(process_normal_ticker_message, std::ref(context), TickerRole::Benchmark);
-        std::thread process_follower(process_normal_ticker_message, std::ref(context), TickerRole::Follower);
+        std::thread process_benchmark(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Benchmark);
+        process_benchmark.detach();
+        std::thread process_follower(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Follower);
+        process_follower.detach();
 
         std::thread subscribe_benchmark(subscribe_normal_ticker, std::ref(config), std::ref(context), std::ref(context.get_benchmark_inst_ids()), TickerRole::Benchmark);
+        subscribe_benchmark.detach();
         std::thread subscribe_follower(subscribe_normal_ticker, std::ref(config), std::ref(context), std::ref(context.get_follower_inst_ids()), TickerRole::Follower);
+        subscribe_follower.detach();
     }
 
     void start_subscribe_best_ticker(ReceiverConfig& config, GlobalContext& context) {
 
     }
 
-    void process_normal_ticker_message(GlobalContext &context, TickerRole role) {
+    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role) {
         moodycamel::ConcurrentQueue<string> *channel;
         if (role == TickerRole::Benchmark) {
             channel = context.get_benchmark_ticker_channel();
@@ -46,8 +52,23 @@ namespace receiver {
                 }
                 binance::WsFuturesBookTickerEvent event = binance::convertJsonToWsFuturesBookTickerEvent(json_result);
 
-                // TODO
-                std::cout << event.symbol << ", bid" << event.bestBidPrice << std::endl;
+                UmTickerInfo info;
+                info.inst_id = event.symbol;
+                info.bid_price = event.bestBidPrice;
+                info.bid_volume = event.bestBidQty;
+                info.ask_price = event.bestAskPrice;
+                info.ask_volume = event.bestAskQty;
+                info.update_time_millis = event.eventTime;
+                info.is_from_trade = false;
+
+                if (str_ends_with(event.symbol, config.benchmark_quote_asset)) {
+                    std::cout << "ticker for benchmark: " << event.symbol << std::endl;
+                    context.get_benchmark_ticker_composite().update_ticker(info);
+                } else {
+                    std::cout << "ticker for follower: " << event.symbol << std::endl;
+                    context.get_follower_ticker_composite().update_ticker(info);
+                }
+                info_log("process normal ticker for {}");
             } catch (std::exception &exp) {
                 //err_log("fail to process normal ticker message: {}", std::string( exp.what()));
             }

@@ -40,7 +40,6 @@ template <typename... Args>
 inline void info_log(const char* format, Args &&...args) {
     spdlog::info(format, args...);
 }
-
 template <typename... Args>
 inline void err_log(const char* format, Args &&...args) {
     spdlog::error(format, args...);

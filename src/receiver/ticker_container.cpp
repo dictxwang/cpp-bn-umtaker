@@ -48,9 +48,9 @@ namespace receiver {
         this->rw_lock.unlock();
     }
     
-    void TickerComposite::update_ticker(string inst_id, UmTickerInfo &ticker) {
+    void TickerComposite::update_ticker(UmTickerInfo &ticker) {
         rw_lock.lock_shared();
-        auto wrapper = this->wrapper_map.find(inst_id);
+        auto wrapper = this->wrapper_map.find(ticker.inst_id);
         rw_lock.unlock_shared();
 
         if (wrapper != this->wrapper_map.end()) {
@@ -61,7 +61,7 @@ namespace receiver {
         TickerWrapper t_wrapper;
         t_wrapper.update_ticker(ticker, this->ticker_remain_senconds);
         rw_lock.lock();
-        wrapper_map.insert({inst_id, t_wrapper});
+        wrapper_map.insert({ticker.inst_id, t_wrapper});
         rw_lock.lock();
     }
 

@@ -37,10 +37,15 @@ include_directories(
     ${CUSTOM_INCLUDE_DIR}
 )
 
+# # common
+# FILE(GLOB_RECURSE LIB_COMMON_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+#     "src/common/*")
+# add_library(lib_common ${LIB_COMMON_SRC})
+
 # config
 FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/config/*")
-add_library(config ${LIB_CONFIG_SRC})
+add_library(lib_config ${LIB_CONFIG_SRC})
 
 # receiver
 FILE(GLOB_RECURSE LIB_RECEIVER_SRC RELATIVE ${CMAKE_SOURCE_DIR}
@@ -61,7 +66,7 @@ target_link_libraries(${PROCESS_MAIN}
     
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
-    config
+    lib_config
 )
 
 add_executable(${PROCESS_TICKER_RECEIVER} "src/bn_umtaker_receiver.cpp")
@@ -74,7 +79,8 @@ target_link_libraries(${PROCESS_TICKER_RECEIVER}
     ${_PROTOBUF_LIBPROTOBUF}
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
-    config
+    # lib_common
+    lib_config
     lib_receiver
 )
 
