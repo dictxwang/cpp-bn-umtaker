@@ -1,8 +1,6 @@
 #include <thread>
 #include <chrono>
 #include "ticker_subscribe.h"
-#include "binancecpp/binance_ws_futures.h"
-#include "binancecpp/util/string_helper.h"
 #include "logger/logger.h"
 #include "common/common.h"
 #include "common/tools.h"
