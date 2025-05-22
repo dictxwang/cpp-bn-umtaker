@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <shared_mutex>
 #include <unordered_map>
+#include <string>
+#include <optional>
 
 using namespace std;
 
