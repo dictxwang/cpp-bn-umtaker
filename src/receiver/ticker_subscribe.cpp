@@ -4,6 +4,9 @@
 #include "logger/logger.h"
 #include "common/common.h"
 #include "common/tools.h"
+#include "binancecpp/binance_ws_futures.h"
+#include "binancecpp/util/string_helper.h"
+#include "binancecpp/binance_ws_model.h"
 
 namespace receiver {
 

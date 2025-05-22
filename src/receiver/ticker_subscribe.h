@@ -3,9 +3,6 @@
 
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
-#include "binancecpp/binance_ws_futures.h"
-#include "binancecpp/util/string_helper.h"
-#include "binancecpp/binance_ws_model.h"
 #include "common/common.h"
 
 namespace receiver {
