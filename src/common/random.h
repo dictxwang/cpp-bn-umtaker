@@ -3,21 +3,21 @@
 
 #include <random>
 
-class RandomInt32Gen {
+class RandomIntGen {
 
 public:
-    RandomInt32Gen(int32_t low, int32_t high);
-    ~RandomInt32Gen() {}
+    RandomIntGen() {}
+    ~RandomIntGen() {}
 
 private:
-    std::mt19937 gen;
-    std::uniform_real_distribution<int32_t> dist;
-    int32_t low;
-    int32_t high;
+    std::mt19937 generator;
+    std::uniform_int_distribution<int> distribution;
+    int min;
+    int max;
 
 public:
-    // void init(int32_t low, int32_t high);
-    int32_t randInt32();
+    void init(int low, int high);
+    int randInt();
 };
 
 #endif

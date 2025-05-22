@@ -6,10 +6,13 @@ namespace receiver {
 
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context) {
 
-        RandomInt32Gen rand_benchmark = RandomInt32Gen(0, 10000);
+        RandomIntGen rand_benchmark;
+        rand_benchmark.init(0, 10000);
+        // std::cout << "random: " << rand_benchmark.randInt() << std::endl;
         std::thread process_benchmark(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Benchmark, std::ref(rand_benchmark));
         process_benchmark.detach();
-        RandomInt32Gen rand_follower = RandomInt32Gen(0, 10000);
+        RandomIntGen rand_follower;
+        rand_follower.init(0, 10000);
         std::thread process_follower(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Follower, std::ref(rand_follower));
         process_follower.detach();
 
@@ -23,7 +26,7 @@ namespace receiver {
 
     }
 
-    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role, RandomInt32Gen &rand) {
+    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role, RandomIntGen &rand) {
         moodycamel::ConcurrentQueue<string> *channel;
         if (role == TickerRole::Benchmark) {
             channel = context.get_benchmark_ticker_channel();
@@ -65,7 +68,7 @@ namespace receiver {
                     // std::cout << "ticker for follower: " << event.symbol << std::endl;
                     context.get_follower_ticker_composite().update_ticker(info);
                 }
-                if (rand.randInt32() < 100) {
+                if (rand.randInt() < 100) {
                     info_log("process normal ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_time{}",
                         info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
                 }
