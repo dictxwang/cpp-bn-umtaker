@@ -4,6 +4,7 @@
 #include <deque>
 #include <vector>
 #include <cstdint>
+#include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
 #include <string>
