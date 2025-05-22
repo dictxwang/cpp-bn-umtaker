@@ -6,14 +6,9 @@ namespace receiver {
 
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context) {
 
-        RandomIntGen rand_benchmark;
-        rand_benchmark.init(0, 10000);
-        // std::cout << "random: " << rand_benchmark.randInt() << std::endl;
-        std::thread process_benchmark(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Benchmark, std::ref(rand_benchmark));
+        std::thread process_benchmark(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Benchmark);
         process_benchmark.detach();
-        RandomIntGen rand_follower;
-        rand_follower.init(0, 10000);
-        std::thread process_follower(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Follower, std::ref(rand_follower));
+        std::thread process_follower(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Follower);
         process_follower.detach();
 
         std::thread subscribe_benchmark(subscribe_normal_ticker, std::ref(config), std::ref(context), std::ref(context.get_benchmark_inst_ids()), TickerRole::Benchmark);
@@ -26,13 +21,16 @@ namespace receiver {
 
     }
 
-    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role, RandomIntGen &rand) {
+    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role) {
         moodycamel::ConcurrentQueue<string> *channel;
         if (role == TickerRole::Benchmark) {
             channel = context.get_benchmark_ticker_channel();
         } else {
             channel = context.get_follower_ticker_channel();
         }
+
+        RandomIntGen rand;
+        rand.init(0, 10000);
 
         while (true) {
             std::string messageJson;

@@ -13,7 +13,7 @@
 
 namespace receiver {
 
-    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role, RandomIntGen &rand);
+    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role);
     void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids, TickerRole role);
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context);
 
