@@ -37,10 +37,10 @@ include_directories(
     ${CUSTOM_INCLUDE_DIR}
 )
 
-# # common
-# FILE(GLOB_RECURSE LIB_COMMON_SRC RELATIVE ${CMAKE_SOURCE_DIR}
-#     "src/common/*")
-# add_library(common ${LIB_COMMON_SRC})
+# common
+FILE(GLOB_RECURSE LIB_COMMON_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/common/*")
+add_library(common ${LIB_COMMON_SRC})
 
 # config
 FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
@@ -60,7 +60,7 @@ target_link_libraries(receiver
     ${_PROTOBUF_LIBPROTOBUF}
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
-    # common
+    common
     config
 )
 

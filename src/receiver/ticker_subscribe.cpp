@@ -6,9 +6,11 @@ namespace receiver {
 
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context) {
 
-        std::thread process_benchmark(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Benchmark);
+        RandomInt32Gen rand_benchmark = RandomInt32Gen(0, 10000);
+        std::thread process_benchmark(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Benchmark, std::ref(rand_benchmark));
         process_benchmark.detach();
-        std::thread process_follower(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Follower);
+        RandomInt32Gen rand_follower = RandomInt32Gen(0, 10000);
+        std::thread process_follower(process_normal_ticker_message, std::ref(config), std::ref(context), TickerRole::Follower, std::ref(rand_follower));
         process_follower.detach();
 
         std::thread subscribe_benchmark(subscribe_normal_ticker, std::ref(config), std::ref(context), std::ref(context.get_benchmark_inst_ids()), TickerRole::Benchmark);
@@ -21,7 +23,7 @@ namespace receiver {
 
     }
 
-    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role) {
+    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role, RandomInt32Gen &rand) {
         moodycamel::ConcurrentQueue<string> *channel;
         if (role == TickerRole::Benchmark) {
             channel = context.get_benchmark_ticker_channel();
@@ -57,16 +59,18 @@ namespace receiver {
                 info.is_from_trade = false;
 
                 if (role == TickerRole::Benchmark) {
-                    std::cout << "ticker for benchmark: " << event.symbol << std::endl;
+                    // std::cout << "ticker for benchmark: " << event.symbol << std::endl;
                     context.get_benchmark_ticker_composite().update_ticker(info);
                 } else {
-                    std::cout << "ticker for follower: " << event.symbol << std::endl;
+                    // std::cout << "ticker for follower: " << event.symbol << std::endl;
                     context.get_follower_ticker_composite().update_ticker(info);
                 }
-                // std::string format = "process normal ticker for";
-                info_log("process normal ticker for {}");
+                if (rand.randInt32() < 100) {
+                    info_log("process normal ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_time{}",
+                        info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
+                }
             } catch (std::exception &exp) {
-                //err_log("fail to process normal ticker message: {}", std::string( exp.what()));
+                err_log("fail to process normal ticker message: {}", std::string( exp.what()));
             }
         }
     }
@@ -87,7 +91,7 @@ namespace receiver {
                 }
                 futuresWsClient.startBookTickerV1(inst_ids);
             } catch (std::exception &exp) {
-                //err_log("error occur while book ticker: {}", std::string(exp.what()));
+                err_log("error occur while book ticker: {}", std::string(exp.what()));
             }
 
             // wait for a while after exception

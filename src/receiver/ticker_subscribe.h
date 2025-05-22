@@ -1,8 +1,9 @@
 #ifndef _RECEIVER_TICKER_SUBSCRIBE_H_
 #define _RECEIVER_TICKER_SUBSCRIBE_H_
 
-#include "common/common.h"
+#include "common/constant.h"
 #include "common/tools.h"
+#include "common/random.h"
 #include "logger/logger.h"
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
@@ -12,7 +13,7 @@
 
 namespace receiver {
 
-    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role);
+    void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role, RandomInt32Gen &rand);
     void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids, TickerRole role);
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context);
 

@@ -1,5 +1,5 @@
-#ifndef _COMMON_COMMON_H_
-#define _COMMON_COMMON_H_
+#ifndef _COMMON_CONSTANT_H_
+#define _COMMON_CONSTANT_H_
 
 enum TickerRole {
     Benchmark,

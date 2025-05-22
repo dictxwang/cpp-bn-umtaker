@@ -47,11 +47,20 @@ inline void init_daily_file_log(std::string &logger_name, std::string &logger_fi
 
 template <typename... Args>
 inline void info_log(const char* format, Args &&...args) {
-    spdlog::info(format, args...);
+    if (sizeof...(args) == 0) {
+        spdlog::info(format);
+    } else {
+        spdlog::info(fmt::runtime(format), args...);
+    }
 }
+
 template <typename... Args>
 inline void err_log(const char* format, Args &&...args) {
-    spdlog::error(format, args...);
+    if (sizeof...(args) == 0) {
+        spdlog::error(format);
+    } else {
+        spdlog::error(fmt::runtime(format), args...);
+    }
 }
 
 #endif
