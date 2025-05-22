@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <string>
 #include <optional>
+#include <memory>
 
 using namespace std;
 
@@ -45,7 +46,7 @@ namespace receiver {
         ~TickerComposite() {}
     
     private:
-        unordered_map<string, TickerWrapper&> wrapper_map;
+        unordered_map<string, shared_ptr<TickerWrapper>> wrapper_map;
         uint64_t ticker_remain_senconds;
         shared_mutex rw_lock;
     

@@ -7,6 +7,7 @@ namespace receiver {
     void TickerWrapper::update_ticker(UmTickerInfo ticker, uint64_t remain_senconds) {
         
         std::unique_lock<std::shared_mutex> lock(rw_lock);
+        // Also could directly lock
         // this->rw_lock.lock();
         ticker_list.push_back(ticker);
 
@@ -20,6 +21,7 @@ namespace receiver {
                 break;
             }
         }
+        // unlock directly
         // this->rw_lock.unlock();
         lock.unlock();
     }
@@ -49,54 +51,42 @@ namespace receiver {
     }
 
     void TickerComposite::init_wrapper(string inst_id) {
-        TickerWrapper t_wrapper;
+        shared_ptr<TickerWrapper> shared_t_wrapper(new TickerWrapper());
         this->rw_lock.lock();
-        this->wrapper_map.insert({inst_id, t_wrapper});
+        this->wrapper_map.insert({inst_id, shared_t_wrapper});
         this->rw_lock.unlock();
     }
     
     void TickerComposite::update_ticker(UmTickerInfo &ticker) {
 
-        try {
-            rw_lock.lock_shared();
-            auto wrapper = this->wrapper_map.find(ticker.inst_id);
-            rw_lock.unlock_shared();
+        // rw_lock.lock_shared();
+        // auto wrapper = this->wrapper_map.find(ticker.inst_id);
+        // rw_lock.unlock_shared();
 
+        std::shared_lock<std::shared_mutex> r_lock(rw_lock); 
+        auto wrapper = this->wrapper_map.find(ticker.inst_id);
+        r_lock.unlock();
 
-            if (wrapper != this->wrapper_map.end()) {
-                try {
-                    auto& [key, value] = *wrapper;
-                    value.update_ticker(ticker, this->ticker_remain_senconds);
-                } catch (std::exception &exp) {
-                    std::cout << "innner1 exception: " << exp.what() << ": " << wrapper->second.get_ticker_list().size() << std::endl;
-                }
-                return;
-            }
-
-            TickerWrapper t_wrapper;
-            t_wrapper.update_ticker(ticker, this->ticker_remain_senconds);
-            std::cout << "ticker info count " << t_wrapper.get_ticker_list().size() << std::endl;
-            try {
-                // std::unique_lock<std::shared_mutex> lock(rw_lock);
-                rw_lock.lock();
-                wrapper_map.insert({ticker.inst_id, t_wrapper});
-                rw_lock.unlock();
-            } catch (std::exception &exp) {
-                std::cout << "inner2 exception" << std::endl;
-            }
-
-        } catch (std::exception &exp) {
-            std::cout << "outer exception" << std::endl;
+        if (wrapper != this->wrapper_map.end()) {
+            auto& [key, value] = *wrapper;
+            (*value).update_ticker(ticker, this->ticker_remain_senconds);
+            return;
         }
+
+        std::shared_ptr<TickerWrapper> shared_t_wrapper(new TickerWrapper());
+        shared_t_wrapper.get()->update_ticker(ticker, this->ticker_remain_senconds);
+        std::unique_lock<std::shared_mutex> w_lock(rw_lock);
+        wrapper_map.insert({ticker.inst_id, shared_t_wrapper});
+        w_lock.unlock();
     }
 
     optional<UmTickerInfo> TickerComposite::get_lastest_ticker(string &inst_id) {
-        rw_lock.lock_shared();
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
         auto wrapper = this->wrapper_map.find(inst_id);
-        rw_lock.unlock_shared();
+        lock.unlock();
 
         if (wrapper != this->wrapper_map.end()) {
-            return wrapper->second.get_lastest_ticker();
+            return (*(wrapper->second)).get_lastest_ticker();
         } else {
             return nullopt;
         }

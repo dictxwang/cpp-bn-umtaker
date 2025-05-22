@@ -63,10 +63,9 @@ namespace receiver {
                     std::cout << "ticker for follower: " << event.symbol << std::endl;
                     context.get_follower_ticker_composite().update_ticker(info);
                 }
-                std::string format = "process normal ticker for";
-                info_log(format.c_str());
+                // std::string format = "process normal ticker for";
+                info_log("process normal ticker for {}");
             } catch (std::exception &exp) {
-                std::cout << "exception occur: " << exp.what() << std::endl;
                 //err_log("fail to process normal ticker message: {}", std::string( exp.what()));
             }
         }
