@@ -2,6 +2,7 @@
 #define _UTIL_LOGGER_H_
 
 #include "spdlog/spdlog.h"
+#include "spdlog/async.h"
 #include "spdlog/sinks/rotating_file_sink.h"
 #include "spdlog/sinks/daily_file_sink.h"
 #include "spdlog/sinks/stdout_sinks.h"
@@ -30,10 +31,18 @@ inline void init_rotating_file_log(std::string &logger_name, std::string &logger
 
 inline void init_daily_file_log(std::string &logger_name, std::string &logger_file_path, spdlog::level::level_enum log_level, int max_files) {
 
+    /* normally daily log
     auto logger = spdlog::daily_logger_mt(logger_name, logger_file_path, max_files=max_files);
     spdlog::set_level(log_level);
     spdlog::flush_every(std::chrono::seconds(1));
     spdlog::set_default_logger(logger);
+    */
+   
+    spdlog::init_thread_pool(8192, 1); // Queue size: 8192, 1 worker thread
+    // Create an asynchronous daily logger
+    auto async_daily_logger = spdlog::daily_logger_mt<spdlog::async_factory>(logger_name, logger_file_path, max_files=max_files);
+    async_daily_logger->set_level(log_level);
+    spdlog::set_default_logger(async_daily_logger);
 }
 
 template <typename... Args>

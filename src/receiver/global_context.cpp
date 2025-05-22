@@ -3,7 +3,7 @@
 namespace receiver {
     
     void GlobalContext::init(ReceiverConfig& config) {
-        this->benchmark_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
+        this->benchmark_ticker_composite.init(config.benchmark_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
         this->follower_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
 
         for (string base : config.base_asset_list) {

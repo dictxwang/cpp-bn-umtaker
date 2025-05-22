@@ -1,5 +1,5 @@
 {
-    "logger_name": "Main",
+    "logger_name": "Receiver",
     "logger_file_path": "logs/output_receiver.log",
     "logger_level": 2,
     "logger_max_files": 7,

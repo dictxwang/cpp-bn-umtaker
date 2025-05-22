@@ -21,12 +21,18 @@ namespace receiver {
         bool is_from_trade = false;
     };
 
-    struct TickerWrapper {
-        deque<UmTickerInfo> ticker_list;
-        shared_mutex rw_lock;
+    class TickerWrapper {
+
+    public:
+        TickerWrapper() {}
+        ~TickerWrapper() {}
 
         void update_ticker(UmTickerInfo ticker, uint64_t remain_senconds);
         optional<UmTickerInfo> get_lastest_ticker();
+        deque<UmTickerInfo>& get_ticker_list();
+    private:
+        deque<UmTickerInfo> ticker_list;
+        shared_mutex rw_lock;
     };
 
     class TickerComposite {

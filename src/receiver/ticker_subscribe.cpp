@@ -61,15 +61,17 @@ namespace receiver {
                 info.update_time_millis = event.eventTime;
                 info.is_from_trade = false;
 
-                if (str_ends_with(event.symbol, config.benchmark_quote_asset)) {
+                if (role == TickerRole::Benchmark) {
                     std::cout << "ticker for benchmark: " << event.symbol << std::endl;
                     context.get_benchmark_ticker_composite().update_ticker(info);
                 } else {
                     std::cout << "ticker for follower: " << event.symbol << std::endl;
                     context.get_follower_ticker_composite().update_ticker(info);
                 }
-                info_log("process normal ticker for {}");
+                std::string format = "process normal ticker for";
+                info_log(format.c_str());
             } catch (std::exception &exp) {
+                std::cout << "exception occur: " << exp.what() << std::endl;
                 //err_log("fail to process normal ticker message: {}", std::string( exp.what()));
             }
         }
