@@ -1,12 +1,6 @@
 #include <thread>
 #include <chrono>
 #include "ticker_subscribe.h"
-#include "logger/logger.h"
-#include "common/common.h"
-#include "common/tools.h"
-#include "binancecpp/binance_ws_futures.h"
-#include "binancecpp/util/string_helper.h"
-#include "binancecpp/binance_ws_model.h"
 
 namespace receiver {
 
@@ -107,19 +101,19 @@ namespace receiver {
     }
 
 
-    bool processFuturesTickerMessage(std::string &messageJson) {
-        Json::Value json_result;
-        Json::Reader reader;
-        json_result.clear();
-        reader.parse(messageJson.c_str(), json_result);
+    // bool processFuturesTickerMessage(std::string &messageJson) {
+    //     Json::Value json_result;
+    //     Json::Reader reader;
+    //     json_result.clear();
+    //     reader.parse(messageJson.c_str(), json_result);
 
-        if (json_result.isMember("data")) {
-            json_result = json_result["data"];
-        }
-        binance::WsFuturesBookTickerEvent event = binance::convertJsonToWsFuturesBookTickerEvent(json_result);
-        // TODO
-        std::cout << "convert ticker event for : " << event.symbol << std::endl;
-        return true;
-    }
+    //     if (json_result.isMember("data")) {
+    //         json_result = json_result["data"];
+    //     }
+    //     binance::WsFuturesBookTickerEvent event = binance::convertJsonToWsFuturesBookTickerEvent(json_result);
+    //     // TODO
+    //     std::cout << "convert ticker event for : " << event.symbol << std::endl;
+    //     return true;
+    // }
 
 }

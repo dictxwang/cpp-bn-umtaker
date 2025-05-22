@@ -40,17 +40,29 @@ include_directories(
 # # common
 # FILE(GLOB_RECURSE LIB_COMMON_SRC RELATIVE ${CMAKE_SOURCE_DIR}
 #     "src/common/*")
-# add_library(lib_common ${LIB_COMMON_SRC})
+# add_library(common ${LIB_COMMON_SRC})
 
 # config
 FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/config/*")
-add_library(lib_config ${LIB_CONFIG_SRC})
+add_library(config ${LIB_CONFIG_SRC})
 
 # receiver
 FILE(GLOB_RECURSE LIB_RECEIVER_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/receiver/*")
-add_library(lib_receiver ${LIB_RECEIVER_SRC})
+add_library(receiver ${LIB_RECEIVER_SRC})
+target_link_libraries(receiver
+    "${BUILD_PATH}/libproject_types_proto.a"
+
+    ${_LIB_BINANCECPP}
+    ${_LIB_SPDLOG}
+    ${_LIB_ZMQ}
+    ${_PROTOBUF_LIBPROTOBUF}
+    CURL::libcurl
+    OpenSSL::SSL OpenSSL::Crypto
+    # common
+    config
+)
 
 
 add_executable(${PROCESS_MAIN} "src/main.cpp")
@@ -66,22 +78,22 @@ target_link_libraries(${PROCESS_MAIN}
     
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
-    lib_config
+    config
 )
 
 add_executable(${PROCESS_TICKER_RECEIVER} "src/bn_umtaker_receiver.cpp")
 target_link_libraries(${PROCESS_TICKER_RECEIVER}
-    "${BUILD_PATH}/libproject_types_proto.a"
+#     "${BUILD_PATH}/libproject_types_proto.a"
 
-    ${_LIB_BINANCECPP}
-    ${_LIB_SPDLOG}
-    ${_LIB_ZMQ}
-    ${_PROTOBUF_LIBPROTOBUF}
-    CURL::libcurl
-    OpenSSL::SSL OpenSSL::Crypto
-    # lib_common
-    lib_config
-    lib_receiver
+#     ${_LIB_BINANCECPP}
+#     ${_LIB_SPDLOG}
+#     ${_LIB_ZMQ}
+#     ${_PROTOBUF_LIBPROTOBUF}
+#     CURL::libcurl
+#     OpenSSL::SSL OpenSSL::Crypto
+#     # common
+#     config
+    receiver
 )
 
 add_executable(${PROCESS_OPPORTUNITY_CALCULATOR} "src/bn_umtaker_calculator.cpp")
