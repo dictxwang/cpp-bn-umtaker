@@ -2,6 +2,7 @@
 #define _RECEIVER_TICKER_CONTAINER_H_
 
 #include <deque>
+#include <vector>
 #include <cstdint>
 #include <shared_mutex>
 #include <unordered_map>
