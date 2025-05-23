@@ -34,7 +34,8 @@ int main(int argc, char const *argv[]) {
         start_subscribe_normal_ticker(config, context);
         info_log("start subscribe normal ticker");
     } else if (config.use_best_ticker) {
-
+        start_subscribe_zmq_best_ticker(config, context);
+        info_log("start subscribe best ticker");
     }
 
     std::cout << "<< this is receiver process >>" << std::endl;

@@ -19,12 +19,16 @@ class ZMQClient {
 
     void PublisherBind(const std::string& host) {
         int ret = zmq_bind(requester_, host.c_str());
-        assert(ret == 0);
+        if (ret != 0) {
+            throw std::runtime_error("fail to zmq bind");
+        }
     }
 
     void SubscriberConnect(const std::string& host) {
         int ret = zmq_connect(requester_, host.c_str());
-        assert(ret == 0);
+        if (ret != 0) {
+            throw std::runtime_error("fail to zmq subscribe");
+        }
         // subscribe all topics
         zmq_setsockopt(requester_, ZMQ_SUBSCRIBE, "", 0);
     }

@@ -1,0 +1,23 @@
+#ifndef _RECEIVER_BASIC_CONTAINER_H_
+#define _RECEIVER_BASIC_CONTAINER_H_
+
+#include <cstdint>
+#include <string>
+
+using namespace std;
+
+namespace receiver {
+
+    struct UmTickerInfo {
+        string inst_id;
+        double bid_price = 0;
+        double bid_volume = 0;
+        double ask_price = 0;
+        double ask_volume = 0;
+        double avg_price = 0;
+        uint64_t update_time_millis = 0;
+        bool is_from_trade = false;
+    };
+}
+
+#endif

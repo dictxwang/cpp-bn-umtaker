@@ -3,8 +3,10 @@
 namespace receiver {
     
     void GlobalContext::init(ReceiverConfig& config) {
-        this->benchmark_ticker_composite.init(config.benchmark_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
-        this->follower_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.normal_ticker_use_intranet);
+        this->benchmark_ticker_composite.init(config.benchmark_quote_asset, config.base_asset_list, config.ticker_validity_period_seconds);
+        this->follower_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.ticker_validity_period_seconds);
+
+        this->price_offset_composite.init(config.base_asset_list, config.ticker_validity_period_seconds);
 
         for (string base : config.base_asset_list) {
             string benchmark_inst = base + config.benchmark_quote_asset;
@@ -24,6 +26,10 @@ namespace receiver {
         return this->follower_ticker_composite;
     }
 
+    PriceOffsetComposite& GlobalContext::get_price_offset_composite() {
+        return this->price_offset_composite;
+    }
+
     vector<string>& GlobalContext::get_benchmark_inst_ids() {
         return this->benchmark_inst_ids;
     }
@@ -41,5 +47,8 @@ namespace receiver {
     }
     moodycamel::ConcurrentQueue<string> *GlobalContext::get_follower_ticker_channel() {
         return &(this->follower_ticker_channel);
+    }
+    moodycamel::ConcurrentQueue<UmTickerInfo> *GlobalContext::get_ticker_info_channel() {
+        return &(this->ticker_info_channel);
     }
 }

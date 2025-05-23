@@ -144,7 +144,7 @@ void startZMQSender(std::string &ipc) {
     ZMQClient zmq_client(ZMQ_PUB);
     zmq_client.PublisherBind(ipc);
     while (true) {
-        TickerInfo info;
+        besttick::TickerInfo info;
         info.set_instid("BTCUSDT");
         info.set_bestbid(1.21);
         std::string output;
@@ -162,7 +162,7 @@ void startZMQReceiver(std::string &ipc) {
     while (true) {
         std::string message = zmq_client.Receive();
         std::cout << "zmq recive: " << message << std::endl;
-        TickerInfo info;
+        besttick::TickerInfo info;
         info.ParseFromString(message);
         std::cout << "info: " << info.instid() << "," << info.bestbid() << std::endl;
     }
@@ -226,7 +226,7 @@ int main(int argc, char const *argv[])
     symbols.push_back("BTCUSDT");
     symbols.push_back("ETHUSDT");
     binanceSpotWs.initBookTicker(false, false);
-    // binanceSpotWs.setMessageCallback(processTickerMessage);
+    binanceSpotWs.setMessageCallback(processTickerMessage);
     moodycamel::ConcurrentQueue<std::string> messageChannel;
     binanceSpotWs.setMessageChannel(&messageChannel);
 
@@ -251,7 +251,9 @@ int main(int argc, char const *argv[])
     // std::cout << "end user data stream" << std::endl;
 
     // binanceSpotWs.initUserDataStream(config.api_key_ed25519, config.secret_key_ed25519, false);
-    // binanceSpotWs.startUserDataStream(processUserDataMessage);
+    // binanceSpotWs.setMessageCallback(processUserDataMessage);
+    // std::pair<bool, string> startResult = binanceSpotWs.startUserDataStream();
+    // std::cout << "start result: " << startResult.first << ", msg=" << startResult.second << std::endl;
 
     // binance::CommonRestResponse<uint64_t> futuresTimeResp;
     // binanceFutures.setServerTimeOffset(futuresTimeResp);
@@ -315,7 +317,7 @@ int main(int argc, char const *argv[])
     // futuresWsClient.initUserDataStream(config.api_key_ed25519, config.secret_key_ed25519, false);
     // futuresWsClient.startUserDataStream(processFuturesUserDataMessage);
 
-    futuresWsClient.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, false);
+    // futuresWsClient.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, false);
 
     // std::thread futureOrderThread(startFuturesOrderService, std::ref(futuresWsClient), std::ref(config.api_key_ed25519), std::ref(config.secret_key_ed25519));
     // futureOrderThread.join();
