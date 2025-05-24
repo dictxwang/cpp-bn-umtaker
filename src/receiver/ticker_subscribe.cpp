@@ -56,8 +56,8 @@ namespace receiver {
 
     void start_subscribe_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context) {
 
-        for (std::string ipc : config.ticker_zmq_ipcs) {
-            std::thread subscribe_and_process(subscribe_process_zmq_best_ticker, std::ref(config), std::ref(context), std::ref(ipc));
+        for (size_t i = 0; i < config.ticker_zmq_ipcs.size(); ++i) {
+            std::thread subscribe_and_process(subscribe_process_zmq_best_ticker, std::ref(config), std::ref(context), i);
             subscribe_and_process.detach();
         }
     }
@@ -157,12 +157,12 @@ namespace receiver {
         }
     }
 
-    void subscribe_process_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context, string &ipc) {
+    void subscribe_process_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index) {
 
         while (true) {
             ZMQClient zmq_client(ZMQ_SUB);
             try {
-                zmq_client.SubscriberConnect(ipc);
+                zmq_client.SubscriberConnect(config.ticker_zmq_ipcs[ipc_index]);
             } catch (std::exception &exp) {
                 err_log("error occur while zmq subscribe connection: {}", std::string(exp.what()));
             }

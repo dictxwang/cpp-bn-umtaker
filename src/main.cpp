@@ -222,17 +222,17 @@ int main(int argc, char const *argv[])
     // std::cout << "Response data: " << accountResp.data.accountType << std::endl;
 
     binance::BinanceSpotWsClient binanceSpotWs;
-    std::vector<std::string> symbols;
-    symbols.push_back("BTCUSDT");
-    symbols.push_back("ETHUSDT");
-    binanceSpotWs.initBookTicker(false, false);
-    binanceSpotWs.setMessageCallback(processTickerMessage);
-    moodycamel::ConcurrentQueue<std::string> messageChannel;
-    binanceSpotWs.setMessageChannel(&messageChannel);
+    // std::vector<std::string> symbols;
+    // symbols.push_back("BTCUSDT");
+    // symbols.push_back("ETHUSDT");
+    // binanceSpotWs.initBookTicker(false, false);
+    // binanceSpotWs.setMessageCallback(processTickerMessage);
+    // moodycamel::ConcurrentQueue<std::string> messageChannel;
+    // binanceSpotWs.setMessageChannel(&messageChannel);
 
-    std::thread messagenChannelConsume(startMessageChannelConsume, &messageChannel);
-    std::cout << "After Inited." << std::endl;
-    binanceSpotWs.startBookTicker(symbols);
+    // std::thread messagenChannelConsume(startMessageChannelConsume, &messageChannel);
+    // std::cout << "After Inited." << std::endl;
+    // binanceSpotWs.startBookTicker(symbols);
 
     // binance::CommonRestResponse<std::string> startUserStreamResp;
     // binanceSpot.start_userDataStream(startUserStreamResp);
@@ -357,9 +357,9 @@ int main(int argc, char const *argv[])
     //     std::cout << "fail to cancel order: " << e.what() << std::endl;
     // }
     
-    // std::thread zmqSender(startZMQSender, std::ref(config.zmq_ipc));
-    // std::this_thread::sleep_for(std::chrono::seconds(3));
-    // std::thread zmqReceiver(startZMQReceiver, std::ref(config.zmq_ipc));
+    std::thread zmqSender(startZMQSender, std::ref(config.zmq_ipc));
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::thread zmqReceiver(startZMQReceiver, std::ref(config.zmq_ipc));
 
     while(true) {
         std::cout << "Keep Running..." << std::endl;

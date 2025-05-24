@@ -19,7 +19,7 @@ namespace receiver {
     void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids, TickerRole role);
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context);
 
-    void subscribe_process_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context, string &ipc);
+    void subscribe_process_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index);
     void start_subscribe_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context);
 
     void process_ticker_info_price_offset(ReceiverConfig& config, GlobalContext &context);

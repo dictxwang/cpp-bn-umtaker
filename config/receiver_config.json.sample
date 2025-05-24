@@ -4,11 +4,11 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
-    "use_normal_ticker": true,
+    "use_normal_ticker": false,
     "normal_ticker_use_intranet": false,
     "normal_ticker_local_ip": "",
 
-    "use_best_ticker": false,
+    "use_best_ticker": true,
     "ticker_zmq_ipcs": [
         "tcp://127.0.0.1:22001"
     ],
