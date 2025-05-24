@@ -17,6 +17,8 @@ namespace receiver {
         double avg_price = 0;
         uint64_t update_time_millis = 0;
         bool is_from_trade = false;
+
+        void copy_self(UmTickerInfo& other);
     };
 }
 

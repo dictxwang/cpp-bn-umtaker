@@ -44,6 +44,7 @@ namespace receiver {
         void init(string& quote_asset, vector<string>& base_assets, uint64_t remain_senconds);
         void update_ticker(UmTickerInfo &ticker);
         optional<UmTickerInfo> get_lastest_ticker(string &inst_id);
+        vector<UmTickerInfo> copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after);
     private:
         void init_wrapper(string inst_id);
     };

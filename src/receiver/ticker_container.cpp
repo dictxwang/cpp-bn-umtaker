@@ -91,4 +91,8 @@ namespace receiver {
             return nullopt;
         }
     }
+
+    vector<UmTickerInfo> TickerComposite::copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after) {
+        // TODO
+    }
 }
