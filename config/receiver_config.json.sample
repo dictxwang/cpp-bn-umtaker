@@ -10,7 +10,7 @@
 
     "use_best_ticker": false,
     "ticker_zmq_ipcs": [
-        "tcp://127.0.0.1:22001
+        "tcp://127.0.0.1:22001"
     ],
     
     "ticker_validity_period_seconds": 300,
@@ -21,6 +21,5 @@
     "base_asset_list": [
         "IP",
         "NEO"
-    ],
-
+    ]
 }
