@@ -10,7 +10,21 @@
 
 using std::string;
 
-class Config
+class BaseConfig
+{
+public:
+    BaseConfig() {};
+    virtual ~BaseConfig() {}
+
+protected:
+    bool load_config_file(const char* inputfile);
+
+protected:
+    Json::Value doc_;
+};
+
+
+class Config : public BaseConfig
 {
 public:
     Config() {};
@@ -24,8 +38,7 @@ public:
     int logger_level;
     int logger_max_files;
     string logger_file_path;
-
-protected:
-    Json::Value doc_;
 };
+
+
 #endif

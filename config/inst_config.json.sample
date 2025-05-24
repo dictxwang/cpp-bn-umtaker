@@ -1,0 +1,18 @@
+{
+    "asset_info_list": [
+        {
+            "asset": "NEO",
+            "volatility_a": 1,
+            "volatility_b": 1,
+            "volatility_c": 1,
+            "beta": 1
+        },
+        {
+            "asset": "IP",
+            "volatility_a": 1,
+            "volatility_b": 1,
+            "volatility_c": 1,
+            "beta": 1
+        }
+    ]
+}

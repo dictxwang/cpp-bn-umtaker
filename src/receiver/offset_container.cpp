@@ -8,6 +8,13 @@ namespace receiver {
         return now - this->update_time_millis > seconds * 1000;
     }
 
+    void PriceOffset::copy_self(PriceOffset &other) {
+        other.avg_price_diff = this->avg_price_diff;
+        other.bid_ask_price_diff = this->bid_ask_price_diff;
+        other.ask_bid_price_diff = this->ask_bid_price_diff;
+        other.update_time_millis = this->update_time_millis;
+    }
+
     void PriceOffsetWrapper::update_price_offset(UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick, uint64_t remain_senconds) {
 
         uint64_t now = binance::get_current_ms_epoch();
@@ -41,8 +48,15 @@ namespace receiver {
         }
     }
     
-    deque<PriceOffset>& PriceOffsetWrapper::get_price_offset_list() {
-        return this->offset_list;
+    vector<PriceOffset> PriceOffsetWrapper::copy_price_offset_list() {
+        vector<PriceOffset> result;
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        for (size_t i = 0; i < this->offset_list.size(); ++i) {
+            PriceOffset other;
+            this->offset_list[i].copy_self(other);
+            result.push_back(other);
+        }
+        return result;
     }
 
     void PriceOffsetComposite::init_wrapper(string base_asset) {
@@ -87,6 +101,20 @@ namespace receiver {
             return (*(wrapper->second)).get_lastest_price_offset();
         } else {
             return nullopt;
+        }
+        // TODO could auto unlock
+    }
+
+    vector<PriceOffset> PriceOffsetComposite::get_price_offset_list(string &base_asset) {
+
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        auto wrapper = this->wrapper_map.find(base_asset);
+        lock.unlock();
+        if (wrapper != this->wrapper_map.end()) {
+            return (*(wrapper->second)).copy_price_offset_list();
+        } else {
+            vector<PriceOffset> result;
+            return result;
         }
     }
 }

@@ -63,7 +63,7 @@ namespace receiver {
         // auto wrapper = this->wrapper_map.find(ticker.inst_id);
         // rw_lock.unlock_shared();
 
-        std::shared_lock<std::shared_mutex> r_lock(rw_lock); 
+        std::shared_lock<std::shared_mutex> r_lock(rw_lock);
         auto wrapper = this->wrapper_map.find(ticker.inst_id);
         r_lock.unlock();
 

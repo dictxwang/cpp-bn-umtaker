@@ -56,6 +56,15 @@ inline void info_log(const char* format, Args &&...args) {
 }
 
 template <typename... Args>
+inline void warn_log(const char* format, Args &&...args) {
+    if (sizeof...(args) == 0) {
+        spdlog::warn(format);
+    } else {
+        spdlog::warn(fmt::runtime(format), args...);
+    }
+}
+
+template <typename... Args>
 inline void err_log(const char* format, Args &&...args) {
     if (sizeof...(args) == 0) {
         spdlog::error(format);

@@ -4,7 +4,7 @@ project(binance_umtaker VERSION 0.1.0 LANGUAGES CXX)
 
 set(PROCESS_MAIN "test_main")
 set(PROCESS_TICKER_RECEIVER "bn_untaker_receiver")
-set(PROCESS_OPPORTUNITY_CALCULATOR "bn_untaker_calculator")
+set(PROCESS_OPPORTUNITY_ACTUARY "bn_untaker_actuary")
 set(PROCESS_ORDER_SUBMITTER "bn_untaker_submitter")
 
 set(CMAKE_CXX_STANDARD 20)
@@ -96,8 +96,8 @@ target_link_libraries(${PROCESS_TICKER_RECEIVER}
     receiver
 )
 
-add_executable(${PROCESS_OPPORTUNITY_CALCULATOR} "src/bn_umtaker_calculator.cpp")
-target_link_libraries(${PROCESS_OPPORTUNITY_CALCULATOR}
+add_executable(${PROCESS_OPPORTUNITY_ACTUARY} "src/bn_umtaker_actuary.cpp")
+target_link_libraries(${PROCESS_OPPORTUNITY_ACTUARY}
     ${_LIB_BINANCECPP}
     ${_LIB_SPDLOG}
     ${_LIB_ZMQ}

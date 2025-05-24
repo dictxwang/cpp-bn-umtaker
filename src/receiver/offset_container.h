@@ -23,6 +23,7 @@ namespace receiver {
         uint64_t update_time_millis = 0;
 
         bool is_expired(uint64_t seconds);
+        void copy_self(PriceOffset &other);
     };
 
     struct PriceOffsetWrapper {
@@ -31,7 +32,7 @@ namespace receiver {
 
         void update_price_offset(UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick, uint64_t remain_senconds);
         optional<PriceOffset> get_lastest_price_offset();
-        deque<PriceOffset>& get_price_offset_list();
+        vector<PriceOffset> copy_price_offset_list();
     };
 
     class PriceOffsetComposite {
@@ -46,7 +47,8 @@ namespace receiver {
     public:
         void init(vector<string>& base_assets, uint64_t remain_senconds);
         void update_price_offset(std::string& base_asset, UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick);
-        optional<PriceOffset> get_lastest_price_offset(string &inst_id);
+        optional<PriceOffset> get_lastest_price_offset(string &base_asset);
+        vector<PriceOffset> get_price_offset_list(string &base_asset);
     private:
         void init_wrapper(string base_asset);
     };

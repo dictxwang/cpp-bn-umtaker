@@ -8,6 +8,8 @@ namespace receiver {
         }
 
         // Parse own configuration properties
+        this->inst_config_file = this->doc_["inst_config_file"].asString();
+
         for (int i = 0; i < this->doc_["ticker_zmq_ipcs"].size(); i++) {
             this->ticker_zmq_ipcs.push_back(this->doc_["ticker_zmq_ipcs"][i].asString());
         }
@@ -17,7 +19,8 @@ namespace receiver {
         this->normal_ticker_use_intranet = this->doc_["normal_ticker_use_intranet"].asBool();
         this->normal_ticker_local_ip = this->doc_["normal_ticker_local_ip"].asString();
 
-        this->ticker_validity_period_seconds = this->doc_["ticker_validity_period_seconds"].asUInt64();
+        this->calculate_sma_interval_seconds = this->doc_["calculate_sma_interval_seconds"].asUInt64();
+        this->stats_interval_seconds = this->doc_["stats_interval_seconds"].asUInt64();
 
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
