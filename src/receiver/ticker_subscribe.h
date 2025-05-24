@@ -22,7 +22,6 @@ namespace receiver {
     void subscribe_process_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index);
     void start_subscribe_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context);
 
-    void process_ticker_info_price_offset(ReceiverConfig& config, GlobalContext &context);
 }
 
 #endif

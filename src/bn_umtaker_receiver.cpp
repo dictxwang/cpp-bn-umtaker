@@ -2,12 +2,13 @@
 
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
+#include "receiver/ticker_calculate.h"
 #include "receiver/ticker_subscribe.h"
 #include "logger/logger.h"
 
 /*
     receive ticker from best ticker
-    calculae beta parameter, and store into share-memory
+    calculate early run / beta parameter, and store into share-memory
 */
 int main(int argc, char const *argv[]) {
     
@@ -28,14 +29,18 @@ int main(int argc, char const *argv[]) {
 
     receiver::GlobalContext context;
     context.init(config);
+
+    // start ticker calculate thread
+    start_ticker_calculate(config, context);
+    info_log("start ticker calculate.");
     
     // subscribe ticker message
     if (config.use_normal_ticker) {
         start_subscribe_normal_ticker(config, context);
-        info_log("start subscribe normal ticker");
+        info_log("start subscribe normal ticker.");
     } else if (config.use_best_ticker) {
         start_subscribe_zmq_best_ticker(config, context);
-        info_log("start subscribe best ticker");
+        info_log("start subscribe best ticker.");
     }
 
     std::cout << "<< this is receiver process >>" << std::endl;
