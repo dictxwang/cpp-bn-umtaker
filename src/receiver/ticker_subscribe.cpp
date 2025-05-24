@@ -164,7 +164,7 @@ namespace receiver {
             try {
                 zmq_client.SubscriberConnect(ipc);
             } catch (std::exception &exp) {
-                err_log("error occur while zmq subscribe connection");
+                err_log("error occur while zmq subscribe connection: {}", std::string(exp.what()));
             }
 
             RandomIntGen rand;
@@ -193,6 +193,13 @@ namespace receiver {
                         // std::cout << "ticker for follower: " << event.symbol << std::endl;
                         context.get_follower_ticker_composite().update_ticker(info);
                     }
+
+                    // put info queue for price offset
+                    bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
+                    if (!result) {
+                        std::cout << "can not enqueue ticker info: " << info.inst_id << std::endl;
+                    }
+
                     if (rand.randInt() < 100) {
                         info_log("process zmq best ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
                             info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
