@@ -61,7 +61,7 @@ namespace receiver {
 
             context.get_early_run_threshold_composite().update(base_asset, threshold);
 
-            if (rand.randInt() < 50) {
+            if (rand.randInt() < 20) {
                 info_log("process early-run threshold: inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={}",
                     inst_id, base_asset, threshold.avg_price_diff_median, threshold.bid_ask_price_diff_median,
                     threshold.ask_bid_price_diff_median, threshold.price_offset_length, threshold.current_time_mills);
@@ -91,7 +91,7 @@ namespace receiver {
             }
 
             if (ticker_list.size() < config.calculate_sma_interval_seconds) {
-                warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
+                // warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
                 continue;
             }
 
@@ -160,7 +160,7 @@ namespace receiver {
             threshold.beta_threshold = avg_beta_threshold;
             context.get_beta_threshold_composite().update(base_asset, threshold);
 
-            if (rand.randInt() < 50) {
+            if (rand.randInt() < 20) {
             threshold.beta_threshold = avg_beta_threshold;
             threshold.beta_threshold = avg_beta_threshold;
                 info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={}",
@@ -204,7 +204,7 @@ namespace receiver {
                 warn_log("can not enqueue early run calcalation: {}", ticker_info.inst_id);
             }
 
-            if (rand.randInt() < 50) {
+            if (rand.randInt() < 20) {
                 info_log("process ticker for price offset: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
                     ticker_info.inst_id, ticker_info.bid_price, ticker_info.bid_volume, ticker_info.ask_price, ticker_info.ask_volume, ticker_info.update_time_millis);
             }
