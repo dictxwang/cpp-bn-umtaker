@@ -61,6 +61,7 @@ namespace receiver {
 
             context.get_early_run_threshold_composite().update(base_asset, threshold);
 
+            // TODO store into share memory
             if (rand.randInt() < 20) {
                 info_log("process early-run threshold: inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={}",
                     inst_id, base_asset, threshold.avg_price_diff_median, threshold.bid_ask_price_diff_median,
@@ -158,7 +159,10 @@ namespace receiver {
             threshold.volatility - avg_volatility;
             threshold.volatility_multiplier = avg_volatility_multiplier;
             threshold.beta_threshold = avg_beta_threshold;
+
             context.get_beta_threshold_composite().update(base_asset, threshold);
+
+            // TODO store into share memory
 
             if (rand.randInt() < 20) {
             threshold.beta_threshold = avg_beta_threshold;
