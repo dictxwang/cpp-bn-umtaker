@@ -61,7 +61,7 @@ namespace receiver {
 
             context.get_early_run_threshold_composite().update(base_asset, threshold);
 
-            if (rand.randInt() < 100) {
+            if (rand.randInt() < 50) {
                 info_log("process early-run threshold: inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={}",
                     inst_id, base_asset, threshold.avg_price_diff_median, threshold.bid_ask_price_diff_median,
                     threshold.ask_bid_price_diff_median, threshold.price_offset_length, threshold.current_time_mills);
@@ -79,11 +79,20 @@ namespace receiver {
                 // Retry if the queue is empty
             }
 
+            uint64_t now = binance::get_current_epoch();
             std::string base_asset;
+            std::vector<UmTickerInfo> ticker_list;
             if (str_ends_with(inst_id, config.benchmark_quote_asset)) {
                 base_asset = inst_id.substr(0, inst_id.size() - config.benchmark_quote_asset.size());
+                ticker_list = context.get_benchmark_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds)*1000);
             } else {
                 base_asset = inst_id.substr(0, inst_id.size() - config.follower_quote_asset.size());
+                ticker_list = context.get_follower_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds)*1000);
+            }
+
+            if (ticker_list.size() < config.calculate_sma_interval_seconds) {
+                warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
+                continue;
             }
 
             auto inst_config = context.get_inst_config().inst_map.find(base_asset);
@@ -92,10 +101,10 @@ namespace receiver {
                 continue;
             }
 
-            double volatility_a = (*inst_config).second.volatility_a;
-            double volatility_b = (*inst_config).second.volatility_b;
-            double volatility_c = (*inst_config).second.volatility_c;
-            double beta = (*inst_config).second.beta;
+            // double volatility_a = (*inst_config).second.volatility_a;
+            // double volatility_b = (*inst_config).second.volatility_b;
+            // double volatility_c = (*inst_config).second.volatility_c;
+            // double beta = (*inst_config).second.beta;
 
             double max_bid = std::numeric_limits<double>::min();
             double min_bid = std::numeric_limits<double>::max();
@@ -106,8 +115,31 @@ namespace receiver {
             double max_avg = std::numeric_limits<double>::min();
             double min_avg = std::numeric_limits<double>::max();
 
-            // TODO copy all ticker
-            // context.get_follower_ticker_composite().
+            for (size_t i = 0; i < ticker_list.size(); i++) {
+                if (ticker_list[i].bid_price > max_bid) {
+                    max_bid = ticker_list[i].bid_price;
+                }
+                if (ticker_list[i].bid_price < min_bid) {
+                    min_bid = ticker_list[i].bid_price;
+                }
+                if (ticker_list[i].ask_price > max_ask) {
+                    max_ask = ticker_list[i].ask_price;
+                }
+                if (ticker_list[i].ask_price < min_ask) {
+                    min_ask = ticker_list[i].ask_price;
+                }
+                if (ticker_list[i].avg_price > max_avg) {
+                    max_avg = ticker_list[i].avg_price;
+                }
+                if (ticker_list[i].avg_price < min_avg) {
+                    min_avg = ticker_list[i].avg_price;
+                }
+            }
+
+            double bid_volatility = (max_bid - min_bid) / min_bid;
+            double bid_volatility_multiplier = calculate_volatility_multiplier(bid_volatility, (*inst_config).second);
+
+            // todo
         }
     }
 
@@ -149,6 +181,13 @@ namespace receiver {
                     ticker_info.inst_id, ticker_info.bid_price, ticker_info.bid_volume, ticker_info.ask_price, ticker_info.ask_volume, ticker_info.update_time_millis);
             }
         }
-    } 
+    }
 
+    double calculate_volatility_multiplier(double volatility, InstConfigItem &inst_config) {
+        return inst_config.volatility_a + inst_config.volatility_b * volatility + inst_config.volatility_c * volatility * volatility;
+    }
+
+    double calculate_beta_threshold(double volatility_multiplier, InstConfigItem &inst_config) {
+        return volatility_multiplier * inst_config.beta;
+    }
 }

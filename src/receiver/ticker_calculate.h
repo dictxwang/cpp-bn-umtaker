@@ -3,6 +3,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <cstdint>
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
 #include "common/tools.h"
@@ -18,6 +19,9 @@ namespace receiver {
     void process_ticker_info_price_offset(ReceiverConfig& config, GlobalContext &context);
     void process_early_run_threshold_calculate(ReceiverConfig& config, GlobalContext &context);
     void process_beta_threshold_calculate(ReceiverConfig& config, GlobalContext &context);
+
+    double calculate_volatility_multiplier(double volatility, InstConfig &inst_config);
+    double calculate_beta_threshold(double volatility_multiplier, InstConfig &inst_config);
 }
 
 #endif

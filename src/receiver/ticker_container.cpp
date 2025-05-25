@@ -93,6 +93,18 @@ namespace receiver {
     }
 
     vector<UmTickerInfo> TickerComposite::copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after) {
-        // TODO
+        std::vector<UmTickerInfo> result;
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        auto wrapper = this->wrapper_map.find(inst_id);
+        if (wrapper != this->wrapper_map.end()) {
+            for (size_t i = 0; i < (*(wrapper->second)).get_ticker_list().size(); i++) {
+                if ((*(wrapper->second)).get_ticker_list()[i].update_time_millis > remain_ts_after) {
+                    UmTickerInfo info;
+                    (*(wrapper->second)).get_ticker_list()[i].copy_self(info);
+                    result.push_back(info);
+                }
+            }
+        }
+        return result;
     }
 }
