@@ -43,7 +43,7 @@ public:
     ~EarlyRunThresholdComposite() {}
 
 private:
-    unordered_map<string, EarlyRunThreshold&> threshold_map;
+    unordered_map<string, EarlyRunThreshold> threshold_map;
     shared_mutex rw_lock;
 public:
     void init(vector<string> &base_assets);
@@ -57,7 +57,7 @@ class BetaThresholdComposite {
         ~BetaThresholdComposite() {}
     
     private:
-        unordered_map<string, BetaThreshold&> threshold_map;
+        unordered_map<string, BetaThreshold> threshold_map;
         shared_mutex rw_lock;
     public:
         void init(vector<string> &base_assets);

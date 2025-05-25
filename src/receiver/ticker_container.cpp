@@ -10,10 +10,10 @@ namespace receiver {
         // Also could directly lock
         // this->rw_lock.lock();
         ticker_list.push_back(ticker);
-
+        
         uint64_t now = binance::get_current_ms_epoch();
         while (!ticker_list.empty()) {
-            if (now - ticker_list.front().update_time_millis > remain_senconds * 1000) {
+            if (now > ticker_list.front().update_time_millis + remain_senconds * 1000) {
                 // remove expired ticker
                 ticker_list.pop_front();
             } else {
@@ -21,6 +21,7 @@ namespace receiver {
                 break;
             }
         }
+
         // unlock directly
         // this->rw_lock.unlock();
         lock.unlock();

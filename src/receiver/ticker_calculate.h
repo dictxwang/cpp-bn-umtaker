@@ -20,8 +20,8 @@ namespace receiver {
     void process_early_run_threshold_calculate(ReceiverConfig& config, GlobalContext &context);
     void process_beta_threshold_calculate(ReceiverConfig& config, GlobalContext &context);
 
-    double calculate_volatility_multiplier(double volatility, InstConfig &inst_config);
-    double calculate_beta_threshold(double volatility_multiplier, InstConfig &inst_config);
+    double calculate_volatility_multiplier(double volatility, InstConfigItem &inst_config);
+    double calculate_beta_threshold(double volatility_multiplier, InstConfigItem &inst_config);
 }
 
 #endif

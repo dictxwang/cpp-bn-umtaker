@@ -83,9 +83,9 @@ namespace receiver {
                     warn_log("can not enqueue beta calculation: {}", info.inst_id);
                 }
 
-                if (rand.randInt() < 100) {
-                    info_log("process normal ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
-                        info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
+                if (rand.randInt() < 20) {
+                    info_log("process normal ticker: role={} symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
+                        strHelper::toString(role), info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
                 }
             } catch (std::exception &exp) {
                 err_log("fail to process normal ticker message: {}", std::string( exp.what()));
@@ -168,7 +168,7 @@ namespace receiver {
                         std::cout << "can not enqueue ticker info: " << info.inst_id << std::endl;
                     }
 
-                    if (rand.randInt() < 100) {
+                    if (rand.randInt() < 20) {
                         info_log("process zmq best ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
                             info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
                     }

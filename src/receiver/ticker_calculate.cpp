@@ -138,8 +138,36 @@ namespace receiver {
 
             double bid_volatility = (max_bid - min_bid) / min_bid;
             double bid_volatility_multiplier = calculate_volatility_multiplier(bid_volatility, (*inst_config).second);
+            double ask_volatility = (max_ask - min_ask) / min_ask;
+            double ask_volatility_multiplier = calculate_volatility_multiplier(ask_volatility, (*inst_config).second);
+            double avg_volatility = (max_avg - min_avg) / min_avg;
+            double avg_volatility_multiplier = calculate_volatility_multiplier(avg_volatility, (*inst_config).second);
 
-            // todo
+            double bid_beta_threshold = calculate_beta_threshold(bid_volatility, (*inst_config).second);
+            double ask_beta_threshold = calculate_beta_threshold(ask_volatility, (*inst_config).second);
+            double avg_beta_threshold = calculate_beta_threshold(avg_volatility, (*inst_config).second);
+
+            BetaThreshold threshold;
+            // TODO not found how to set parameter of sam
+            threshold.bid_volatility = bid_volatility;
+            threshold.bid_volatility_multiplier = bid_volatility_multiplier;
+            threshold.bid_beta_threshold = bid_beta_threshold;
+            threshold.ask_volatility = ask_volatility;
+            threshold.ask_volatility_multiplier = ask_volatility_multiplier;
+            threshold.ask_beta_threshold = ask_beta_threshold;
+            threshold.volatility - avg_volatility;
+            threshold.volatility_multiplier = avg_volatility_multiplier;
+            threshold.beta_threshold = avg_beta_threshold;
+            context.get_beta_threshold_composite().update(base_asset, threshold);
+
+            if (rand.randInt() < 50) {
+            threshold.beta_threshold = avg_beta_threshold;
+            threshold.beta_threshold = avg_beta_threshold;
+                info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={}",
+                    inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier, threshold.bid_beta_threshold,
+                    threshold.ask_volatility, threshold.ask_volatility_multiplier, threshold.ask_beta_threshold,
+                    threshold.volatility, threshold.volatility_multiplier, threshold.beta_threshold);
+            }
         }
     }
 
@@ -176,7 +204,7 @@ namespace receiver {
                 warn_log("can not enqueue early run calcalation: {}", ticker_info.inst_id);
             }
 
-            if (rand.randInt() < 100) {
+            if (rand.randInt() < 50) {
                 info_log("process ticker for price offset: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
                     ticker_info.inst_id, ticker_info.bid_price, ticker_info.bid_volume, ticker_info.ask_price, ticker_info.ask_volume, ticker_info.update_time_millis);
             }
