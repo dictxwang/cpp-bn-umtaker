@@ -30,6 +30,11 @@ namespace receiver {
 
         bool enable_beta_strategy;
         bool enable_early_run_strategy;
+
+        int share_memory_project_id;
+        string share_memory_path_ticker;
+        string share_memory_path_early_run;
+        string share_memory_path_beta;
     };
 }
 #endif  

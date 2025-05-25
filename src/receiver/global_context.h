@@ -8,6 +8,7 @@
 #include "config/inst_config.h"
 #include "binancecpp/moodycamel/concurrentqueue.h"
 #include <set>
+#include "shm/threshold_shm.h"
 
 namespace receiver {
 
@@ -36,9 +37,11 @@ namespace receiver {
         EarlyRunThresholdComposite early_run_threshold_composite;
         BetaThresholdComposite beta_threshold_composite;
 
+        ShmStoreInfo shm_store_info;
     
     public:
         void init(ReceiverConfig& config);
+        void init_shm(ReceiverConfig& config);
         InstConfig &get_inst_config();
         TickerComposite& get_benchmark_ticker_composite();
         TickerComposite& get_follower_ticker_composite();

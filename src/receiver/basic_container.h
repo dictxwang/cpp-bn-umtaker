@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <string>
+#include "shm/threshold_shm.h"
 
 using namespace std;
 
@@ -19,6 +20,13 @@ namespace receiver {
         bool is_from_trade = false;
 
         void copy_self(UmTickerInfo& other);
+    };
+
+    struct ShmStoreInfo {
+        int early_run_shm_id;
+        shm_mng::EarlyRunThresholdShm* early_run_start;
+        int beta_shm_id;
+        shm_mng::BetaThresholdShm* beta_start;
     };
 }
 

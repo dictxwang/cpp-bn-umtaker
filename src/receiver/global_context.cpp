@@ -20,7 +20,18 @@ namespace receiver {
         }
 
         this->inst_config.loadInstConfig(config.inst_config_file);
+
+        this->init_shm(config);
     };
+
+    void GlobalContext::init_shm(ReceiverConfig& config) {
+        ShmStoreInfo info;
+
+        int shm_id_early_run = shm_mng::writer_common_create_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id, SMALL_SEG_PER_SIZE, config.base_asset_list.size());
+        // TODO sort assets, and init
+        // shm_mng::early_run_shm_writer_init();
+
+    }
 
     InstConfig& GlobalContext::get_inst_config() {
         return this->inst_config;
