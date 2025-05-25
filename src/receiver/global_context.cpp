@@ -86,4 +86,8 @@ namespace receiver {
     moodycamel::ConcurrentQueue<std::string> *GlobalContext::get_beta_calculation_channel() {
         return &(this->beta_calculation_channel);
     }
+
+    ShmStoreInfo& GlobalContext::get_shm_store_info() {
+        return this->shm_store_info;
+    }
 }

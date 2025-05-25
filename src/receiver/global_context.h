@@ -56,6 +56,7 @@ namespace receiver {
         vector<string>& get_benchmark_inst_ids();
         vector<string>& get_follower_inst_ids();
         set<string>& get_inst_ids_set();
+        ShmStoreInfo& get_shm_store_info();
     };
 }
 
