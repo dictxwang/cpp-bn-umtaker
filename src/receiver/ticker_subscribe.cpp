@@ -83,7 +83,7 @@ namespace receiver {
 
                         if (rand_value < 20) {
                             std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, (*address).second);
-                            std::cout << "get benchmark shm ticker: " << (*ticker).inst_id << ", " << (*ticker).bid_price << ", " << (*ticker).update_time << std::endl;
+                            std::cout << "get benchmark shm ticker: " << (*ticker).inst_id << ", " << (*ticker).bid_price << ", " << (*ticker).version_number << ", " << (*ticker).update_time << std::endl;
                         }
                     }
                 } else {
@@ -95,7 +95,7 @@ namespace receiver {
 
                         if (rand_value < 20) {
                             std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, (*address).second);
-                            std::cout << "get benchmark shm ticker: " << (*ticker).inst_id << ", " << (*ticker).bid_price << ", " << (*ticker).update_time << std::endl;
+                            std::cout << "get benchmark shm ticker: " << (*ticker).inst_id << ", " << (*ticker).bid_price << ", " << (*ticker).version_number << ", " << (*ticker).update_time << std::endl;
                         }
                     }
                 }
