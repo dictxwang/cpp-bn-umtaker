@@ -29,13 +29,13 @@ namespace shm_mng {
 
         long hist_time_mills = (*(start + offset)).time_mills;
     
-        if (hist_time_mills < threshold.time_mills) {
+        if (hist_time_mills <= threshold.time_mills) {
             int update_result = 0;
     
             common_acquire_lock(&((start + offset)->lock));
     
             hist_time_mills = (*(start + offset)).time_mills;
-            if (hist_time_mills < threshold.time_mills) {
+            if (hist_time_mills <= threshold.time_mills) {
 
                 (start + offset)->avg_median = threshold.avg_median;
                 (start + offset)->bid_ask_median = threshold.bid_ask_median;
@@ -108,13 +108,13 @@ namespace shm_mng {
 
         long hist_time_mills = (*(start + offset)).time_mills;
     
-        if (hist_time_mills < threshold.time_mills) {
+        if (hist_time_mills <= threshold.time_mills) {
             int update_result = 0;
     
             common_acquire_lock(&((start + offset)->lock));
     
             hist_time_mills = (*(start + offset)).time_mills;
-            if (hist_time_mills < threshold.time_mills) {
+            if (hist_time_mills <= threshold.time_mills) {
 
                 (start + offset)->sma = threshold.sma;
                 (start + offset)->volatility = threshold.volatility;

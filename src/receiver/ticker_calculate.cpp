@@ -91,15 +91,15 @@ namespace receiver {
                 // Retry if the queue is empty
             }
 
-            uint64_t now = binance::get_current_epoch();
+            uint64_t now = binance::get_current_ms_epoch();
             std::string base_asset;
             std::vector<UmTickerInfo> ticker_list;
             if (str_ends_with(inst_id, config.benchmark_quote_asset)) {
                 base_asset = inst_id.substr(0, inst_id.size() - config.benchmark_quote_asset.size());
-                ticker_list = context.get_benchmark_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds)*1000);
+                ticker_list = context.get_benchmark_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
             } else {
                 base_asset = inst_id.substr(0, inst_id.size() - config.follower_quote_asset.size());
-                ticker_list = context.get_follower_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds)*1000);
+                ticker_list = context.get_follower_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
             }
 
             if (ticker_list.size() < config.calculate_sma_interval_seconds) {
@@ -170,6 +170,7 @@ namespace receiver {
             threshold.volatility - avg_volatility;
             threshold.volatility_multiplier = avg_volatility_multiplier;
             threshold.beta_threshold = avg_beta_threshold;
+            threshold.current_time_mills = now;
 
             context.get_beta_threshold_composite().update(base_asset, threshold);
 
@@ -193,6 +194,7 @@ namespace receiver {
                 threshold_shm.ask_volatility = threshold.ask_volatility;
                 threshold_shm.ask_volatility_multiplier = threshold.ask_volatility_multiplier;
                 threshold_shm.ask_beta_threshold = threshold.ask_beta_threshold;
+                threshold_shm.time_mills = threshold.current_time_mills;
                 update_shm = shm_mng::beta_shm_writer_update(context.get_shm_store_info().beta_start, (*address).second, threshold_shm);
             }
 
