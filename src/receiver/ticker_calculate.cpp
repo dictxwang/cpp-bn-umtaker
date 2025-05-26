@@ -167,7 +167,7 @@ namespace receiver {
             threshold.ask_volatility = ask_volatility;
             threshold.ask_volatility_multiplier = ask_volatility_multiplier;
             threshold.ask_beta_threshold = ask_beta_threshold;
-            threshold.volatility - avg_volatility;
+            threshold.volatility = avg_volatility;
             threshold.volatility_multiplier = avg_volatility_multiplier;
             threshold.beta_threshold = avg_beta_threshold;
             threshold.current_time_mills = now;
@@ -199,8 +199,8 @@ namespace receiver {
             }
 
             if (rand.randInt() < 20) {
-                shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, (*address).second);
-                std::cout << "shm asset: " << (*shared_shm).asset << "," << (*shared_shm).bid_beta_threshold << "," << (*shared_shm).time_mills << std::endl;
+                // shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, (*address).second);
+                // std::cout << "shm asset: " << (*shared_shm).asset << "," << (*shared_shm).bid_beta_threshold << "," << (*shared_shm).time_mills << std::endl;
                 info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
                     inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier, threshold.bid_beta_threshold,
                     threshold.ask_volatility, threshold.ask_volatility_multiplier, threshold.ask_beta_threshold,
