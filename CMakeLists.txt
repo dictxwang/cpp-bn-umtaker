@@ -5,7 +5,7 @@ project(binance_umtaker VERSION 0.1.0 LANGUAGES CXX)
 set(PROCESS_MAIN "test_main")
 set(PROCESS_TICKER_RECEIVER "bn_untaker_receiver")
 set(PROCESS_OPPORTUNITY_ACTUARY "bn_untaker_actuary")
-set(PROCESS_ORDER_SUBMITTER "bn_untaker_submitter")
+set(PROCESS_ORDER_TRADER "bn_untaker_trader")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
@@ -111,8 +111,8 @@ target_link_libraries(${PROCESS_OPPORTUNITY_ACTUARY}
     OpenSSL::SSL OpenSSL::Crypto
 )
 
-add_executable(${PROCESS_ORDER_SUBMITTER} "src/bn_umtaker_submitter.cpp")
-target_link_libraries(${PROCESS_ORDER_SUBMITTER}
+add_executable(${PROCESS_ORDER_TRADER} "src/bn_umtaker_trader.cpp")
+target_link_libraries(${PROCESS_ORDER_TRADER}
     ${_LIB_BINANCECPP}
     ${_LIB_SPDLOG}
     ${_LIB_ZMQ}

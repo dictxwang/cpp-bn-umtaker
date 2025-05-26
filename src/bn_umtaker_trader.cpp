@@ -2,6 +2,6 @@
 
 int main(int argc, char const *argv[])
 {
-    std::cout << "this is submitter." << std::endl;
+    std::cout << "this is trader." << std::endl;
     return 0;
 }
