@@ -24,7 +24,7 @@ void EarlyRunThresholdComposite::update(string &base_asset, EarlyRunThreshold &t
     w_lock.unlock();
 }
 
-std::optional<EarlyRunThreshold> EarlyRunThresholdComposite::get_threshold(string &base_asset) {
+optional<EarlyRunThreshold> EarlyRunThresholdComposite::get_threshold(string &base_asset) {
     std::shared_lock<std::shared_mutex> r_lock(rw_lock);
     auto shared = this->threshold_map.find(base_asset);
     if (shared != this->threshold_map.end()) {
@@ -57,7 +57,7 @@ void BetaThresholdComposite::update(string &base_asset, BetaThreshold &threshold
     w_lock.unlock();
 }
 
-std::optional<BetaThreshold> BetaThresholdComposite::get_threshold(string &base_asset) {
+optional<BetaThreshold> BetaThresholdComposite::get_threshold(string &base_asset) {
     std::shared_lock<std::shared_mutex> r_lock(rw_lock);
     auto shared = this->threshold_map.find(base_asset);
     if (shared != this->threshold_map.end()) {
