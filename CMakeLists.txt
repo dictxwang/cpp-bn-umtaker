@@ -70,6 +70,23 @@ target_link_libraries(receiver
     shm
 )
 
+# actuary
+FILE(GLOB_RECURSE LIB_ACTUARY_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/actuary/*")
+add_library(actuary ${LIB_ACTUARY_SRC})
+target_link_libraries(actuary
+
+    ${_LIB_BINANCECPP}
+    ${_LIB_SPDLOG}
+    # ${_LIB_ZMQ}
+    # ${_PROTOBUF_LIBPROTOBUF}
+    CURL::libcurl
+    OpenSSL::SSL OpenSSL::Crypto
+    common
+    config
+    shm
+)
+
 
 add_executable(${PROCESS_MAIN} "src/main.cpp")
 target_link_libraries(${PROCESS_MAIN}
@@ -104,11 +121,7 @@ target_link_libraries(${PROCESS_TICKER_RECEIVER}
 
 add_executable(${PROCESS_OPPORTUNITY_ACTUARY} "src/bn_umtaker_actuary.cpp")
 target_link_libraries(${PROCESS_OPPORTUNITY_ACTUARY}
-    ${_LIB_BINANCECPP}
-    ${_LIB_SPDLOG}
-    ${_LIB_ZMQ}
-    CURL::libcurl
-    OpenSSL::SSL OpenSSL::Crypto
+    actuary
 )
 
 add_executable(${PROCESS_ORDER_TRADER} "src/bn_umtaker_trader.cpp")
