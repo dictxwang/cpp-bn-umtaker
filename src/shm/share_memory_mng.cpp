@@ -1,4 +1,6 @@
 #include "share_memory_mng.h"
+#include <iostream>
+#include <errno.h>
 
 namespace shm_mng {
 
@@ -13,8 +15,7 @@ namespace shm_mng {
         }
 
         shm_id = shmget(key, 0, 0);
-        if (shm_id == -1)
-        {
+        if (shm_id == -1) {
             return;
         }
 
@@ -31,12 +32,14 @@ namespace shm_mng {
 
         key = ftok(path, project_id);
         if (key == -1) {
+            std::cerr << "ftok failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -1;
         }
 
         //创建共享内存
         shm_id = shmget(key, seg_size*count, IPC_CREAT | IPC_EXCL | 0664);
         if (shm_id == -1) {
+            std::cerr << "shmget failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -2;
         }
 
@@ -53,12 +56,14 @@ namespace shm_mng {
 
         key = ftok(path, project_id);
         if (key == -1) {
+            std::cerr << "ftok failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -1;
         }
 
         //创建共享内存
         shm_id = shmget(key, 0, 0);
         if (shm_id == -1) {
+            std::cerr << "shmget failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -2;
         }
 

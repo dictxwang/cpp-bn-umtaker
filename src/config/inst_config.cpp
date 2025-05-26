@@ -18,4 +18,5 @@ bool InstConfig::loadInstConfig(std::string& inputfile) {
             this->inst_map[item.asset] = item;
         }
     }
+    return true;
 }

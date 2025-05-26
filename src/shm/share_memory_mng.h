@@ -4,9 +4,11 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <string>
+#include <cstring>
 #include <atomic>
 #include <time.h>
 #include <unistd.h>
+#include <stdio.h>
 
 namespace shm_mng {
 

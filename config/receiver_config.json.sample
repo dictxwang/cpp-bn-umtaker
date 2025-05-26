@@ -24,10 +24,10 @@
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 
-    "share_memory_project_id": 12707,
+    "share_memory_project_id": 65,
     "share_memory_path_ticker": "/shm_umtaker_ticker",
-    "share_memory_path_early_run": "/shm_umtaker_early_run",
-    "share_memory_path_beta": "/shm_umtaker_beta",
+    "share_memory_path_early_run": "/home/ubuntu/code/shm_space/shm_umtaker_early_run",
+    "share_memory_path_beta": "/home/ubuntu/code/shm_space/shm_umtaker_beta",
 
     "base_asset_list": [
         "IP",

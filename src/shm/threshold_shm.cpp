@@ -3,18 +3,22 @@
 namespace shm_mng {
 
     EarlyRunThresholdShm* early_run_shm_find_start_address(int shm_id) {
+        
         EarlyRunThresholdShm *start;
-
         start = (EarlyRunThresholdShm*)shmat(shm_id, NULL, 0);
         return start;
     }
 
     void early_run_shm_writer_init(EarlyRunThresholdShm* start, int offset, const char* asset) {
 
-        strncpy((start + offset)->asset, asset, sizeof((start + offset)->asset) - 1);
-        (start + offset)->asset[sizeof((start + offset)->asset) - 1] = '\0';
-        (start + offset)->avg_median = 0.0;
-        (start + offset)->bid_ask_median = 0.0;
+        // EarlyRunThresholdShm* item_list = static_cast<EarlyRunThresholdShm*>(start);
+        // item_list[0].avg_median = 0.0;
+
+        // strncpy((start + offset)->asset, asset, sizeof((start + offset)->asset) - 1);
+        // (start + offset)->asset[sizeof((start + offset)->asset) - 1] = '\0';
+        memcpy((start + offset)->asset, asset, strlen(asset) + 1);
+        (start + 0)->avg_median = 0.0;
+        (start + 0)->bid_ask_median = 0.0;
         (start + offset)->ask_bid_median = 0.0;
         (start + offset)->time_mills = 0;
 
@@ -73,12 +77,14 @@ namespace shm_mng {
 
         BetaThresholdShm *start;
         start = (BetaThresholdShm*)shmat(shm_id, NULL, 0);
+        return start;
     }
 
     void beta_shm_writer_init(BetaThresholdShm* start, int offset, const char* asset) {
 
-        strncpy((start + offset)->asset, asset, sizeof((start + offset)->asset) - 1);
-        (start + offset)->asset[sizeof((start + offset)->asset) - 1] = '\0';
+        // strncpy((start + offset)->asset, asset, sizeof((start + offset)->asset) - 1);
+        // (start + offset)->asset[sizeof((start + offset)->asset) - 1] = '\0';
+        memcpy((start + offset)->asset, asset, strlen(asset) + 1);
         (start + offset)->sma = 0.0;
         (start + offset)->volatility = 0.0;
         (start + offset)->volatility_multiplier = 0.0;
