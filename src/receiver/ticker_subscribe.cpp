@@ -83,7 +83,7 @@ namespace receiver {
 
                         if (rand_value < 20) {
                             std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, (*address).second);
-                            info_log("get benchmark shm ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
+                            info_log("get benchmark shm normal ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
                         }
                     }
                 } else {
@@ -95,7 +95,7 @@ namespace receiver {
 
                         if (rand_value < 20) {
                             std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, (*address).second);
-                            info_log("get follower shm ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
+                            info_log("get follower shm normal ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
                         }
                     }
                 }
@@ -182,12 +182,43 @@ namespace receiver {
                     info.update_time_millis = event.eventts();
                     info.is_from_trade = false;
 
+                    shm_mng::TickerInfoShm info_shm;
+                    info_shm.bid_price = info.bid_price;
+                    info_shm.bid_size = info.bid_volume;
+                    info_shm.ask_price = info.ask_price;
+                    info_shm.ask_size = info.ask_volume;
+                    info_shm.update_id = event.updateid();
+                    info_shm.update_time = info.update_time_millis;
+
+                    int rand_value = rand.randInt();
+                    int update_shm = 0;
+
                     if (str_ends_with(info.inst_id, config.benchmark_quote_asset)) {
                         // std::cout << "ticker for benchmark: " << event.symbol << std::endl;
                         context.get_benchmark_ticker_composite().update_ticker(info);
+
+                        auto address = context.get_shm_benchmark_ticker_mapping().find(info.inst_id);
+                        if (address != context.get_shm_benchmark_ticker_mapping().end()) {
+                            update_shm = shm_mng::ticker_shm_writer_update(context.get_shm_store_info().benchmark_start, (*address).second, info_shm);
+
+                            if (rand_value < 20) {
+                                std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, (*address).second);
+                                info_log("get benchmark shm zmq ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
+                            }
+                        }
                     } else {
                         // std::cout << "ticker for follower: " << event.symbol << std::endl;
                         context.get_follower_ticker_composite().update_ticker(info);
+                       
+                        auto address = context.get_shm_follower_ticker_mapping().find(info.inst_id);
+                        if (address != context.get_shm_follower_ticker_mapping().end()) {
+                            update_shm = shm_mng::ticker_shm_writer_update(context.get_shm_store_info().follower_start, (*address).second, info_shm);
+    
+                            if (rand_value < 20) {
+                                std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, (*address).second);
+                                info_log("get follower shm zmq ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
+                            }
+                        }
                     }
 
                     // put info queue for price offset
@@ -196,9 +227,9 @@ namespace receiver {
                         std::cout << "can not enqueue ticker info: " << info.inst_id << std::endl;
                     }
 
-                    if (rand.randInt() < 20) {
-                        info_log("process zmq best ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
-                            info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis);
+                    if (rand_value < 20) {
+                        info_log("process zmq best ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={} update_shm={}",
+                            info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis, update_shm);
                     }
                 } catch (std::exception &exp) {
                     err_log("error occur while parse zmq message");
