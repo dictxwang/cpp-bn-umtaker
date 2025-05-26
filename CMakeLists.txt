@@ -47,6 +47,11 @@ FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/config/*")
 add_library(config ${LIB_CONFIG_SRC})
 
+# shm
+FILE(GLOB_RECURSE LIB_SHM_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/shm/*")
+add_library(shm ${LIB_SHM_SRC})
+
 # receiver
 FILE(GLOB_RECURSE LIB_RECEIVER_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/receiver/*")
@@ -62,6 +67,7 @@ target_link_libraries(receiver
     OpenSSL::SSL OpenSSL::Crypto
     common
     config
+    shm
 )
 
 

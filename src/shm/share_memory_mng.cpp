@@ -65,14 +65,14 @@ namespace shm_mng {
         return shm_id;
     }
 
-    void common_acquire_lock(atomic_int *lock) {
-        while (atomic_exchange_explicit(lock, 1, memory_order_acquire) != 0) {
+    void common_acquire_lock(std::atomic_int *lock) {
+        while (atomic_exchange_explicit(lock, 1, std::memory_order_acquire) != 0) {
             common_precise_sleep(); // Just to avoid burning too much CPU in a busy loop
         }
     }
 
-    void common_release_lock(atomic_int *lock) {
-        atomic_store_explicit(lock, 0, memory_order_release);  // Release the lock
+    void common_release_lock(std::atomic_int *lock) {
+        atomic_store_explicit(lock, 0, std::memory_order_release);  // Release the lock
     }
 
     void common_precise_sleep() {

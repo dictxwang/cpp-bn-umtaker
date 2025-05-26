@@ -7,21 +7,21 @@ namespace shm_mng {
 
     struct TickerInfoShm {
         char inst_id[24];
-        double bid_price;
-        double bid_size;
-        double ask_price;
-        double ask_size;
-        long update_id;
-        long update_time;
-        long version_number;
-        atomic_int lock;
+        double bid_price = 0;
+        double bid_size = 0;
+        double ask_price = 0;
+        double ask_size = 0;
+        long update_id = 0;
+        long update_time = 0;
+        long version_number = 0;
+        std::atomic_int lock = std::atomic_int(0);
     };
 
     TickerInfoShm* ticker_shm_find_start_address(int shm_id);
     void ticker_shm_writer_init(TickerInfoShm* start, int offset, const char* asset);
     int ticker_shm_writer_update(TickerInfoShm* start, int offset, TickerInfoShm& threshold);
 
-    TickerInfoShm ticker_shm_reader_get(TickerInfoShm* start, int offset);
+    TickerInfoShm& ticker_shm_reader_get(TickerInfoShm* start, int offset);
     void ticker_shm_reader_detach(TickerInfoShm* start);
 }
 

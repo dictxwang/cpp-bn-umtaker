@@ -65,7 +65,7 @@ namespace shm_mng {
         }
     }
 
-    TickerInfoShm ticker_shm_reader_get(TickerInfoShm* start, int offset) {
+    TickerInfoShm& ticker_shm_reader_get(TickerInfoShm* start, int offset) {
         TickerInfoShm instance;
         common_acquire_lock(&((start + offset)->lock));
 

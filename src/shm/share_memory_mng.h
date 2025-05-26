@@ -3,8 +3,8 @@
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <string.h>
-#include <stdatomic.h>
+#include <string>
+#include <atomic>
 #include <time.h>
 #include <unistd.h>
 
@@ -17,8 +17,8 @@ namespace shm_mng {
     int writer_common_create_shm(const char* path, int project_id, int seg_size, int count);
     int reader_common_attach_shm(const char* path, int project_id);
 
-    void common_acquire_lock(atomic_int *lock);
-    void common_release_lock(atomic_int *lock);
+    void common_acquire_lock(std::atomic_int *lock);
+    void common_release_lock(std::atomic_int *lock);
     void common_precise_sleep();
 }
 #endif

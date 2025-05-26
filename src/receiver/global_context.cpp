@@ -30,11 +30,11 @@ namespace receiver {
 
         int early_run_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id, SMALL_SEG_PER_SIZE, config.base_asset_list.size());
         shm_mng::EarlyRunThresholdShm* early_run_start = shm_mng::early_run_shm_find_start_address(early_run_shm_id);
-        info_log("create early run shm {} start {}", early_run_shm_id, early_run_start);
+        info_log("create early run shm {} start {}", early_run_shm_id, int64_t(early_run_start));
 
         int beta_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_beta.c_str(), config.share_memory_project_id, BIG_SEG_PER_SIZE, config.base_asset_list.size());
         shm_mng::BetaThresholdShm *beta_start = shm_mng::beta_shm_find_start_address(beta_shm_id);
-        info_log("create beta shm {} start {}", beta_shm_id, beta_start);
+        info_log("create beta shm {} start {}", beta_shm_id, int64_t(beta_start));
 
         info.early_run_shm_id = early_run_shm_id;
         info.early_run_start = early_run_start;

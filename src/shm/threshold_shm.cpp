@@ -48,7 +48,7 @@ namespace shm_mng {
         }
     }
 
-    EarlyRunThresholdShm early_run_shm_reader_get(EarlyRunThresholdShm* start, int offset) {
+    EarlyRunThresholdShm& early_run_shm_reader_get(EarlyRunThresholdShm* start, int offset) {
         EarlyRunThresholdShm instance;
         common_acquire_lock(&((start + offset)->lock));
 
@@ -137,7 +137,7 @@ namespace shm_mng {
         }
     }
 
-    BetaThresholdShm beta_shm_reader_get(BetaThresholdShm* start, int offset) {
+    BetaThresholdShm& beta_shm_reader_get(BetaThresholdShm* start, int offset) {
         BetaThresholdShm instance;
         common_acquire_lock(&((start + offset)->lock));
 
