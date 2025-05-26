@@ -9,7 +9,7 @@ namespace shm_mng {
         return start;
     }
 
-    void ticker_shm_writer_init(TickerInfoShm* start, int offset, char* inst_id) {
+    void ticker_shm_writer_init(TickerInfoShm* start, int offset, const char* inst_id) {
 
         strncpy((start + offset)->inst_id, inst_id, sizeof((start + offset)->inst_id) - 1);
         (start + offset)->inst_id[sizeof((start + offset)->inst_id) - 1] = '\0';
@@ -65,8 +65,24 @@ namespace shm_mng {
         }
     }
 
-    TickerInfoShm* ticker_shm_reader_get(TickerInfoShm* start, int offset) {
-        return start + offset;
+    TickerInfoShm ticker_shm_reader_get(TickerInfoShm* start, int offset) {
+        TickerInfoShm instance;
+        common_acquire_lock(&((start + offset)->lock));
+
+        // return a new instance
+        strncpy(instance.inst_id, (start + offset)->inst_id, sizeof(instance.inst_id) - 1);
+        instance.inst_id[sizeof(instance.inst_id) - 1] = '\0';
+        instance.bid_price = (start + offset)->bid_price;
+        instance.bid_size = (start + offset)->bid_size;
+        instance.ask_price = (start + offset)->ask_price;
+        instance.ask_size = (start + offset)->ask_size;
+        instance.update_id = (start + offset)->update_id;
+        instance.update_time = (start + offset)->update_time;
+        instance.version_number = (start + offset)->version_number;
+    
+        common_release_lock(&((start + offset)->lock));
+
+        return instance;
     }
 
     void ticker_shm_reader_detach(TickerInfoShm* start) {

@@ -9,6 +9,7 @@
 #include "common/tools.h"
 #include "common/random.h"
 #include "logger/logger.h"
+#include "shm/threshold_shm.h"
 #include "binancecpp/util/string_helper.h"
 #include "binancecpp/util/binance_tool.h"
 

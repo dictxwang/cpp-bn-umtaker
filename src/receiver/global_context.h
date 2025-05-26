@@ -9,6 +9,7 @@
 #include "binancecpp/moodycamel/concurrentqueue.h"
 #include <set>
 #include "shm/threshold_shm.h"
+#include "logger/logger.h"
 
 namespace receiver {
 
@@ -22,6 +23,7 @@ namespace receiver {
         vector<string> benchmark_inst_ids;
         vector<string> follower_inst_ids;
         set<string> inst_ids_set;
+        unordered_map<string, int> shm_threshold_mapping;
 
         TickerComposite benchmark_ticker_composite;
         TickerComposite follower_ticker_composite;
@@ -42,6 +44,7 @@ namespace receiver {
     public:
         void init(ReceiverConfig& config);
         void init_shm(ReceiverConfig& config);
+        void init_shm_mapping(ReceiverConfig& config);
         InstConfig &get_inst_config();
         TickerComposite& get_benchmark_ticker_composite();
         TickerComposite& get_follower_ticker_composite();
@@ -57,6 +60,7 @@ namespace receiver {
         vector<string>& get_follower_inst_ids();
         set<string>& get_inst_ids_set();
         ShmStoreInfo& get_shm_store_info();
+        unordered_map<string, int>& get_shm_threshold_mapping();
     };
 }
 

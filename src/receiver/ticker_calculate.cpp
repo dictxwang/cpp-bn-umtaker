@@ -61,11 +61,22 @@ namespace receiver {
 
             context.get_early_run_threshold_composite().update(base_asset, threshold);
 
-            // TODO store into share memory
+            // sotre into share memory
+            auto address = context.get_shm_threshold_mapping().find(base_asset);
+            int update_shm = 0;
+            if (address != context.get_shm_threshold_mapping().end()) {
+                shm_mng::EarlyRunThresholdShm threshold_shm;
+                threshold_shm.avg_median = threshold.avg_price_diff_median;
+                threshold_shm.bid_ask_median = threshold.bid_ask_price_diff_median;
+                threshold_shm.ask_bid_median = threshold.ask_bid_price_diff_median;
+                threshold_shm.time_mills = threshold.current_time_mills;
+                update_shm = shm_mng::early_run_shm_writer_update(context.get_shm_store_info().early_run_start, (*address).second, threshold_shm);
+            }
+
             if (rand.randInt() < 20) {
-                info_log("process early-run threshold: inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={}",
+                info_log("process early-run threshold: inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={} update_shm={}",
                     inst_id, base_asset, threshold.avg_price_diff_median, threshold.bid_ask_price_diff_median,
-                    threshold.ask_bid_price_diff_median, threshold.price_offset_length, threshold.current_time_mills);
+                    threshold.ask_bid_price_diff_median, threshold.price_offset_length, threshold.current_time_mills, update_shm);
             }
         }
     }
@@ -162,15 +173,34 @@ namespace receiver {
 
             context.get_beta_threshold_composite().update(base_asset, threshold);
 
-            // TODO store into share memory
+            // store into share memory
+
+            auto address = context.get_shm_threshold_mapping().find(base_asset);
+            int update_shm = 0;
+            if (address != context.get_shm_threshold_mapping().end()) {
+                shm_mng::BetaThresholdShm threshold_shm;
+                threshold_shm.sma = threshold.sma;
+                threshold_shm.volatility = threshold.volatility;
+                threshold_shm.volatility_multiplier = threshold.volatility_multiplier;
+                threshold_shm.beta_threshold = threshold.beta_threshold;
+
+                threshold_shm.bid_sma = threshold.bid_sma;
+                threshold_shm.bid_volatility = threshold.bid_volatility;
+                threshold_shm.bid_volatility_multiplier = threshold.bid_volatility_multiplier;
+                threshold_shm.bid_beta_threshold = threshold.bid_beta_threshold;
+
+                threshold_shm.ask_sma = threshold.ask_sma;
+                threshold_shm.ask_volatility = threshold.ask_volatility;
+                threshold_shm.ask_volatility_multiplier = threshold.ask_volatility_multiplier;
+                threshold_shm.ask_beta_threshold = threshold.ask_beta_threshold;
+                update_shm = shm_mng::beta_shm_writer_update(context.get_shm_store_info().beta_start, (*address).second, threshold_shm);
+            }
 
             if (rand.randInt() < 20) {
-            threshold.beta_threshold = avg_beta_threshold;
-            threshold.beta_threshold = avg_beta_threshold;
-                info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={}",
+                info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
                     inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier, threshold.bid_beta_threshold,
                     threshold.ask_volatility, threshold.ask_volatility_multiplier, threshold.ask_beta_threshold,
-                    threshold.volatility, threshold.volatility_multiplier, threshold.beta_threshold);
+                    threshold.volatility, threshold.volatility_multiplier, threshold.beta_threshold, update_shm);
             }
         }
     }
