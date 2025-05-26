@@ -48,7 +48,7 @@ private:
 public:
     void init(vector<string> &base_assets);
     void update(string &base_asset, EarlyRunThreshold& threshold);
-    optional<EarlyRunThreshold> get_threshold(string &base_asset);
+    std::optional<EarlyRunThreshold> get_threshold(string &base_asset);
 };
 
 class BetaThresholdComposite {
@@ -62,7 +62,7 @@ class BetaThresholdComposite {
     public:
         void init(vector<string> &base_assets);
         void update(string &base_asset, BetaThreshold& threshold);
-        optional<BetaThreshold> get_threshold(string &base_asset);
+        std::optional<BetaThreshold> get_threshold(string &base_asset);
     };
     
 #endif
