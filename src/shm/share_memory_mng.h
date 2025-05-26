@@ -9,6 +9,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <memory>
 
 namespace shm_mng {
 

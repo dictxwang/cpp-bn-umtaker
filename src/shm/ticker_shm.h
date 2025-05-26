@@ -21,7 +21,7 @@ namespace shm_mng {
     void ticker_shm_writer_init(TickerInfoShm* start, int offset, const char* asset);
     int ticker_shm_writer_update(TickerInfoShm* start, int offset, TickerInfoShm& threshold);
 
-    TickerInfoShm& ticker_shm_reader_get(TickerInfoShm* start, int offset);
+    std::shared_ptr<TickerInfoShm> ticker_shm_reader_get(TickerInfoShm* start, int offset);
     void ticker_shm_reader_detach(TickerInfoShm* start);
 }
 

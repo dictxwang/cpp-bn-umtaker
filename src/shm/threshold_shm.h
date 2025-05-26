@@ -39,7 +39,7 @@ namespace shm_mng {
     void early_run_shm_writer_init(EarlyRunThresholdShm* start, int offset, const char* asset);
     int early_run_shm_writer_update(EarlyRunThresholdShm* start, int offset, EarlyRunThresholdShm& threshold);
 
-    EarlyRunThresholdShm& early_run_shm_reader_get(EarlyRunThresholdShm* start, int offset);
+    std::shared_ptr<EarlyRunThresholdShm> early_run_shm_reader_get(EarlyRunThresholdShm* start, int offset);
     void early_run_shm_reader_detach(EarlyRunThresholdShm* start);
 
 
@@ -47,7 +47,7 @@ namespace shm_mng {
     void beta_shm_writer_init(BetaThresholdShm* start, int offset, const char* asset);
     int beta_shm_writer_update(BetaThresholdShm* start, int offset, BetaThresholdShm& threshold);
 
-    BetaThresholdShm& beta_shm_reader_get(BetaThresholdShm* start, int offset);
+    std::shared_ptr<BetaThresholdShm> beta_shm_reader_get(BetaThresholdShm* start, int offset);
     void beta_shm_reader_detach(BetaThresholdShm* start);
 }
 

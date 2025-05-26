@@ -52,21 +52,21 @@ namespace shm_mng {
         }
     }
 
-    EarlyRunThresholdShm& early_run_shm_reader_get(EarlyRunThresholdShm* start, int offset) {
-        EarlyRunThresholdShm instance;
+    std::shared_ptr<EarlyRunThresholdShm> early_run_shm_reader_get(EarlyRunThresholdShm* start, int offset) {
+        std::shared_ptr<EarlyRunThresholdShm> shared_instance(new EarlyRunThresholdShm());
         common_acquire_lock(&((start + offset)->lock));
 
         // return a new instance
-        strncpy(instance.asset, (start + offset)->asset, sizeof(instance.asset) - 1);
-        instance.asset[sizeof(instance.asset) - 1] = '\0';
-        instance.avg_median = (start + offset)->avg_median;
-        instance.bid_ask_median = (start + offset)->bid_ask_median;
-        instance.ask_bid_median = (start + offset)->ask_bid_median;
-        instance.time_mills = (start + offset)->time_mills;
+        strncpy((*shared_instance).asset, (start + offset)->asset, sizeof((*shared_instance).asset) - 1);
+        (*shared_instance).asset[sizeof((*shared_instance).asset) - 1] = '\0';
+        (*shared_instance).avg_median = (start + offset)->avg_median;
+        (*shared_instance).bid_ask_median = (start + offset)->bid_ask_median;
+        (*shared_instance).ask_bid_median = (start + offset)->ask_bid_median;
+        (*shared_instance).time_mills = (start + offset)->time_mills;
     
         common_release_lock(&((start + offset)->lock));
 
-        return instance;
+        return shared_instance;
     }
 
     void early_run_shm_reader_detach(EarlyRunThresholdShm* start) {
@@ -143,33 +143,34 @@ namespace shm_mng {
         }
     }
 
-    BetaThresholdShm& beta_shm_reader_get(BetaThresholdShm* start, int offset) {
-        BetaThresholdShm instance;
+    std::shared_ptr<BetaThresholdShm> beta_shm_reader_get(BetaThresholdShm* start, int offset) {
+
+        std::shared_ptr<BetaThresholdShm> shared_instance(new BetaThresholdShm());
         common_acquire_lock(&((start + offset)->lock));
 
         // return a new instance
-        strncpy(instance.asset, (start + offset)->asset, sizeof(instance.asset) - 1);
-        instance.asset[sizeof(instance.asset) - 1] = '\0';
-        instance.sma = (start + offset)->sma;
-        instance.volatility = (start + offset)->volatility;
-        instance.volatility_multiplier = (start + offset)->volatility_multiplier;
-        instance.beta_threshold = (start + offset)->beta_threshold;
+        strncpy((*shared_instance).asset, (start + offset)->asset, sizeof((*shared_instance).asset) - 1);
+        (*shared_instance).asset[sizeof((*shared_instance).asset) - 1] = '\0';
+        (*shared_instance).sma = (start + offset)->sma;
+        (*shared_instance).volatility = (start + offset)->volatility;
+        (*shared_instance).volatility_multiplier = (start + offset)->volatility_multiplier;
+        (*shared_instance).beta_threshold = (start + offset)->beta_threshold;
 
-        instance.bid_sma = (start + offset)->bid_sma;
-        instance.bid_volatility = (start + offset)->bid_volatility;
-        instance.bid_volatility_multiplier = (start + offset)->bid_volatility_multiplier;
-        instance.bid_beta_threshold = (start + offset)->bid_beta_threshold;
+        (*shared_instance).bid_sma = (start + offset)->bid_sma;
+        (*shared_instance).bid_volatility = (start + offset)->bid_volatility;
+        (*shared_instance).bid_volatility_multiplier = (start + offset)->bid_volatility_multiplier;
+        (*shared_instance).bid_beta_threshold = (start + offset)->bid_beta_threshold;
 
-        instance.ask_sma = (start + offset)->ask_sma;
-        instance.ask_volatility = (start + offset)->ask_volatility;
-        instance.ask_volatility_multiplier = (start + offset)->ask_volatility_multiplier;
-        instance.ask_beta_threshold = (start + offset)->ask_beta_threshold;
+        (*shared_instance).ask_sma = (start + offset)->ask_sma;
+        (*shared_instance).ask_volatility = (start + offset)->ask_volatility;
+        (*shared_instance).ask_volatility_multiplier = (start + offset)->ask_volatility_multiplier;
+        (*shared_instance).ask_beta_threshold = (start + offset)->ask_beta_threshold;
 
-        instance.time_mills = (start + offset)->time_mills;
+        (*shared_instance).time_mills = (start + offset)->time_mills;
     
         common_release_lock(&((start + offset)->lock));
 
-        return instance;
+        return shared_instance;
     }
 
     void beta_shm_reader_detach(BetaThresholdShm* start) {

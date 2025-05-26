@@ -65,24 +65,24 @@ namespace shm_mng {
         }
     }
 
-    TickerInfoShm& ticker_shm_reader_get(TickerInfoShm* start, int offset) {
-        TickerInfoShm instance;
+    std::shared_ptr<TickerInfoShm> ticker_shm_reader_get(TickerInfoShm* start, int offset) {
+        std::shared_ptr<TickerInfoShm> shared_instance(new TickerInfoShm());
         common_acquire_lock(&((start + offset)->lock));
 
         // return a new instance
-        strncpy(instance.inst_id, (start + offset)->inst_id, sizeof(instance.inst_id) - 1);
-        instance.inst_id[sizeof(instance.inst_id) - 1] = '\0';
-        instance.bid_price = (start + offset)->bid_price;
-        instance.bid_size = (start + offset)->bid_size;
-        instance.ask_price = (start + offset)->ask_price;
-        instance.ask_size = (start + offset)->ask_size;
-        instance.update_id = (start + offset)->update_id;
-        instance.update_time = (start + offset)->update_time;
-        instance.version_number = (start + offset)->version_number;
+        strncpy((*shared_instance).inst_id, (start + offset)->inst_id, sizeof((*shared_instance).inst_id) - 1);
+        (*shared_instance).inst_id[sizeof((*shared_instance).inst_id) - 1] = '\0';
+        (*shared_instance).bid_price = (start + offset)->bid_price;
+        (*shared_instance).bid_size = (start + offset)->bid_size;
+        (*shared_instance).ask_price = (start + offset)->ask_price;
+        (*shared_instance).ask_size = (start + offset)->ask_size;
+        (*shared_instance).update_id = (start + offset)->update_id;
+        (*shared_instance).update_time = (start + offset)->update_time;
+        (*shared_instance).version_number = (start + offset)->version_number;
     
         common_release_lock(&((start + offset)->lock));
 
-        return instance;
+        return shared_instance;
     }
 
     void ticker_shm_reader_detach(TickerInfoShm* start) {
