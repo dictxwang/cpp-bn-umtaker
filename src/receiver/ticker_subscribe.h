@@ -8,6 +8,7 @@
 #include "zmq/zmq_client.h"
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
+#include "shm/ticker_shm.h"
 #include "protocol/ticker_info.pb.h"
 #include "binancecpp/binance_ws_futures.h"
 #include "binancecpp/util/string_helper.h"

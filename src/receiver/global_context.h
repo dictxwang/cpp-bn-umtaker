@@ -24,6 +24,8 @@ namespace receiver {
         vector<string> follower_inst_ids;
         set<string> inst_ids_set;
         unordered_map<string, int> shm_threshold_mapping;
+        unordered_map<string, int> shm_benchmark_ticker_mapping;
+        unordered_map<string, int> shm_follower_ticker_mapping;
 
         TickerComposite benchmark_ticker_composite;
         TickerComposite follower_ticker_composite;
@@ -61,6 +63,8 @@ namespace receiver {
         set<string>& get_inst_ids_set();
         ShmStoreInfo& get_shm_store_info();
         unordered_map<string, int>& get_shm_threshold_mapping();
+        unordered_map<string, int>& get_shm_benchmark_ticker_mapping();
+        unordered_map<string, int>& get_shm_follower_ticker_mapping();
     };
 }
 

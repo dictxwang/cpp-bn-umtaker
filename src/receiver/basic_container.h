@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <string>
 #include "shm/threshold_shm.h"
+#include "shm/ticker_shm.h"
 
 using namespace std;
 
@@ -27,6 +28,11 @@ namespace receiver {
         shm_mng::EarlyRunThresholdShm* early_run_start;
         int beta_shm_id;
         shm_mng::BetaThresholdShm* beta_start;
+
+        int benchmark_shm_id;
+        shm_mng::TickerInfoShm* benchmark_start;
+        int follower_shm_id;
+        shm_mng::TickerInfoShm* follower_start;
     };
 }
 
