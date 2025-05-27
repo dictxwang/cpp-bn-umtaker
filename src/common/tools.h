@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <sys/time.h>
+#include <cstdint>
 
 bool str_ends_with(const std::string& str, const std::string& suffix);
 
