@@ -3,9 +3,9 @@ cmake_minimum_required(VERSION 3.10)
 project(binance_umtaker VERSION 0.1.0 LANGUAGES CXX)
 
 set(PROCESS_MAIN "test_main")
-set(PROCESS_TICKER_RECEIVER "bn_untaker_receiver")
-set(PROCESS_OPPORTUNITY_ACTUARY "bn_untaker_actuary")
-set(PROCESS_ORDER_TRADER "bn_untaker_trader")
+set(PROCESS_TICKER_RECEIVER "bn_umtaker_receiver")
+set(PROCESS_OPPORTUNITY_ACTUARY "bn_umtaker_actuary")
+set(PROCESS_ORDER_TRADER "bn_umtaker_trader")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
