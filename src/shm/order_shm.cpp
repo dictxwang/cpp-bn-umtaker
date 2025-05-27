@@ -36,6 +36,7 @@ namespace shm_mng {
                 memcpy((start + offset)->side, order.side, strlen(order.side) + 1);
                 memcpy((start + offset)->pos_side, order.pos_side, strlen(order.pos_side) + 1);
                 memcpy((start + offset)->time_in_force, order.time_in_force, strlen(order.time_in_force) + 1);
+                memcpy((start + offset)->client_order_id, order.client_order_id, strlen(order.client_order_id) + 1);
                 (start + offset)->price = order.price;
                 (start + offset)->volume = order.volume;
                 (start + offset)->update_time = order.update_time;
@@ -60,9 +61,10 @@ namespace shm_mng {
 
         // return a new instance
         memcpy((*shared_instance).inst_id, (start + offset)->inst_id, strlen((start + offset)->inst_id) + 1);
-        memcpy((*shared_instance).side, (start + offset)->inst_id, strlen((start + offset)->side) + 1);
-        memcpy((*shared_instance).pos_side, (start + offset)->inst_id, strlen((start + offset)->pos_side) + 1);
-        memcpy((*shared_instance).time_in_force, (start + offset)->inst_id, strlen((start + offset)->time_in_force) + 1);
+        memcpy((*shared_instance).side, (start + offset)->side, strlen((start + offset)->side) + 1);
+        memcpy((*shared_instance).pos_side, (start + offset)->pos_side, strlen((start + offset)->pos_side) + 1);
+        memcpy((*shared_instance).time_in_force, (start + offset)->time_in_force, strlen((start + offset)->time_in_force) + 1);
+        memcpy((*shared_instance).client_order_id, (start + offset)->client_order_id, strlen((start + offset)->client_order_id) + 1);
         (*shared_instance).price = (start + offset)->price;
         (*shared_instance).volume = (start + offset)->volume;
         (*shared_instance).update_time = (start + offset)->update_time;

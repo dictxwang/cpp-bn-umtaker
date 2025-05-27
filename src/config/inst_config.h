@@ -13,6 +13,7 @@ struct InstConfigItem {
     double beta = 0;
     double min_ticker_size = 0;
     double max_ticker_size = 0;
+    double order_size = 0;
 };
 
 class InstConfig : public BaseConfig

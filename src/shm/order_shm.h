@@ -10,6 +10,7 @@ namespace shm_mng {
         char side[8];
         char pos_side[8];
         char time_in_force[8];
+        char client_order_id[40];
         double price = 0;
         double volume = 0;
         long update_time = 0;

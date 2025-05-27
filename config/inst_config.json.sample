@@ -7,7 +7,8 @@
             "volatility_c": 1,
             "beta": 1,
             "min_ticker_size": 1,
-            "max_ticker_size": 1
+            "max_ticker_size": 1,
+            "order_size": 0.1
         },
         {
             "asset": "IP",
@@ -16,7 +17,8 @@
             "volatility_c": 1,
             "beta": 1,
             "min_ticker_size": 1,
-            "max_ticker_size": 1
+            "max_ticker_size": 1,
+            "order_size": 0.1
         },
         {
             "asset": "BTC",
@@ -25,7 +27,8 @@
             "volatility_c": 1,
             "beta": 1,
             "min_ticker_size": 1,
-            "max_ticker_size": 1
+            "max_ticker_size": 1,
+            "order_size": 0.1
         },
         {
             "asset": "ETH",
@@ -34,7 +37,8 @@
             "volatility_c": 1,
             "beta": 1,
             "min_ticker_size": 1,
-            "max_ticker_size": 1
+            "max_ticker_size": 1,
+            "order_size": 0.1
         }
     ]
 }
