@@ -16,13 +16,13 @@ namespace trader {
         info_log("start thread of starting order serice");
 
         for (std::string base_asset : config.base_asset_list) {
-            std::thread thread_scan(scan_and_send_order, std::ref(config), std::ref(context), std::ref(base_asset));
+            std::thread thread_scan(scan_and_send_order, std::ref(config), std::ref(context), base_asset);
             thread_scan.detach();
             info_log("start thread of scanning and sending order for {}", base_asset);
         }
     }
 
-    void scan_and_send_order(TraderConfig& config, GlobalContext& context, std::string& base_asset) {
+    void scan_and_send_order(TraderConfig& config, GlobalContext& context, std::string base_asset) {
         
         std::string follower_inst_id = base_asset + config.follower_quote_asset;
         int shm_mapping_index = -1;

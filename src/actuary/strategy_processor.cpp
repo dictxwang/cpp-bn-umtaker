@@ -7,15 +7,16 @@ namespace actuary {
 
     void start_strategy_processors(ActuaryConfig& config, GlobalContext& context) {
 
-        for (std::string base_asset : config.base_asset_list) {
+        for (size_t i = 0; i < config.base_asset_list.size(); ++i) {
 
-            std::thread check_task_thread(check_signal_make_order, std::ref(config), std::ref(context), std::ref(base_asset));
+            std::string base_asset = config.base_asset_list[i];
+            std::thread check_task_thread(check_signal_make_order, std::ref(config), std::ref(context), base_asset);
             check_task_thread.detach();
             info_log("start strategy processor for {}", base_asset);
         }
     }
 
-    void check_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string& base_asset) {
+    void check_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string base_asset) {
 
         std::string benchmark_inst_id = base_asset + config.benchmark_quote_asset;
         std::string follower_inst_id = base_asset + config.follower_quote_asset;
@@ -49,15 +50,18 @@ namespace actuary {
             base_asset, benchmark_shm_index, follower_shm_index, threshold_shm_index, order_shm_index
         );
         if (benchmark_shm_index < 0 || follower_shm_index < 0 || threshold_shm_index < 0 || order_shm_index < 0) {
-            err_log("fail to find shm mapping index");
+            
+            err_log("fail to find shm mapping index for {}", base_asset);
             exit(-1);
         }
 
         auto inst_config_auto = context.get_inst_config().inst_map.find(base_asset);
         if (inst_config_auto == context.get_inst_config().inst_map.end()) {
+
             warn_log("inst config not found for {}", base_asset);
             exit(-1);
         }
+        
         InstConfigItem inst_config = (*inst_config_auto).second;
 
         long benchmark_ticker_version, follower_ticker_version, earyly_run_version, beta_version = 0;
