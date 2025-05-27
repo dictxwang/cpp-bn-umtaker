@@ -3,6 +3,10 @@
 #include "actuary/global_context.h"
 #include "actuary/strategy_processor.h"
 
+/*
+    loop scan ticker and threshold like 'early-run' 'beta' from share memory
+    calculate the opportunities and make order, and save order to share memory
+*/
 int main(int argc, char const *argv[]) {
 
     if (argc < 2) {

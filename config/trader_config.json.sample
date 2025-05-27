@@ -1,0 +1,19 @@
+{
+    "logger_name": "Trader",
+    "logger_file_path": "logs/output_trader.log",
+    "logger_level": 2,
+    "logger_max_files": 7,
+
+    "benchmark_quote_asset": "USDT",
+    "follower_quote_asset": "USDC",
+
+    "share_memory_project_id": 65,
+    "share_memory_path_order": "/home/ubuntu/code/shm_space/shm_umtaker_order",
+
+    "base_asset_list": [
+        "BTC",
+        "ETH",
+        "NEO",
+        "IP"
+    ]
+}
