@@ -66,36 +66,48 @@ namespace actuary {
 
         long benchmark_ticker_version, follower_ticker_version, earyly_run_version, beta_version = 0;
         while (true) {
+
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
             std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm_index);
             if (benchmark_ticker == nullptr || follower_ticker == nullptr ||
                 (*benchmark_ticker).version_number == 0 || (*follower_ticker).version_number == 0) {
+                std::cout << "001" << std::endl;
                 continue;
             }
             if ((*benchmark_ticker).version_number <= benchmark_ticker_version && (*follower_ticker).version_number <= follower_ticker_version) {
                 benchmark_ticker_version = (*benchmark_ticker).version_number;
                 follower_ticker_version = (*follower_ticker).version_number;
+                std::cout << "002" << std::endl;
                 continue;
             }
 
             benchmark_ticker_version = (*benchmark_ticker).version_number;
             follower_ticker_version = (*follower_ticker).version_number;
 
+            std::cout << "ticker version: " << benchmark_ticker_version << "," << follower_ticker_version << std::endl;
+
             std::shared_ptr<shm_mng::EarlyRunThresholdShm> early_run_threshold = shm_mng::early_run_shm_reader_get(context.get_shm_store_info().early_run_start, threshold_shm_index);
             std::shared_ptr<shm_mng::BetaThresholdShm> beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, threshold_shm_index);
             
             if (beta_threshold == nullptr || (*beta_threshold).version_number == 0 ||
                 early_run_threshold == nullptr || (*early_run_threshold).version_number == 0) {
+                    std::cout << "no threshold" << std::endl;
                 continue;
             }
             if ((*beta_threshold).version_number <= beta_version && (*early_run_threshold).version_number <= earyly_run_version) {
                 beta_version = (*beta_threshold).version_number;
                 earyly_run_version = (*early_run_threshold).version_number;
+                    std::cout << "expired threshold" << std::endl;
                 continue;
             }
 
             beta_version = (*beta_threshold).version_number;
             earyly_run_version = (*early_run_threshold).version_number;
+
+            std::cout << "threshold version: " << beta_version << "," << earyly_run_version << std::endl;
+
 
             if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
                 // make buy-side order

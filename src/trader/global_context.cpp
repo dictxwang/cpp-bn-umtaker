@@ -47,7 +47,7 @@ namespace trader {
 
         ShmStoreInfo info;
 
-        int order_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_order.c_str(), config.share_memory_project_id);
+        int order_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_order.c_str(), config.share_memory_project_id, sizeof(shm_mng::OrderShm), config.base_asset_list.size());
         shm_mng::OrderShm* order_start = shm_mng::order_shm_find_start_address(order_shm_id);
         info_log("attach order shm {} start {}", order_shm_id, int64_t(order_start));
 
