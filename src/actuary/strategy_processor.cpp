@@ -17,6 +17,7 @@ namespace actuary {
 
     void check_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string& base_asset) {
 
+        std::string benchmark_inst_id = base_asset + config.benchmark_quote_asset;
         std::string follower_inst_id = base_asset + config.follower_quote_asset;
 
         int benchmark_shm_index = -1;
@@ -24,12 +25,12 @@ namespace actuary {
         int threshold_shm_index = -1;
         int order_shm_index = -1;
 
-        auto benchmark = context.get_shm_benchmark_ticker_mapping().find(base_asset);
+        auto benchmark = context.get_shm_benchmark_ticker_mapping().find(benchmark_inst_id);
         if (benchmark != context.get_shm_benchmark_ticker_mapping().end()) {
             benchmark_shm_index = (*benchmark).second;
         }
 
-        auto follower = context.get_shm_follower_ticker_mapping().find(base_asset);
+        auto follower = context.get_shm_follower_ticker_mapping().find(follower_inst_id);
         if (follower != context.get_shm_follower_ticker_mapping().end()) {
             follower_shm_index = (*follower).second;
         }

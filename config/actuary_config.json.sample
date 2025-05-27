@@ -4,6 +4,8 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
+    "inst_config_file": "../config/inst_config.json.sample",
+
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 
