@@ -1,11 +1,109 @@
 #include "trade_processor.h"
+#include "common/random.h"
+#include <thread>
+#include <chrono>
 
 namespace trader {
 
     void start_trade_processors(TraderConfig& config, GlobalContext& context) {
-        // TODO
+        
+        std::thread thread_process_message(process_order_message, std::ref(config), std::ref(context));
+        thread_process_message.detach();
+        info_log("start thread of processing order message");
+
+        std::thread thread_order_service(start_order_service, std::ref(config), std::ref(context));
+        thread_order_service.detach();
+        info_log("start thread of starting order serice");
+
+        for (std::string base_asset : config.base_asset_list) {
+            std::thread thread_scan(scan_and_send_order, std::ref(config), std::ref(context), std::ref(base_asset));
+            thread_scan.detach();
+            info_log("start thread of scanning and sending order for {}", base_asset);
+        }
     }
-    void scan_and_send_order(TraderConfig& config, GlobalContext& context, std::string& base_assets) {
-        // TODO
+
+    void scan_and_send_order(TraderConfig& config, GlobalContext& context, std::string& base_asset) {
+        
+        std::string follower_inst_id = base_asset + config.follower_quote_asset;
+        int shm_mapping_index = -1;
+        auto mapping = context.get_shm_order_mapping().find(follower_inst_id);
+        if (mapping == context.get_shm_order_mapping().end()) {
+            warn_log("order shm mapping index not found");
+            return;
+        } else {
+            shm_mapping_index = (*mapping).second;
+        }
+
+        long order_version = 0;
+
+        while (true) {
+            shared_ptr<shm_mng::OrderShm> shm_order = shm_mng::order_shm_reader_get(context.get_shm_store_info().order_start, shm_mapping_index);
+            if (shm_order == nullptr || (*shm_order).version_number <= order_version) {
+                continue;
+            }
+            order_version = (*shm_order).version_number;
+
+            uint64_t now = binance::get_current_ms_epoch();
+            if (now > (*shm_order).update_time + 3000) {
+                continue;
+            }
+            binance::FuturesNewOrder order;
+            order.symbol = follower_inst_id;
+            order.side = std::string((*shm_order).side);
+            order.positionSide = std::string((*shm_order).pos_side);
+            order.quantity = (*shm_order).volume;
+            order.price = (*shm_order).price;
+            order.type = std::string((*shm_order).type);
+            order.timeInForce = std::string((*shm_order).time_in_force);
+            order.newClientOrderId = std::string((*shm_order).client_order_id);
+            order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+
+            pair<bool, string> result = context.get_order_service().placeOrder(order);
+            
+            info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={})",
+                result.first, result.second, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId);
+        }
+    }
+
+    void start_order_service(TraderConfig& config, GlobalContext& context) {
+        while (true) {
+            try {
+                pair<bool, string> result = context.get_order_service().startOrderService();
+            } catch (std::exception &e) {
+                err_log("fail to start order service: {}", std::string(e.what()));
+            }
+
+            // reconnect after 5 seconds
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }
+
+void process_order_message(TraderConfig& config, GlobalContext& context) {
+        moodycamel::ConcurrentQueue<string> *channel = context.get_order_chanel();
+
+        RandomIntGen rand;
+        rand.init(0, 10000);
+
+        while (true) {
+            std::string messageJson;
+            while (!channel->try_dequeue(messageJson)) {
+                // Retry if the queue is empty
+                std::this_thread::sleep_for(std::chrono::milliseconds(3));
+            }
+
+            try {
+                // process message
+                Json::Value json_result;
+                Json::Reader reader;
+                json_result.clear();
+                reader.parse(messageJson.c_str(), json_result);
+
+                // TODO parse json
+                info_log("receive order message: {}", messageJson);
+
+            } catch (std::exception &exp) {
+                err_log("fail to process order message: {}", std::string( exp.what()));
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@ namespace shm_mng {
 
     struct OrderShm {
         char inst_id[24];
+        char type[8];
         char side[8];
         char pos_side[8];
         char time_in_force[8];

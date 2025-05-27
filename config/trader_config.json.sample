@@ -4,6 +4,11 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
+    "api_key_ed25519": "",
+    "secret_key_ed25519": "-----BEGIN PRIVATE KEY-----\n\n-----END PRIVATE KEY-----",
+    "trade_use_intranet": false,
+    "trade_local_ip": "",
+
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 

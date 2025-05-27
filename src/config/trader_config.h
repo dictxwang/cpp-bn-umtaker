@@ -16,6 +16,11 @@ namespace trader {
     
     public:
 
+        string api_key_ed25519;
+        string secret_key_ed25519;
+        bool trade_use_intranet;
+        string trade_local_ip;
+        
         string benchmark_quote_asset;
         string follower_quote_asset;
         std::vector<string> base_asset_list;

@@ -15,6 +15,20 @@ namespace trader {
 
         this->init_shm_mapping(config);
         this->init_shm(config);
+        info_log("finish init share memory settings");
+
+        // init trading service
+        this->init_order_service(config);
+        info_log("finish init order service");
+    }
+
+    void GlobalContext::init_order_service(TraderConfig& config) {
+
+        if (config.trade_local_ip.size() > 0) {
+            this->order_service.setLocalIP(config.trade_local_ip);
+        }
+        this->order_service.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, config.trade_use_intranet);
+        this->order_service.setMessageChannel(this->get_order_chanel());
     }
 
     void GlobalContext::init_shm_mapping(TraderConfig& config) {
@@ -57,5 +71,12 @@ namespace trader {
     }
     unordered_map<string, int>& GlobalContext::get_shm_order_mapping() {
         return this->shm_order_mapping;
+    }
+
+    binance::BinanceFuturesWsClient& GlobalContext::get_order_service() {
+        return this->order_service;
+    }
+    moodycamel::ConcurrentQueue<std::string>* GlobalContext::get_order_chanel() {
+        return &(this->order_chanel);
     }
 }

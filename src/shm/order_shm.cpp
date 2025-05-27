@@ -33,6 +33,7 @@ namespace shm_mng {
             if (hist_update_time < order.update_time) {
 
                 memcpy((start + offset)->inst_id, order.inst_id, strlen(order.inst_id) + 1);
+                memcpy((start + offset)->type, order.type, strlen(order.type) + 1);
                 memcpy((start + offset)->side, order.side, strlen(order.side) + 1);
                 memcpy((start + offset)->pos_side, order.pos_side, strlen(order.pos_side) + 1);
                 memcpy((start + offset)->time_in_force, order.time_in_force, strlen(order.time_in_force) + 1);
@@ -61,6 +62,7 @@ namespace shm_mng {
 
         // return a new instance
         memcpy((*shared_instance).inst_id, (start + offset)->inst_id, strlen((start + offset)->inst_id) + 1);
+        memcpy((*shared_instance).type, (start + offset)->type, strlen((start + offset)->type) + 1);
         memcpy((*shared_instance).side, (start + offset)->side, strlen((start + offset)->side) + 1);
         memcpy((*shared_instance).pos_side, (start + offset)->pos_side, strlen((start + offset)->pos_side) + 1);
         memcpy((*shared_instance).time_in_force, (start + offset)->time_in_force, strlen((start + offset)->time_in_force) + 1);

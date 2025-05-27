@@ -8,6 +8,9 @@ namespace trader {
 
     void start_trade_processors(TraderConfig& config, GlobalContext& context);
     void scan_and_send_order(TraderConfig& config, GlobalContext& context, std::string& base_assets);
+    
+    void start_order_service(TraderConfig& config, GlobalContext& context);
+    void process_order_message(TraderConfig& config, GlobalContext& context);
 } 
 
 #endif

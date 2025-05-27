@@ -9,6 +9,11 @@ namespace trader {
         }
 
         // Parse own configuration properties
+        this->api_key_ed25519 = this->doc_["api_key_ed25519"].asString();
+        this->secret_key_ed25519 = this->doc_["secret_key_ed25519"].asString();
+        this->trade_use_intranet = this->doc_["trade_use_intranet"].asBool();
+        this->trade_local_ip = this->doc_["trade_local_ip"].asString();
+
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
 

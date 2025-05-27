@@ -96,6 +96,7 @@ namespace actuary {
                 // make buy-side order
                 shm_mng::OrderShm order_buy;
                 strcpy(order_buy.inst_id, follower_inst_id.c_str());
+                strcpy(order_buy.type, binance::ORDER_TYPE_LIMIT.c_str());
                 strcpy(order_buy.side, binance::ORDER_SIDE_BUY.c_str());
                 // strcpy(order_buy.pos_side, binance::PositionSide_LONG.c_str());
                 strcpy(order_buy.time_in_force, binance::TimeInForce_IOC.c_str());
@@ -113,6 +114,7 @@ namespace actuary {
                 // make sell-side order
                 shm_mng::OrderShm order_sell;
                 strcpy(order_sell.inst_id, follower_inst_id.c_str());
+                strcpy(order_sell.type, binance::ORDER_TYPE_LIMIT.c_str());
                 strcpy(order_sell.side, binance::ORDER_SIDE_SELL.c_str());
                 // strcpy(order_buy.pos_side, binance::PositionSide_SHORT.c_str());
                 strcpy(order_sell.time_in_force, binance::TimeInForce_IOC.c_str());
