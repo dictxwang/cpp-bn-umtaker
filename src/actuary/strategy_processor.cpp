@@ -1,10 +1,19 @@
 #include "strategy_processor.h"
 
 #include <cstdlib> // For exit()
+#include <thread>
 
 namespace actuary {
 
-    void start_strategy_process(ActuaryConfig& config, GlobalContext& context) {}
+    void start_strategy_processors(ActuaryConfig& config, GlobalContext& context) {
+
+        for (std::string base_asset : config.base_asset_list) {
+
+            std::thread check_task_thread(check_signal_make_order, std::ref(config), std::ref(context), std::ref(base_asset));
+            check_task_thread.detach();
+            info_log("start strategy processor for {}", base_asset);
+        }
+    }
 
     void check_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string& base_asset) {
 
@@ -92,11 +101,11 @@ namespace actuary {
                 strcpy(order_buy.time_in_force, binance::TimeInForce_IOC.c_str());
                 order_buy.price = (*benchmark_ticker).ask_price;
                 order_buy.volume = inst_config.order_size;
-                // TODO
-                std::string client_order_id = "";
+                std::string client_order_id = gen_client_order_id(true);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
 
                 int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
+                // TODO reduce too many logs
                 info_log("update buy order: inst_id={} price={} size={} client_id={}",
                     follower_inst_id, order_buy.price, order_buy.volume, client_order_id);
             
@@ -109,11 +118,11 @@ namespace actuary {
                 strcpy(order_sell.time_in_force, binance::TimeInForce_IOC.c_str());
                 order_sell.price = (*benchmark_ticker).bid_price;
                 order_sell.volume = inst_config.order_size;
-                // TODO
-                std::string client_order_id = "";
+                std::string client_order_id = gen_client_order_id(false);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 
                 int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
+                // TODO reduce too many logs
                 info_log("update sell order: inst_id={} price={} size={} client_id={}",
                     follower_inst_id, order_sell.price, order_sell.volume, client_order_id);
             }

@@ -1,7 +1,6 @@
 #include <iostream>
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
     std::cout << "this is trader." << std::endl;
     return 0;
 }

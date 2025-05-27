@@ -1,6 +1,7 @@
 #include <iostream>
 #include "config/actuary_config.h"
 #include "actuary/global_context.h"
+#include "actuary/strategy_processor.h"
 
 int main(int argc, char const *argv[]) {
 
@@ -23,7 +24,14 @@ int main(int argc, char const *argv[]) {
     context.init(config);
 
     // create threads for per asset
+    actuary::start_strategy_processors(config, context);
 
-    std::cout << "this is actuary." << std::endl;
-    return 0;
+    std::cout << "<< this is acturay process >>" << std::endl;
+    info_log("acturay processor started.");
+    
+    while(true) {
+        // std::cout << "Keep Running..." << std::endl;
+        // info_log("Process Keep Running...");
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+    }
 }
