@@ -12,6 +12,7 @@
     "share_memory_path_follower_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_follower_ticker",
     "share_memory_path_early_run": "/home/ubuntu/code/shm_space/shm_umtaker_early_run",
     "share_memory_path_beta": "/home/ubuntu/code/shm_space/shm_umtaker_beta",
+    "share_memory_path_order": "/home/ubuntu/code/shm_space/shm_umtaker_order",
 
     "base_asset_list": [
         "BTC",

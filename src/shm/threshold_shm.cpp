@@ -17,9 +17,10 @@ namespace shm_mng {
         // strncpy((start + offset)->asset, asset, sizeof((start + offset)->asset) - 1);
         // (start + offset)->asset[sizeof((start + offset)->asset) - 1] = '\0';
         memcpy((start + offset)->asset, asset, strlen(asset) + 1);
-        (start + 0)->avg_median = 0.0;
-        (start + 0)->bid_ask_median = 0.0;
+        (start + offset)->avg_median = 0.0;
+        (start + offset)->bid_ask_median = 0.0;
         (start + offset)->ask_bid_median = 0.0;
+        (start + offset)->version_number = 0;
         (start + offset)->time_mills = 0;
 
         atomic_init(&((start + offset)->lock), 0);
@@ -41,6 +42,8 @@ namespace shm_mng {
                 (start + offset)->bid_ask_median = threshold.bid_ask_median;
                 (start + offset)->ask_bid_median = threshold.ask_bid_median;
                 (start + offset)->time_mills = threshold.time_mills;
+                long version_number = (*(start + offset)).version_number;
+                (start + offset)->version_number = version_number + 1;
                 
                 update_result = 1;
             }
@@ -62,6 +65,7 @@ namespace shm_mng {
         (*shared_instance).avg_median = (start + offset)->avg_median;
         (*shared_instance).bid_ask_median = (start + offset)->bid_ask_median;
         (*shared_instance).ask_bid_median = (start + offset)->ask_bid_median;
+        (*shared_instance).version_number = (start + offset)->version_number;
         (*shared_instance).time_mills = (start + offset)->time_mills;
     
         common_release_lock(&((start + offset)->lock));
@@ -100,6 +104,7 @@ namespace shm_mng {
         (start + offset)->ask_volatility_multiplier = 0.0;
         (start + offset)->ask_beta_threshold = 0.0;
 
+        (start + offset)->version_number = 0;
         (start + offset)->time_mills = 0;
 
         atomic_init(&((start + offset)->lock), 0);
@@ -132,6 +137,8 @@ namespace shm_mng {
                 (start + offset)->ask_beta_threshold = threshold.ask_beta_threshold;
 
                 (start + offset)->time_mills = threshold.time_mills;
+                long version_number = (*(start + offset)).version_number;
+                (start + offset)->version_number = version_number + 1;
                 
                 update_result = 1;
             }
@@ -166,6 +173,7 @@ namespace shm_mng {
         (*shared_instance).ask_volatility_multiplier = (start + offset)->ask_volatility_multiplier;
         (*shared_instance).ask_beta_threshold = (start + offset)->ask_beta_threshold;
 
+        (*shared_instance).version_number = (start + offset)->version_number;
         (*shared_instance).time_mills = (start + offset)->time_mills;
     
         common_release_lock(&((start + offset)->lock));

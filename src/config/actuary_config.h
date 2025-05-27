@@ -25,6 +25,7 @@ namespace actuary {
         string share_memory_path_follower_ticker;
         string share_memory_path_early_run;
         string share_memory_path_beta;
+        string share_memory_path_order;
     };
 }
 #endif

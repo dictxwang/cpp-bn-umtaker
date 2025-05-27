@@ -22,6 +22,7 @@ namespace actuary {
         this->share_memory_path_follower_ticker = this->doc_["share_memory_path_follower_ticker"].asString();
         this->share_memory_path_early_run = this->doc_["share_memory_path_early_run"].asString();
         this->share_memory_path_beta = this->doc_["share_memory_path_beta"].asString();
+        this->share_memory_path_order = this->doc_["share_memory_path_order"].asString();
 
         return true;
     }

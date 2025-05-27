@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
     actuary::GlobalContext context;
     context.init(config);
 
-    // TODO create threads for per asset
+    // create threads for per asset
 
     std::cout << "this is actuary." << std::endl;
     return 0;

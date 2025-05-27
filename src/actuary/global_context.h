@@ -5,6 +5,9 @@
 #include "config/inst_config.h"
 #include "logger/logger.h"
 #include "basic_container.h"
+#include "shm/threshold_shm.h"
+#include "shm/ticker_shm.h"
+#include "shm/order_shm.h"
 #include <unordered_map>
 #include <vector>
 #include <set>
@@ -26,13 +29,23 @@ namespace actuary {
         unordered_map<string, int> shm_threshold_mapping;
         unordered_map<string, int> shm_benchmark_ticker_mapping;
         unordered_map<string, int> shm_follower_ticker_mapping;
+        unordered_map<string, int> shm_order_mapping;
 
         ShmStoreInfo shm_store_info;
     
     public:
         void init(ActuaryConfig& config);
-        void init_shm(ActuaryConfig& config);
         void init_shm_mapping(ActuaryConfig& config);
+        void init_shm(ActuaryConfig& config);
+        InstConfig &get_inst_config();
+        vector<string>& get_benchmark_inst_ids();
+        vector<string>& get_follower_inst_ids();
+        set<string>& get_inst_ids_set();
+        ShmStoreInfo& get_shm_store_info();
+        unordered_map<string, int>& get_shm_threshold_mapping();
+        unordered_map<string, int>& get_shm_benchmark_ticker_mapping();
+        unordered_map<string, int>& get_shm_follower_ticker_mapping();
+        unordered_map<string, int>& get_shm_order_mapping();
     };
 }
 #endif

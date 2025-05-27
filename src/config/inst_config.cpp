@@ -15,6 +15,8 @@ bool InstConfig::loadInstConfig(std::string& inputfile) {
             item.volatility_b = binance::str_to_dobule(info_list[i]["volatility_b"]);
             item.volatility_c = binance::str_to_dobule(info_list[i]["volatility_c"]);
             item.beta = binance::str_to_dobule(info_list[i]["beta"]);
+            item.min_ticker_size = binance::str_to_dobule(info_list[i]["min_ticker_size"]);
+            item.max_ticker_size = binance::str_to_dobule(info_list[i]["max_ticker_size"]);
             this->inst_map[item.asset] = item;
         }
     }

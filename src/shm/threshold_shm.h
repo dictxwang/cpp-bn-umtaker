@@ -11,6 +11,7 @@ namespace shm_mng {
         double bid_ask_median = 0;  // benchmark_bid vs follower_ask
         double ask_bid_median = 0;  // benchmark_ask vs follower_bid
         uint64_t time_mills = 0;
+        long version_number = 0;
         std::atomic_int lock = std::atomic_int(0);
     };
 
@@ -31,6 +32,7 @@ namespace shm_mng {
         double ask_volatility_multiplier = 0;
         double ask_beta_threshold = 0;
 
+        long version_number = 0;
         uint64_t time_mills = 0;
         std::atomic_int lock = std::atomic_int(0);
     };

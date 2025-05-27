@@ -11,6 +11,8 @@ struct InstConfigItem {
     double volatility_b = 0;
     double volatility_c = 0;
     double beta = 0;
+    double min_ticker_size = 0;
+    double max_ticker_size = 0;
 };
 
 class InstConfig : public BaseConfig
