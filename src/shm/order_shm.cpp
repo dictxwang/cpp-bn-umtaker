@@ -6,7 +6,7 @@ namespace shm_mng {
 
         OrderShm *start;
 
-        start = (OrderShm*)shmat(shm_id, NULL, 0);
+        start = (OrderShm*)shmat(shm_id, 0, 0);
         return start;
     }
 

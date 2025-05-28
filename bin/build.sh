@@ -25,11 +25,7 @@ function compile_one_third_library() {
     prefix_path=${build_path}/${name}
     build_path=${prefix_path}/src/${name}-build
     cmake ${source_path} -B ${build_path} -DCMAKE_INSTALL_PREFIX=${prefix_path} -DCMAKE_INSTALL_LIBDIR=${prefix_path}/lib -DCMAKE_CXX_FLAGS_RELEASE=-O2 ${other_args}
-    dd=$(pwd)
-    echo ">>>>> in ${dd}"
     cd ${build_path}; make -j ${MAKE_JOB_NUM}; make install; cd -
-    dd=$(pwd)
-    echo ">>>>> out ${dd}"
 }
 
 function build_all_third_libraries() {

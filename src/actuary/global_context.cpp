@@ -55,19 +55,19 @@ namespace actuary {
         
         ShmStoreInfo info;
 
-        int early_run_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id, sizeof(shm_mng::EarlyRunThresholdShm), config.base_asset_list.size());
+        int early_run_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id);
         shm_mng::EarlyRunThresholdShm* early_run_start = shm_mng::early_run_shm_find_start_address(early_run_shm_id);
         info_log("attach early run shm {} start {}", early_run_shm_id, int64_t(early_run_start));
 
-        int beta_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_beta.c_str(), config.share_memory_project_id, sizeof(shm_mng::BetaThresholdShm), config.base_asset_list.size());
+        int beta_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_beta.c_str(), config.share_memory_project_id);
         shm_mng::BetaThresholdShm* beta_start = shm_mng::beta_shm_find_start_address(beta_shm_id);
         info_log("attach beta shm {} start {}", beta_shm_id, int64_t(beta_start));
 
-        int benchmark_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_benchmark_ticker.c_str(), config.share_memory_project_id, sizeof(shm_mng::TickerInfoShm), this->benchmark_inst_ids.size());
+        int benchmark_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_benchmark_ticker.c_str(), config.share_memory_project_id);
         shm_mng::TickerInfoShm* benchmark_start = shm_mng::ticker_shm_find_start_address(benchmark_shm_id);
         info_log("attach benchmark shm {} start {}", benchmark_shm_id, int64_t(benchmark_start));
 
-        int follower_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_follower_ticker.c_str(), config.share_memory_project_id, sizeof(shm_mng::TickerInfoShm), this->follower_inst_ids.size());
+        int follower_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_follower_ticker.c_str(), config.share_memory_project_id);
         shm_mng::TickerInfoShm* follower_start = shm_mng::ticker_shm_find_start_address(follower_shm_id);
         info_log("attach follower shm {} start {}", follower_shm_id, int64_t(follower_start));
 

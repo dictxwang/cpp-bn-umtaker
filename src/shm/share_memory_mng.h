@@ -18,7 +18,7 @@ namespace shm_mng {
 
     void writer_common_delete_shm(const char* path, int project_id);
     int writer_common_create_shm(const char* path, int project_id, int seg_size, int count);
-    int reader_common_attach_shm(const char* path, int project_id, int seg_size, int count);
+    int reader_common_attach_shm(const char* path, int project_id);
 
     void common_acquire_lock(std::atomic_int *lock);
     void common_release_lock(std::atomic_int *lock);

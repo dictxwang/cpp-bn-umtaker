@@ -37,7 +37,7 @@ namespace shm_mng {
         }
 
         //创建共享内存
-        shm_id = shmget(key, seg_size*count, IPC_CREAT | IPC_EXCL | 0664);
+        shm_id = shmget(key, seg_size*count, IPC_CREAT | IPC_EXCL | 0666);
         if (shm_id == -1) {
             std::cerr << "shmget failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -2;
@@ -50,7 +50,7 @@ namespace shm_mng {
         return shm_id;
     }
 
-    int reader_common_attach_shm(const char* path, int project_id, int seg_size, int count) {
+    int reader_common_attach_shm(const char* path, int project_id) {
         int shm_id;
         key_t key;
 
@@ -60,8 +60,7 @@ namespace shm_mng {
             return -1;
         }
 
-        //创建共享内存
-        shm_id = shmget(key, seg_size*count, 0);
+        shm_id = shmget(key, 0, IPC_R);
         if (shm_id == -1) {
             std::cerr << "shmget failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -2;

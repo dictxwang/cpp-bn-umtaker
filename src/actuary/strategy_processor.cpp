@@ -71,15 +71,18 @@ namespace actuary {
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
             std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm_index);
-            if (benchmark_ticker == nullptr || follower_ticker == nullptr ||
-                (*benchmark_ticker).version_number == 0 || (*follower_ticker).version_number == 0) {
+            if (benchmark_ticker == nullptr || follower_ticker == nullptr) {
                 std::cout << "001" << std::endl;
                 continue;
             }
+            if ((*benchmark_ticker).version_number == 0 || (*follower_ticker).version_number == 0) {
+                std::cout << "002" << std::endl;
+                continue;
+            }
+
             if ((*benchmark_ticker).version_number <= benchmark_ticker_version && (*follower_ticker).version_number <= follower_ticker_version) {
                 benchmark_ticker_version = (*benchmark_ticker).version_number;
                 follower_ticker_version = (*follower_ticker).version_number;
-                std::cout << "002" << std::endl;
                 continue;
             }
 
