@@ -28,12 +28,7 @@ function start_daemon() {
     pid_file=$2
     config_file=$3
     cpu_index=$4
-    echo $process_name
-    echo $pid_file
-    echo $config_file
-    echo $cpu_index
-
-    exit 0
+    
     if [[ ! -e ${process_name} || ! -x ${process_name} ]]; then
       echo "'${process_name}' is not exists or is not executable."
       exit 0

@@ -25,10 +25,4 @@ elif [[ ${ACTION} == "resume" ]]; then
     ${PROJECT_ROOT}/bin/catalina.sh resume ${PROCESS_NAME} ${PID_FILE} 
 elif [[ ${ACTION} == "status" ]]; then
     ${PROJECT_ROOT}/bin/catalina.sh status ${PROCESS_NAME} ${PID_FILE} 
-  s=$?
-  if [[ $s == 1 ]];then
-    echo "process '${PROCESS_NAME}' is running."
-  else
-    echo "process '${PROCESS_NAME}' had stopped."
-  fi
 fi
