@@ -28,6 +28,12 @@ function start_daemon() {
     pid_file=$2
     config_file=$3
     cpu_index=$4
+    echo $process_name
+    echo $pid_file
+    echo $config_file
+    echo $cpu_index
+
+    exit 0
     if [[ ! -e ${process_name} || ! -x ${process_name} ]]; then
       echo "'${process_name}' is not exists or is not executable."
       exit 0
@@ -42,7 +48,8 @@ function start_daemon() {
 
     # nohup ./${process_name} ${config_file} > /dev/null 2>&1 & disown
     if [[ -z ${cpu_index} ]]; then
-      nohup ./${process_name} ${config_file} > /dev/null 2>&1 &
+    #   nohup ./${process_name} ${config_file} > /dev/null 2>&1 &
+      ./${process_name} ${config_file}
     else
       nohup taskset -c ${cpu_index} ./${process_name} ${config_file} > /dev/null 2>&1 &
     fi

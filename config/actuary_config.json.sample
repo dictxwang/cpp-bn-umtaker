@@ -4,7 +4,7 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
-    "inst_config_file": "../config/inst_config.json.sample",
+    "inst_config_file": "config/inst_config.json.sample",
 
     "ticker_valid_millis": 1000,
     "loop_pause_time_seconds": 5,

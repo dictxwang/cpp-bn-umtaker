@@ -4,7 +4,7 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
-    "inst_config_file": "../config/inst_config.json.sample",
+    "inst_config_file": "config/inst_config.json.sample",
 
     "use_normal_ticker": true,
     "normal_ticker_use_intranet": false,
