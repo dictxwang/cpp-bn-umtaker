@@ -162,7 +162,7 @@ namespace actuary {
             // );
 
             // TODO delete true condition
-            if (true || (*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
+            if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
                 // make buy-side order
                 shm_mng::OrderShm order_buy;
                 strcpy(order_buy.inst_id, follower_inst_id.c_str());
@@ -174,6 +174,7 @@ namespace actuary {
                 order_buy.volume = inst_config.order_size;
                 std::string client_order_id = gen_client_order_id(true);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
+                order_buy.update_time = now;
 
                 int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 // TODO reduce too many logs
@@ -193,6 +194,7 @@ namespace actuary {
                 order_sell.volume = inst_config.order_size;
                 std::string client_order_id = gen_client_order_id(false);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
+                order_sell.update_time = now;
                 
                 int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 // TODO reduce too many logs

@@ -53,9 +53,10 @@ namespace trader {
                 }
                 continue;
             }
+
             if ((*shm_order).version_number <= order_version) {
-                if (rnd_number < 10) {
-                    warn_log("order version in share memory is old {}", base_asset);
+                if (true || rnd_number < 10) {
+                    warn_log("order version in share memory is old for {} {} {} {}:{}", base_asset, shm_mapping_index, (*shm_order).inst_id, (*shm_order).version_number, order_version);
                 }
                 continue;
             }
@@ -68,6 +69,7 @@ namespace trader {
                 }
                 continue;
             }
+
             binance::FuturesNewOrder order;
             order.symbol = follower_inst_id;
             order.side = std::string((*shm_order).side);
