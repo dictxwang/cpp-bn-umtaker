@@ -6,11 +6,11 @@
 
     "inst_config_file": "../config/inst_config.json.sample",
 
-    "use_normal_ticker": false,
+    "use_normal_ticker": true,
     "normal_ticker_use_intranet": false,
     "normal_ticker_local_ip": "",
 
-    "use_best_ticker": true,
+    "use_best_ticker": false,
     "ticker_zmq_ipcs": [
         "tcp://127.0.0.1:22001"
     ],
