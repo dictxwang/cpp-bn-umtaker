@@ -60,7 +60,7 @@ namespace shm_mng {
             return -1;
         }
 
-        shm_id = shmget(key, 0, IPC_R);
+        shm_id = shmget(key, 0, 0);
         if (shm_id == -1) {
             std::cerr << "shmget failed with errno: " << errno << " (" << strerror(errno) << ")" << std::endl;
             return -2;
