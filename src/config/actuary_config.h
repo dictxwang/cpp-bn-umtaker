@@ -17,6 +17,7 @@ namespace actuary {
         string inst_config_file;
 
         uint64_t ticker_valid_millis;
+        long loop_pause_time_seconds;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

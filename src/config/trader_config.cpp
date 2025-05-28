@@ -16,6 +16,7 @@ namespace trader {
 
         this->open_place_order = this->doc_["open_place_order"].asBool();
         this->order_valid_millis = this->doc_["order_valid_millis"].asUInt64();
+        this->loop_pause_time_seconds = this->doc_["loop_pause_time_seconds"].asInt64();
 
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();

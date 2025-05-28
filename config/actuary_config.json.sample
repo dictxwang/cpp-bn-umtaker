@@ -7,6 +7,7 @@
     "inst_config_file": "../config/inst_config.json.sample",
 
     "ticker_valid_millis": 1000,
+    "loop_pause_time_seconds": 5,
 
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",

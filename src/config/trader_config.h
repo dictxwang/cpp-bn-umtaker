@@ -23,6 +23,7 @@ namespace trader {
 
         bool open_place_order;
         uint64_t order_valid_millis;
+        long loop_pause_time_seconds;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

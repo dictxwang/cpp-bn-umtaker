@@ -37,6 +37,11 @@ namespace trader {
         long order_version = 0;
 
         while (true) {
+
+            if (config.loop_pause_time_seconds > 0) {
+                std::this_thread::sleep_for(std::chrono::seconds(config.loop_pause_time_seconds));
+            }
+
             shared_ptr<shm_mng::OrderShm> shm_order = shm_mng::order_shm_reader_get(context.get_shm_store_info().order_start, shm_mapping_index);
             if (shm_order == nullptr || (*shm_order).version_number <= order_version) {
                 continue;
