@@ -42,3 +42,9 @@ build/
 logs/
 *.json
 ticker_info.pb.*
+
+*.pid*
+test_main
+bn_umtaker_receiver
+bn_umtaker_actuary
+bn_umtaker_trader

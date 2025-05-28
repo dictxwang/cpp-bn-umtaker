@@ -51,6 +51,27 @@ function build_all_third_libraries() {
     # fi
 }
 
+function link_process_files() {
+    cd ${PROJECT_ROOT}
+    rm -f test_main
+    rm -f bn_umtaker_receiver
+    rm -f bn_umtaker_actuary
+    rm -f bn_umtaker_trader
+
+    if [[ -e build/test_main ]]; then
+        ln -s build/test_main test_main
+    fi
+    if [[ -e build/bn_umtaker_receiver ]]; then
+        ln -s build/bn_umtaker_receiver bn_umtaker_receiver
+    fi
+    if [[ -e build/bn_umtaker_actuary ]]; then
+        ln -s build/bn_umtaker_actuary bn_umtaker_actuary
+    fi
+    if [[ -e build/bn_umtaker_trader ]]; then
+        ln -s build/bn_umtaker_trader bn_umtaker_trader
+    fi
+}
+
 BUILD_TYPE="all"
 if [ $# -eq 1 ];
 then
@@ -73,4 +94,6 @@ fi
 if [[ ${BUILD_TYPE} == "all" || ${BUILD_TYPE} == "main" ]]; then
     cmake ..
     make
+
+    link_process_files
 fi

@@ -178,6 +178,8 @@ void startMessageChannelConsume(moodycamel::ConcurrentQueue<std::string> *messag
 
 int main(int argc, char const *argv[])
 {
+    std::cout << "00000" << std::endl;
+    
     if (argc < 2) {
         std::cout << "Usage: " << argv[0] << " config_file" << std::endl;
         return 0;
