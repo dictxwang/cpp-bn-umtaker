@@ -111,10 +111,6 @@ PROCESS_NAME=$2
 PID_FILE=$3
 CONFIG_FILE=$4
 CPU_NO=$5
-# P1=$1
-# P2=$2
-# P3=$3
-# P4=$4
 
 if [[ -z ${PROCESS_NAME} || -z ${ACTION} || -z ${PID_FILE} ]]; then
   echo "Usage Sample: bin/catalina.sh start test_main config.json"
