@@ -42,6 +42,19 @@ namespace receiver {
         }
     }
 
+    vector<UmTickerInfo> TickerWrapper::copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after) {
+        std::vector<UmTickerInfo> result;
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        for (size_t i = 0; i < this->ticker_list.size(); i++) {
+            if (this->ticker_list[i].update_time_millis > remain_ts_after) {
+                UmTickerInfo info;
+                this->ticker_list[i].copy_self(info);
+                result.push_back(info);
+            }
+        }
+        return result;
+    }
+
     void TickerComposite::init(string& quote_asset, vector<string>& base_assets, uint64_t remain_seconds) {
         this->ticker_remain_senconds = remain_seconds;
 
@@ -98,13 +111,7 @@ namespace receiver {
         std::shared_lock<std::shared_mutex> lock(rw_lock);
         auto wrapper = this->wrapper_map.find(inst_id);
         if (wrapper != this->wrapper_map.end()) {
-            for (size_t i = 0; i < (*(wrapper->second)).get_ticker_list().size(); i++) {
-                if ((*(wrapper->second)).get_ticker_list()[i].update_time_millis > remain_ts_after) {
-                    UmTickerInfo info;
-                    (*(wrapper->second)).get_ticker_list()[i].copy_self(info);
-                    result.push_back(info);
-                }
-            }
+            result = (*wrapper->second).copy_ticker_list_after(inst_id, remain_ts_after);
         }
         return result;
     }

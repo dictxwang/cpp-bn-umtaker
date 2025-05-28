@@ -25,6 +25,7 @@ namespace receiver {
         void update_ticker(UmTickerInfo ticker, uint64_t remain_senconds);
         optional<UmTickerInfo> get_lastest_ticker();
         deque<UmTickerInfo>& get_ticker_list();
+        vector<UmTickerInfo> copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after);
     private:
         deque<UmTickerInfo> ticker_list;
         shared_mutex rw_lock;
