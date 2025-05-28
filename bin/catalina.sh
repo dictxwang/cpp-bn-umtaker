@@ -122,7 +122,7 @@ if [[ ${ACTION} == "start" ]]; then
     echo "should give config file, like 'config.json'"
     exit 0
   fi
-  start_daemon ${PROCESS_NAME} ${CONFIG_FILE} ${PID_FILE} ${CPU_NO}
+  start_daemon ${PROCESS_NAME} ${PID_FILE} ${CONFIG_FILE} ${CPU_NO}
 elif [[ ${ACTION} == "stop" ]]; then
   stop ${PROCESS_NAME} ${PID_FILE}
 elif [[ ${ACTION} == "pause" ]]; then
