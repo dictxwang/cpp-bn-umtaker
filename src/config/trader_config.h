@@ -22,6 +22,7 @@ namespace trader {
         string trade_local_ip;
 
         bool open_place_order;
+        uint64_t order_valid_millis;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

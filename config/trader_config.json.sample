@@ -10,6 +10,7 @@
     "trade_local_ip": "",
 
     "open_place_order": false,
+    "order_valid_millis": 3000,
 
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",

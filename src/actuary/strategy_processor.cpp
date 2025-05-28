@@ -114,8 +114,10 @@ namespace actuary {
             beta_version = (*beta_threshold).version_number;
             early_run_version = (*early_run_threshold).version_number;
 
-            if (now > (*benchmark_ticker).update_time+1000 || now > (*follower_ticker).update_time+1000 ||
-                now > (*beta_threshold).time_mills+1000 || now > (*early_run_threshold).time_mills+1000) {
+            if (now > (*benchmark_ticker).update_time + config.ticker_valid_millis ||
+                now > (*follower_ticker).update_time + config.ticker_valid_millis ||
+                now > (*beta_threshold).time_mills + config.ticker_valid_millis ||
+                now > (*early_run_threshold).time_mills + config.ticker_valid_millis) {
                 if (rnd_number < 10) {
                     warn_log("timestamp expired for {}", base_asset);
                 }

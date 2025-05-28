@@ -44,7 +44,7 @@ namespace trader {
             order_version = (*shm_order).version_number;
 
             uint64_t now = binance::get_current_ms_epoch();
-            if (now > (*shm_order).update_time + 3000) {
+            if (now > (*shm_order).update_time + config.order_valid_millis) {
                 continue;
             }
             binance::FuturesNewOrder order;

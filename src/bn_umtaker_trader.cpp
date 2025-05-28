@@ -33,7 +33,7 @@ int main(int argc, char const *argv[]) {
     info_log("trader processor started.");
     
     while(true) {
-        std::cout << "process keep running" << std::endl;
+        std::cout << "process trader keep running" << std::endl;
         // info_log("process keep running");
         std::this_thread::sleep_for(std::chrono::seconds(10));
     }

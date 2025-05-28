@@ -10,6 +10,8 @@ namespace actuary {
         // Parse own configuration properties
         this->inst_config_file = this->doc_["inst_config_file"].asString();
 
+        this->ticker_valid_millis = this->doc_["ticker_valid_millis"].asUInt64();
+
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
 
