@@ -5,6 +5,7 @@
 #include "global_context.h"
 #include "binancecpp/binance_enum.h"
 #include "common/tools.h"
+#include "common/random.h"
 
 namespace actuary {
 
