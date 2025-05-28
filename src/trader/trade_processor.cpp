@@ -35,6 +35,8 @@ namespace trader {
         }
 
         long order_version = 0;
+        RandomIntGen rand;
+        rand.init(0, 10000);
 
         while (true) {
 
@@ -42,14 +44,28 @@ namespace trader {
                 std::this_thread::sleep_for(std::chrono::seconds(config.loop_pause_time_seconds));
             }
 
+            int rnd_number = rand.randInt();
+
             shared_ptr<shm_mng::OrderShm> shm_order = shm_mng::order_shm_reader_get(context.get_shm_store_info().order_start, shm_mapping_index);
-            if (shm_order == nullptr || (*shm_order).version_number <= order_version) {
+            if (shm_order == nullptr) {
+                if (rnd_number < 10) {
+                    warn_log("order in share memory not found for {}", base_asset);
+                }
+                continue;
+            }
+            if ((*shm_order).version_number <= order_version) {
+                if (rnd_number < 10) {
+                    warn_log("order version in share memory is old {}", base_asset);
+                }
                 continue;
             }
             order_version = (*shm_order).version_number;
 
             uint64_t now = binance::get_current_ms_epoch();
             if (now > (*shm_order).update_time + config.order_valid_millis) {
+                if (rnd_number < 10) {
+                    warn_log("order is expired for {}", base_asset);
+                }
                 continue;
             }
             binance::FuturesNewOrder order;

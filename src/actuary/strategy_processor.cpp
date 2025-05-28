@@ -87,9 +87,17 @@ namespace actuary {
                 continue;
             }
 
-            if ((*benchmark_ticker).version_number <= benchmark_ticker_version && (*follower_ticker).version_number <= follower_ticker_version) {
-                benchmark_ticker_version = (*benchmark_ticker).version_number;
-                follower_ticker_version = (*follower_ticker).version_number;
+            if ((*benchmark_ticker).version_number == benchmark_ticker_version && (*follower_ticker).version_number == follower_ticker_version ||
+                (*benchmark_ticker).version_number < benchmark_ticker_version || (*follower_ticker).version_number < follower_ticker_version) {
+                if ((*benchmark_ticker).version_number > benchmark_ticker_version) {
+                    benchmark_ticker_version = (*benchmark_ticker).version_number;
+                }
+                if ((*follower_ticker).version_number > follower_ticker_version) {
+                    follower_ticker_version = (*follower_ticker).version_number;
+                }
+                if (rnd_number < 10) {
+                    warn_log("ticker version is old in share memory for {}", base_asset);
+                }
                 continue;
             }
 
@@ -106,9 +114,17 @@ namespace actuary {
                 }
                 continue;
             }
-            if ((*beta_threshold).version_number <= beta_version && (*early_run_threshold).version_number <= early_run_version) {
-                beta_version = (*beta_threshold).version_number;
-                early_run_version = (*early_run_threshold).version_number;
+            if ((*beta_threshold).version_number == beta_version && (*early_run_threshold).version_number == early_run_version ||
+                (*beta_threshold).version_number < beta_version || (*early_run_threshold).version_number < early_run_version) {
+                if ((*beta_threshold).version_number > beta_version) {
+                    beta_version = (*beta_threshold).version_number;
+                }
+                if ((*early_run_threshold).version_number > early_run_version) {
+                    early_run_version = (*early_run_threshold).version_number;
+                }
+                if (rnd_number < 10) {
+                    warn_log("threshold version is old in share memory for {}", base_asset);
+                }
                 continue;
             }
 
@@ -120,7 +136,7 @@ namespace actuary {
                 now > (*beta_threshold).time_mills + config.ticker_valid_millis ||
                 now > (*early_run_threshold).time_mills + config.ticker_valid_millis) {
                 if (rnd_number < 10) {
-                    warn_log("timestamp expired for {}", base_asset);
+                    warn_log(" ticker or threshold timestamp expired for {}", base_asset);
                 }
                 continue;
             }
