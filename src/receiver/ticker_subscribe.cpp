@@ -108,7 +108,9 @@ namespace receiver {
 
                 result = (*context.get_beta_calculation_channel()).try_enqueue(info.inst_id);
                 if (!result) {
-                    warn_log("can not enqueue beta calculation: {}", info.inst_id);
+                    if (rand_value < 10) {
+                        warn_log("can not enqueue beta calculation: {}", info.inst_id);
+                    }
                 }
 
                 if (rand_value < 20) {
@@ -224,7 +226,7 @@ namespace receiver {
                     // put info queue for price offset
                     bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
                     if (!result) {
-                        std::cout << "can not enqueue ticker info: " << info.inst_id << std::endl;
+                        warn_log("can not enqueue ticker info: {}", info.inst_id);
                     }
 
                     if (rand_value < 20) {

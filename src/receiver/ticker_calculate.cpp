@@ -219,6 +219,8 @@ namespace receiver {
             while (!context.get_ticker_info_channel()->try_dequeue(ticker_info)) {
                 // Retry if the queue is empty
             }
+            
+            int rnd_value = rand.randInt();
 
             if (str_ends_with(ticker_info.inst_id, config.benchmark_quote_asset)) {
                 std::string base_asset = ticker_info.inst_id.substr(0, ticker_info.inst_id.size() - config.benchmark_quote_asset.size());
@@ -239,10 +241,12 @@ namespace receiver {
             // Send ticker info to early run parameter calculator
             bool result = (*context.get_early_run_calculation_channel()).try_enqueue(ticker_info.inst_id);
             if (!result) {
-                warn_log("can not enqueue early run calcalation: {}", ticker_info.inst_id);
+                if (rnd_value < 10) {
+                    warn_log("can not enqueue early run calcalation: {}", ticker_info.inst_id);
+                }
             }
 
-            if (rand.randInt() < 20) {
+            if (rnd_value < 20) {
                 info_log("process ticker for price offset: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={}",
                     ticker_info.inst_id, ticker_info.bid_price, ticker_info.bid_volume, ticker_info.ask_price, ticker_info.ask_volume, ticker_info.update_time_millis);
             }
