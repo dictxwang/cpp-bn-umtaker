@@ -20,7 +20,9 @@ namespace trader {
         string secret_key_ed25519;
         bool trade_use_intranet;
         string trade_local_ip;
-        
+
+        bool open_place_order;
+
         string benchmark_quote_asset;
         string follower_quote_asset;
         std::vector<string> base_asset_list;

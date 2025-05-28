@@ -63,12 +63,13 @@ namespace actuary {
         RandomIntGen rand;
         rand.init(0, 10000);
         InstConfigItem inst_config = (*inst_config_auto).second;
-        long benchmark_ticker_version, follower_ticker_version, earyly_run_version, beta_version = 0;
+        long benchmark_ticker_version, follower_ticker_version, early_run_version, beta_version = 0;
         while (true) {
 
             // TODO delete it
             std::this_thread::sleep_for(std::chrono::seconds(5));
             int rnd_number = rand.randInt();
+            uint64_t now = binance::get_current_ms_epoch();
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
             std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm_index);
@@ -104,16 +105,45 @@ namespace actuary {
                 }
                 continue;
             }
-            if ((*beta_threshold).version_number <= beta_version && (*early_run_threshold).version_number <= earyly_run_version) {
+            if ((*beta_threshold).version_number <= beta_version && (*early_run_threshold).version_number <= early_run_version) {
                 beta_version = (*beta_threshold).version_number;
-                earyly_run_version = (*early_run_threshold).version_number;
+                early_run_version = (*early_run_threshold).version_number;
                 continue;
             }
 
             beta_version = (*beta_threshold).version_number;
-            earyly_run_version = (*early_run_threshold).version_number;
+            early_run_version = (*early_run_threshold).version_number;
 
-            if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
+            if (now > (*benchmark_ticker).update_time+1000 || now > (*follower_ticker).update_time+1000 ||
+                now > (*beta_threshold).time_mills+1000 || now > (*early_run_threshold).time_mills+1000) {
+                if (rnd_number < 10) {
+                    warn_log("timestamp expired for {}", base_asset);
+                }
+                continue;
+            }
+
+            // info_log("parameters: {} {}, {}, {}, {}, {}, {}",
+            //     base_asset,
+            //     (*benchmark_ticker).bid_price,
+            //     ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta),
+            //     (*benchmark_ticker).bid_size,
+            //     inst_config.max_ticker_size,
+            //     (*follower_ticker).ask_size,
+            //     inst_config.min_ticker_size
+            // );
+
+            // info_log("parameters: {} {}, {}, {}, {}, {}, {}",
+            //     base_asset,
+            //     (*benchmark_ticker).ask_price,
+            //     ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta),
+            //     (*benchmark_ticker).ask_size,
+            //     inst_config.max_ticker_size,
+            //     (*follower_ticker).bid_size,
+            //     inst_config.min_ticker_size
+            // );
+
+            // TODO delete true condition
+            if (true || (*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
                 // make buy-side order
                 shm_mng::OrderShm order_buy;
                 strcpy(order_buy.inst_id, follower_inst_id.c_str());
@@ -128,8 +158,9 @@ namespace actuary {
 
                 int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 // TODO reduce too many logs
-                info_log("update buy order: inst_id={} price={} size={} client_id={}",
-                    follower_inst_id, order_buy.price, order_buy.volume, client_order_id);
+                info_log("update buy order: inst_id={} price={} size={} client_id={} updated={} ticker_version={}/{} threshold_version={}/{}",
+                    follower_inst_id, order_buy.price, order_buy.volume, client_order_id, updated,
+                    benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
             
             } else if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).ask_size > inst_config.max_ticker_size && (*follower_ticker).bid_size < inst_config.min_ticker_size) {
                 // make sell-side order
@@ -146,8 +177,9 @@ namespace actuary {
                 
                 int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 // TODO reduce too many logs
-                info_log("update sell order: inst_id={} price={} size={} client_id={}",
-                    follower_inst_id, order_sell.price, order_sell.volume, client_order_id);
+                info_log("update sell order: inst_id={} price={} size={} client_id={} updated={} ticker_version={}/{} threshold_version={}/{}",
+                    follower_inst_id, order_sell.price, order_sell.volume, client_order_id, updated,
+                    benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
             }
         }
     }

@@ -14,6 +14,8 @@ namespace trader {
         this->trade_use_intranet = this->doc_["trade_use_intranet"].asBool();
         this->trade_local_ip = this->doc_["trade_local_ip"].asString();
 
+        this->open_place_order = this->doc_["open_place_order"].asBool();
+
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
 

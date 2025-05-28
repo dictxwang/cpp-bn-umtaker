@@ -9,6 +9,8 @@
     "trade_use_intranet": false,
     "trade_local_ip": "",
 
+    "open_place_order": false,
+
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 

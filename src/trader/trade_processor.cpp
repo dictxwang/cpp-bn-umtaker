@@ -58,7 +58,13 @@ namespace trader {
             order.newClientOrderId = std::string((*shm_order).client_order_id);
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
 
-            pair<bool, string> result = context.get_order_service().placeOrder(order);
+            pair<bool, string> result;
+            if (config.open_place_order) {
+                result = context.get_order_service().placeOrder(order);
+            } else {
+                result.first = false;
+                result.second = "close place order";
+            }
             
             info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={})",
                 result.first, result.second, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId);

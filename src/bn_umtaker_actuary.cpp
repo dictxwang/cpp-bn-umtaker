@@ -34,8 +34,8 @@ int main(int argc, char const *argv[]) {
     info_log("acturay processor started.");
     
     while(true) {
-        // std::cout << "Keep Running..." << std::endl;
-        // info_log("Process Keep Running...");
+        std::cout << "process keep running" << std::endl;
+        // info_log("process keep running");
         std::this_thread::sleep_for(std::chrono::seconds(10));
     }
 }
