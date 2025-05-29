@@ -86,7 +86,7 @@ namespace trader {
                 result = context.get_order_service().placeOrder(order);
             } else {
                 result.first = false;
-                result.second = "close place order";
+                result.second = "config stop place order";
             }
             
             info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={})",

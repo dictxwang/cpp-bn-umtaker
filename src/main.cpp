@@ -132,9 +132,10 @@ bool processFuturesOrderServiceMessage(std::string &messageJson) {
 
 void startFuturesOrderService(binance::BinanceFuturesWsClient &futuresWsClient, std::string &apiKey, std::string &secretKey) {
     try {
-        futuresWsClient.initOrderService(apiKey, secretKey, false);
+        // futuresWsClient.initOrderService(apiKey, secretKey, false);
         futuresWsClient.setMessageCallback(processFuturesOrderServiceMessage);
-        futuresWsClient.startOrderService();
+        std::pair<bool, string> startResult = futuresWsClient.startOrderService();
+        std::cout << "start: " << startResult.first << "," << startResult.second << std::endl;
     } catch (std::exception &e) {
         std::cout << "futures order error: " << e.what() << std::endl;
     }
@@ -179,7 +180,7 @@ void startMessageChannelConsume(moodycamel::ConcurrentQueue<std::string> *messag
 int main(int argc, char const *argv[])
 {
     std::cout << "00000" << std::endl;
-    
+
     if (argc < 2) {
         std::cout << "Usage: " << argv[0] << " config_file" << std::endl;
         return 0;
@@ -319,49 +320,49 @@ int main(int argc, char const *argv[])
     // futuresWsClient.initUserDataStream(config.api_key_ed25519, config.secret_key_ed25519, false);
     // futuresWsClient.startUserDataStream(processFuturesUserDataMessage);
 
-    // futuresWsClient.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, false);
+    futuresWsClient.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, false);
 
-    // std::thread futureOrderThread(startFuturesOrderService, std::ref(futuresWsClient), std::ref(config.api_key_ed25519), std::ref(config.secret_key_ed25519));
-    // futureOrderThread.join();
-    // std::cout << "start order service" << std::endl;
+    std::thread futureOrderThread(startFuturesOrderService, std::ref(futuresWsClient), std::ref(config.api_key_ed25519), std::ref(config.secret_key_ed25519));
+    futureOrderThread.detach();
+    std::cout << "start order service" << std::endl;
 
-    // std::cout << "local time: " << binance::get_current_ms_epoch() << std::endl;
-    // std::this_thread::sleep_for(std::chrono::seconds(10));
+    std::cout << "local time: " << binance::get_current_ms_epoch() << std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    // binance::FuturesNewOrder order;
-    // order.symbol = "BTCUSDT";
-    // order.side = binance::ORDER_SIDE_BUY;
-    // order.positionSide = binance::PositionSide_LONG;
-    // order.quantity = 0.002;
-    // order.price = 80000.00;
-    // order.type = binance::ORDER_TYPE_LIMIT;
-    // order.timeInForce = binance::TimeInForce_GTC;
-    // order.newClientOrderId = "a1234567890";
-    // order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+    binance::FuturesNewOrder order;
+    order.symbol = "BTCUSDT";
+    order.side = binance::ORDER_SIDE_BUY;
+    order.positionSide = binance::PositionSide_LONG;
+    order.quantity = 0.002;
+    order.price = 80000.00;
+    order.type = binance::ORDER_TYPE_LIMIT;
+    order.timeInForce = binance::TimeInForce_GTC;
+    order.newClientOrderId = "a1234567890";
+    order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
 
-    // try {
-    //     bool placeResult = futuresWsClient.placeOrder(order);
-    //     std::cout << "place result: " << placeResult << std::endl;
-    // } catch (std::exception &e) {
-    //     std::cout << "fail to place order: " << e.what() << std::endl;
-    // }
+    try {
+        std::pair<bool, string> placeResult = futuresWsClient.placeOrder(order);
+        std::cout << "place result: " << placeResult.first << "," << placeResult.second << std::endl;
+    } catch (std::exception &e) {
+        std::cout << "fail to place order: " << e.what() << std::endl;
+    }
     
-    // std::this_thread::sleep_for(std::chrono::seconds(5));
+    std::this_thread::sleep_for(std::chrono::seconds(5));
     
-    // binance::FuturesCancelOrder cancelOrder;
-    // cancelOrder.origClientOrderId = "a1234567890";
-    // cancelOrder.symbol = "BTCUSDT";
+    binance::FuturesCancelOrder cancelOrder;
+    cancelOrder.origClientOrderId = "a1234567890";
+    cancelOrder.symbol = "BTCUSDT";
 
-    // try {
-    //     bool cancelResult = futuresWsClient.cancelOrder(cancelOrder);
-    //     std::cout << "cancel result: " << cancelResult << std::endl;
-    // } catch (std::exception &e) {
-    //     std::cout << "fail to cancel order: " << e.what() << std::endl;
-    // }
+    try {
+        std::pair<bool, string> cancelResult = futuresWsClient.cancelOrder(cancelOrder);
+        std::cout << "cancel result: " << cancelResult.first << "," << cancelResult.second << std::endl;
+    } catch (std::exception &e) {
+        std::cout << "fail to cancel order: " << e.what() << std::endl;
+    }
     
-    std::thread zmqSender(startZMQSender, std::ref(config.zmq_ipc));
-    std::this_thread::sleep_for(std::chrono::seconds(3));
-    std::thread zmqReceiver(startZMQReceiver, std::ref(config.zmq_ipc));
+    // std::thread zmqSender(startZMQSender, std::ref(config.zmq_ipc));
+    // std::this_thread::sleep_for(std::chrono::seconds(3));
+    // std::thread zmqReceiver(startZMQReceiver, std::ref(config.zmq_ipc));
 
     while(true) {
         std::cout << "Keep Running..." << std::endl;
