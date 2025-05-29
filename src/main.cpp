@@ -131,6 +131,7 @@ bool processFuturesOrderServiceMessage(std::string &messageJson) {
 }
 
 void startFuturesOrderService(binance::BinanceFuturesWsClient &futuresWsClient, std::string &apiKey, std::string &secretKey) {
+    std::cout << "apiKey=" << apiKey << ",secretKey=" << secretKey << std::endl;
     try {
         // futuresWsClient.initOrderService(apiKey, secretKey, false);
         futuresWsClient.setMessageCallback(processFuturesOrderServiceMessage);
