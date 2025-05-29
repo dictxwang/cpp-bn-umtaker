@@ -126,7 +126,16 @@ bool processFuturesUserDataMessage(std::string &messageJson) {
 }
 
 bool processFuturesOrderServiceMessage(std::string &messageJson) {
-    std::cout << messageJson << std::endl;
+    // std::cout << messageJson << std::endl;
+    Json::Value json_result;
+    Json::Reader reader;
+    json_result.clear();
+    reader.parse(messageJson.c_str(), json_result);
+
+    std::cout << "process futures order message: " << json_result << std::endl;
+    binance::WsFuturesOrderCallbackEvent event = binance::convertJsonToWsFuturesOrderCallbackEvent(json_result);
+    std::cout << "status:" << event.status << std::endl;
+
     return true;
 }
 
