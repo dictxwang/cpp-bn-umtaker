@@ -10,6 +10,11 @@ namespace actuary {
         // Parse own configuration properties
         this->inst_config_file = this->doc_["inst_config_file"].asString();
 
+        this->api_key_hmac = this->doc_["api_key_hmac"].asString();
+        this-> secret_key_hmac = this->doc_["secret_key_hmac"].asString();
+        this->rest_use_intranet = this->doc_["rest_use_intranet"].asBool();
+        this->rest_local_ip = this->doc_["rest_local_ip"].asString();
+
         this->ticker_valid_millis = this->doc_["ticker_valid_millis"].asUInt64();
         this->loop_pause_time_seconds = this->doc_["loop_pause_time_seconds"].asInt64();
 

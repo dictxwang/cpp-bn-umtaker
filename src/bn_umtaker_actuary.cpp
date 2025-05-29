@@ -2,6 +2,7 @@
 #include "config/actuary_config.h"
 #include "actuary/global_context.h"
 #include "actuary/strategy_processor.h"
+#include "actuary/account_prepare.h"
 
 /*
     loop scan ticker and threshold like 'early-run' 'beta' from share memory
@@ -26,6 +27,8 @@ int main(int argc, char const *argv[]) {
 
     actuary::GlobalContext context;
     context.init(config);
+
+    // actuary::load_account_info(config);
 
     // create threads for per asset
     actuary::start_strategy_processors(config, context);

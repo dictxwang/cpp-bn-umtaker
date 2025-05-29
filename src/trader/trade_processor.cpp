@@ -83,6 +83,7 @@ namespace trader {
 
             pair<bool, string> result;
             if (config.open_place_order) {
+                // TODO select best order path
                 result = context.get_order_service().placeOrder(order);
             } else {
                 result.first = false;
@@ -107,7 +108,7 @@ namespace trader {
         }
     }
 
-void process_order_message(TraderConfig& config, GlobalContext& context) {
+    void process_order_message(TraderConfig& config, GlobalContext& context) {
         moodycamel::ConcurrentQueue<string> *channel = context.get_order_chanel();
 
         RandomIntGen rand;
@@ -127,8 +128,14 @@ void process_order_message(TraderConfig& config, GlobalContext& context) {
                 json_result.clear();
                 reader.parse(messageJson.c_str(), json_result);
 
-                // TODO parse json
                 info_log("receive order message: {}", messageJson);
+
+                binance::WsFuturesOrderCallbackEvent event = binance::convertJsonToWsFuturesOrderCallbackEvent(json_result);
+                if (event.status == binance::WsCallbackStatusOK) {
+                    // TODO normal message
+                } else {
+                    // TODO error message
+                }
 
             } catch (std::exception &exp) {
                 err_log("fail to process order message: {}", std::string( exp.what()));

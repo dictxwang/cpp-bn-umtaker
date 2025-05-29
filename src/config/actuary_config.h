@@ -15,6 +15,11 @@ namespace actuary {
     
     public:
         string inst_config_file;
+        
+        string api_key_hmac;
+        string secret_key_hmac;
+        bool rest_use_intranet;
+        string rest_local_ip;
 
         uint64_t ticker_valid_millis;
         long loop_pause_time_seconds;
