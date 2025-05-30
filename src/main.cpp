@@ -2,6 +2,8 @@
 #include <thread>
 #include <chrono>
 #include "binancecpp/binance.h"
+#include "binancecpp/binance_param.h"
+#include "binancecpp/binance_model.h"
 #include "binancecpp/binance_spot.h"
 #include "binancecpp/binance_futures.h"
 #include "binancecpp/binance_ws.h"

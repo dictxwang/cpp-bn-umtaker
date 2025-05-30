@@ -6,6 +6,9 @@
 
     "api_key_hmac": "",
     "secret_key_hmac": "",
+    "rest_use_intranet": false,
+    "rest_local_ip": "",
+
     "api_key_ed25519": "",
     "secret_key_ed25519": "-----BEGIN PRIVATE KEY-----\n\n-----END PRIVATE KEY-----",
 
