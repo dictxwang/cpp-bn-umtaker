@@ -117,6 +117,7 @@ target_link_libraries(${PROCESS_MAIN}
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
     config
+    common
 )
 
 add_executable(${PROCESS_TICKER_RECEIVER} "src/bn_umtaker_receiver.cpp")

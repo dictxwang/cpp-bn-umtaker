@@ -15,6 +15,9 @@ public:
 public:
     std::string api_key_hmac;
     std::string secret_key_hmac;
+    bool rest_use_intranet;
+    std::string rest_local_ip;
+
     std::string api_key_ed25519;
     std::string secret_key_ed25519;
     std::string zmq_ipc;

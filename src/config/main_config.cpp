@@ -9,6 +9,9 @@ bool MainConfig::loadMainConfig(const char* inputfile) {
     // Parse own configuration properties
     this->api_key_hmac = this->doc_["api_key_hmac"].asString();
     this->secret_key_hmac = this->doc_["secret_key_hmac"].asString();
+    this->rest_use_intranet = this->doc_["rest_use_intranet"].asBool();
+    this->rest_local_ip = this->doc_["rest_local_ip"].asString();
+
     this->api_key_ed25519 = this->doc_["api_key_ed25519"].asString();
     this->secret_key_ed25519 = this->doc_["secret_key_ed25519"].asString();
     this->zmq_ipc = this->doc_["zmq_ipc"].asString();

@@ -12,6 +12,7 @@
 #include "config/main_config.h"
 #include "logger/logger.h"
 #include "zmq/zmq_client.h"
+#include "common/tools.h"
 #include "protocol/ticker_info.pb.h"
 
 bool processTickerMessage(std::string &messageJson) {
@@ -187,10 +188,7 @@ void startMessageChannelConsume(moodycamel::ConcurrentQueue<std::string> *messag
     }
 }
 
-int main(int argc, char const *argv[])
-{
-    std::cout << "00000" << std::endl;
-
+int main(int argc, char const *argv[]) {
     if (argc < 2) {
         std::cout << "Usage: " << argv[0] << " config_file" << std::endl;
         return 0;
@@ -206,35 +204,45 @@ int main(int argc, char const *argv[])
     spdlog::level::level_enum logger_level = static_cast<spdlog::level::level_enum>(config.logger_level);
     init_daily_file_log(config.logger_name, config.logger_file_path, logger_level, config.logger_max_files);
 
-    std::cout << "<< this is main process >>" << std::endl;
+    // Create instance of rest
+    binance::BinanceSpotRestClient binanceRestSpot;
+    binance::BinanceFuturesRestClient binanceRestFutures;
+    if (config.rest_local_ip.size() > 0) {
+        binanceRestSpot.setLocalIP(config.rest_local_ip);
+    }
+    if (config.rest_local_ip.size() > 0) {
+        binanceRestFutures.setLocalIP(config.rest_local_ip);
+    }
+    binanceRestSpot.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
+    binanceRestFutures.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
 
-    // Create an instance of BinanceSpotRestClient
-    binance::BinanceSpotRestClient binanceSpot;
-    binanceSpot.init(config.api_key_hmac, config.secret_key_hmac, false);
+    // Create instance of ws
+    binance::BinanceSpotWsClient binanceSpotWs;
+    binance::BinanceFuturesWsClient futuresWsClient;
 
-    binance::BinanceFuturesRestClient binanceFutures;
-    binanceFutures.init(config.api_key_hmac, config.secret_key_hmac, false);
-
+    // Example: setServerTimeOffset
     // binance::CommonRestResponse<uint64_t> timeResp;
-    // binanceSpot.setServerTimeOffset(timeResp);
+    // binanceRestSpot.setServerTimeOffset(timeResp);
     // std::cout << "Response code: " << timeResp.code << std::endl;
     // std::cout << "Response data " << timeResp.data << std::endl;
 
+    // Example: get_exchangeInfo
     // binance::CommonRestResponse<std::vector<binance::SpotExchangeInfo>> response;
     // std::vector<std::string> instIds;
     // instIds.push_back("BTCUSDT");
     // instIds.push_back("ETHUSDT");
-    // binanceSpot.get_exchangeInfo(instIds, response);
+    // binanceRestSpot.get_exchangeInfo(instIds, response);
     // std::cout << "Response code: " << response.code << std::endl;
     // std::cout << "Response symbols-0.baseAsset: " << response.data.size() << std::endl;
 
+    // Example: get_account
     // binance::CommonRestResponse<binance::SpotAccount> accountResp;
-    // binanceSpot.get_account(accountResp);
+    // binanceRestSpot.get_account(accountResp);
     // std::cout << "Response code: " << accountResp.code << std::endl;
     // std::cout << "Response msg: " << accountResp.msg << std::endl;
     // std::cout << "Response data: " << accountResp.data.accountType << std::endl;
 
-    binance::BinanceSpotWsClient binanceSpotWs;
+    // Example: subscribe bookticker
     // std::vector<std::string> symbols;
     // symbols.push_back("BTCUSDT");
     // symbols.push_back("ETHUSDT");
@@ -242,137 +250,164 @@ int main(int argc, char const *argv[])
     // binanceSpotWs.setMessageCallback(processTickerMessage);
     // moodycamel::ConcurrentQueue<std::string> messageChannel;
     // binanceSpotWs.setMessageChannel(&messageChannel);
-
     // std::thread messagenChannelConsume(startMessageChannelConsume, &messageChannel);
+    // messagenChannelConsume.detach();
     // std::cout << "After Inited." << std::endl;
     // binanceSpotWs.startBookTicker(symbols);
 
+    // Example: get listenKey / refresh listenKey
     // binance::CommonRestResponse<std::string> startUserStreamResp;
-    // binanceSpot.start_userDataStream(startUserStreamResp);
+    // binanceRestSpot.start_userDataStream(startUserStreamResp);
     // std::cout << "Response code: " << startUserStreamResp.code << std::endl;
     // std::cout << "Response msg: " << startUserStreamResp.msg << std::endl;
-    // std::cout << "Response data: " << startUserStreamResp.data << std::endl;
-    
+    // std::cout << "Response data-listenKey: " << startUserStreamResp.data << std::endl;
+
     // std::string listenKey = "2B1i7X0Y7VSyTnLcCBjxpXJTPcMPRcmZxri2L0DkRsnp6aTW4pzFeO9fvDP7";
     // binance::CommonRestResponse<std::string> keepUserStreamResp;
-    // binanceSpot.keep_userDataStream(listenKey, keepUserStreamResp);
+    // binanceRestSpot.keep_userDataStream(listenKey, keepUserStreamResp);
     // std::cout << "Response code: " << keepUserStreamResp.code << std::endl;
     // std::cout << "Response msg: " << keepUserStreamResp.msg << std::endl;
 
+    // Example: startUserDataStreamV1
     // binanceSpotWs.initUserDataStreamV1(config.api_key_hmac, config.secret_key_hmac, false);
     // binanceSpotWs.startUserDataStreamV1(processUserDataMessage, listenKey);
     // std::cout << "end user data stream" << std::endl;
 
+    // Example: startUserDataStream
     // binanceSpotWs.initUserDataStream(config.api_key_ed25519, config.secret_key_ed25519, false);
     // binanceSpotWs.setMessageCallback(processUserDataMessage);
     // std::pair<bool, string> startResult = binanceSpotWs.startUserDataStream();
     // std::cout << "start result: " << startResult.first << ", msg=" << startResult.second << std::endl;
 
+    // Example: setServerTimeOffset
     // binance::CommonRestResponse<uint64_t> futuresTimeResp;
-    // binanceFutures.setServerTimeOffset(futuresTimeResp);
+    // binanceRestFutures.setServerTimeOffset(futuresTimeResp);
     // std::cout << "Response code futures set time-offset: " << futuresTimeResp.code << std::endl;
     // std::cout << "Response data futures set time-offset:" << futuresTimeResp.data << std::endl;
 
+    // Example: get_exchangeInfo
     // binance::CommonRestResponse<std::vector<binance::FuturesExchangeInfo>> futuresResponse;
-    // binanceFutures.get_exchangeInfo(futuresResponse);
+    // binanceRestFutures.get_exchangeInfo(futuresResponse);
     // std::cout << "Response code: " << futuresResponse.code << std::endl;
     // std::cout << "Response symbols-0.symbol: " << futuresResponse.data[0].symbol << std::endl;
 
+    // Example: get_account_v2
     // binance::CommonRestResponse<binance::FuturesAccount> fururesAcccountResponse;
-    // binanceFutures.get_account_v2(fururesAcccountResponse);
+    // binanceRestFutures.get_account_v2(fururesAcccountResponse);
     // std::cout << "Response code: " << fururesAcccountResponse.code << std::endl;
     // std::cout << "Response account canWithdraw: " << fururesAcccountResponse.data.canWithdraw << std::endl;
 
+    // Example: get_multiAssetMargin
     // binance::CommonRestResponse<bool> futuresMultiAssetResponse;
-    // binanceFutures.get_multiAssetMargin(futuresMultiAssetResponse);
+    // binanceRestFutures.get_multiAssetMargin(futuresMultiAssetResponse);
     // std::cout << "Response-get_multiAssetMargin code: " << futuresMultiAssetResponse.code << std::endl;
     // std::cout << "Response-get_multiAssetMargin msg: " << futuresMultiAssetResponse.msg << std::endl;
     // std::cout << "Response-get_multiAssetMargin data: " << futuresMultiAssetResponse.data << std::endl;
 
+    // Example: get_bnbFeeBurn
     // binance::CommonRestResponse<bool> futuresFeeBurnResponse;
-    // binanceFutures.get_bnbFeeBurn(futuresFeeBurnResponse);
+    // binanceRestFutures.get_bnbFeeBurn(futuresFeeBurnResponse);
     // std::cout << "Response-get_bnbFeeBurn code: " << futuresMultiAssetResponse.code << std::endl;
     // std::cout << "Response-get_bnbFeeBurn msg: " << futuresMultiAssetResponse.msg << std::endl;
     // std::cout << "Response-get_bnbFeeBurn data: " << futuresMultiAssetResponse.data << std::endl;
 
+    // Example: toggle_bnbFeeBurn
     // binance::CommonRestResponse<bool> futuresFeeBurnToggleResponse;
-    // binanceFutures.toggle_bnbFeeBurn(true, futuresFeeBurnToggleResponse);
+    // binanceRestFutures.toggle_bnbFeeBurn(true, futuresFeeBurnToggleResponse);
     // std::cout << "Response-toggle_bnbFeeBurn code: " << futuresFeeBurnToggleResponse.code << std::endl;
     // std::cout << "Response-toggle_bnbFeeBurn msg: " << futuresFeeBurnToggleResponse.msg << std::endl;
     // std::cout << "Response-toggle_bnbFeeBurn data: " << futuresFeeBurnToggleResponse.data << std::endl;
 
-    binance::BinanceFuturesWsClient futuresWsClient;
+    // Example: startBookTickerV1
     // futuresWsClient.initBookTickerV1(false, false);
     // std::vector<string> futuresSymbols;
     // futuresSymbols.push_back("BTCUSDT");
     // futuresSymbols.push_back("ETHUSDT");
-    // // futuresWsClient.startBookTickerV1(processFuturesTickerMessage, futuresSymbols);
+    // futuresWsClient.startBookTickerV1(processFuturesTickerMessage, futuresSymbols);
 
+    // Example: startMarkPriceV1
     // futuresWsClient.initMarkPriceV1(false, false);
     // futuresWsClient.startAllMarkPricesV1(processMarkPriceMessage, binance::WsMarkPriceInterval::WsMPThreeSeconds);
     // futuresWsClient.startMarkPriceV1(processMarkPriceMessage, futuresSymbols, binance::WsMarkPriceInterval::WsMPThreeSeconds);
 
+    // Example: start_userDataStream / keep_userDataStream
     // binance::CommonRestResponse<std::string> startFuturesUserStreamResp;
-    // binanceFutures.start_userDataStream(startFuturesUserStreamResp);
+    // binanceRestFutures.start_userDataStream(startFuturesUserStreamResp);
     // std::cout << "Response code: " << startFuturesUserStreamResp.code << std::endl;
     // std::cout << "Response msg: " << startFuturesUserStreamResp.msg << std::endl;
     // std::cout << "Response data: " << startFuturesUserStreamResp.data << std::endl;
     
-    std::string futuresListenKey = "SkF9KFpQMstAbYf4KXtHD60J3nq1TYrIVYWx3oujAf2Sk2oPssRrwVZosUKGv3a3";
+    // std::string futuresListenKey = "SkF9KFpQMstAbYf4KXtHD60J3nq1TYrIVYWx3oujAf2Sk2oPssRrwVZosUKGv3a3";
     // binance::CommonRestResponse<std::string> keepFuturesUserStreamResp;
-    // binanceFutures.keep_userDataStream(futuresListenKey, keepFuturesUserStreamResp);
+    // binanceRestFutures.keep_userDataStream(futuresListenKey, keepFuturesUserStreamResp);
     // std::cout << "Response code: " << keepFuturesUserStreamResp.code << std::endl;
     // std::cout << "Response msg: " << keepFuturesUserStreamResp.msg << std::endl;
 
+    // Example: startUserDataStreamV1
     // futuresWsClient.initUserDataStreamV1(config.api_key_hmac, config.secret_key_hmac, false);
     // futuresWsClient.startUserDataStreamV1(processFuturesUserDataMessage, futuresListenKey);
 
+    // Example: startUserDataStream
     // futuresWsClient.initUserDataStream(config.api_key_ed25519, config.secret_key_ed25519, false);
     // futuresWsClient.startUserDataStream(processFuturesUserDataMessage);
 
-    futuresWsClient.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, false);
 
-    std::thread futureOrderThread(startFuturesOrderService, std::ref(futuresWsClient), std::ref(config.api_key_ed25519), std::ref(config.secret_key_ed25519));
-    futureOrderThread.detach();
-    std::cout << "start order service" << std::endl;
+    // Example: placeOrder / cancelOrder
+    // futuresWsClient.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, false);
+    // std::thread futureOrderThread(startFuturesOrderService, std::ref(futuresWsClient), std::ref(config.api_key_ed25519), std::ref(config.secret_key_ed25519));
+    // futureOrderThread.detach();
+    // std::this_thread::sleep_for(std::chrono::seconds(2));
 
-    std::cout << "local time: " << binance::get_current_ms_epoch() << std::endl;
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-
-    binance::FuturesNewOrder order;
-    order.symbol = "BTCUSDT";
-    order.side = binance::ORDER_SIDE_BUY;
-    order.positionSide = binance::PositionSide_LONG;
-    order.quantity = 0.002;
-    order.price = 80000.00;
-    order.type = binance::ORDER_TYPE_LIMIT;
-    order.timeInForce = binance::TimeInForce_GTC;
-    order.newClientOrderId = "a1234567890";
-    order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
-
-    try {
-        std::pair<bool, string> placeResult = futuresWsClient.placeOrder(order);
-        std::cout << "place result: " << placeResult.first << "," << placeResult.second << std::endl;
-    } catch (std::exception &e) {
-        std::cout << "fail to place order: " << e.what() << std::endl;
-    }
+    // binance::FuturesNewOrder order;
+    // order.symbol = "BTCUSDT";
+    // order.side = binance::ORDER_SIDE_BUY;
+    // order.positionSide = binance::PositionSide_LONG;
+    // order.quantity = 0.002;
+    // order.price = 80000.00;
+    // order.type = binance::ORDER_TYPE_LIMIT;
+    // order.timeInForce = binance::TimeInForce_GTC;
+    // order.newClientOrderId = "a1234567890";
+    // order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+    // try {
+    //     std::pair<bool, string> placeResult = futuresWsClient.placeOrder(order);
+    //     std::cout << "place result: " << placeResult.first << "," << placeResult.second << std::endl;
+    // } catch (std::exception &e) {
+    //     std::cout << "fail to place order: " << e.what() << std::endl;
+    // }
     
-    std::this_thread::sleep_for(std::chrono::seconds(5));
+    // std::this_thread::sleep_for(std::chrono::seconds(5));
     
-    binance::FuturesCancelOrder cancelOrder;
-    cancelOrder.origClientOrderId = "a1234567890";
-    cancelOrder.symbol = "BTCUSDT";
+    // binance::FuturesCancelOrder cancelOrder;
+    // cancelOrder.origClientOrderId = "a1234567890";
+    // cancelOrder.symbol = "BTCUSDT";
+    // try {
+    //     std::pair<bool, string> cancelResult = futuresWsClient.cancelOrder(cancelOrder);
+    //     std::cout << "cancel result: " << cancelResult.first << "," << cancelResult.second << std::endl;
+    // } catch (std::exception &e) {
+    //     std::cout << "fail to cancel order: " << e.what() << std::endl;
+    // }
+    
 
-    try {
-        std::pair<bool, string> cancelResult = futuresWsClient.cancelOrder(cancelOrder);
-        std::cout << "cancel result: " << cancelResult.first << "," << cancelResult.second << std::endl;
-    } catch (std::exception &e) {
-        std::cout << "fail to cancel order: " << e.what() << std::endl;
-    }
-    
+    // Example: zmq sender and receiver
     // std::thread zmqSender(startZMQSender, std::ref(config.zmq_ipc));
     // std::this_thread::sleep_for(std::chrono::seconds(3));
     // std::thread zmqReceiver(startZMQReceiver, std::ref(config.zmq_ipc));
+
+    // Example: spot order by rest
+    binance::SpotNewOrder newOrder;
+    newOrder.symbol = "BNBETH";
+    newOrder.side = binance::ORDER_SIDE_BUY;
+    newOrder.type = binance::ORDER_TYPE_LIMIT;
+    newOrder.timeInForce = binance::TimeInForce_IOC;
+    newOrder.quantity = 0.5;
+    newOrder.price = 0.0001;
+    newOrder.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+    newOrder.newClientOrderId = gen_client_order_id(true);
+
+    binance::CommonRestResponse<binance::SpotNewOrderResult> newOrderResp;
+    binanceRestSpot.create_new_order(newOrder, newOrderResp);
+    std::cout << "code=" << newOrderResp.code << ",msg=" << newOrderResp.msg << std::endl;
+    std::cout << "order: status=" << newOrderResp.data.status << std::endl;
 
     while(true) {
         std::cout << "Keep Running..." << std::endl;
