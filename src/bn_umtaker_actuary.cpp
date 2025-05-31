@@ -28,7 +28,7 @@ int main(int argc, char const *argv[]) {
     actuary::GlobalContext context;
     context.init(config);
 
-    // actuary::load_account_info(config);
+    actuary::load_account_info(config);
 
     // create threads for per asset
     actuary::start_strategy_processors(config, context);

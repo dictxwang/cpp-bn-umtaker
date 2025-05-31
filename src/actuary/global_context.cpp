@@ -18,6 +18,12 @@ namespace actuary {
 
         this->init_shm_mapping(config);
         this->init_shm(config);
+
+        // init rest client
+        if (config.rest_local_ip.size() > 0) {
+            this->furures_rest_client.setLocalIP(config.rest_local_ip);
+        }
+        this->furures_rest_client.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -128,5 +134,9 @@ namespace actuary {
 
     unordered_map<string, int>& GlobalContext::get_shm_order_mapping() {
         return this->shm_order_mapping;
+    }
+
+    binance::BinanceFuturesRestClient& GlobalContext::get_furures_rest_client() {
+        return this->furures_rest_client;
     }
 }

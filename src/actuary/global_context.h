@@ -1,6 +1,7 @@
 #ifndef _ACTUARY_GLOBAL_CONTEXT_H_
 #define _ACTUARY_GLOBAL_CONTEXT_H_
 
+#include "binancecpp/binance_futures.h"
 #include "config/actuary_config.h"
 #include "config/inst_config.h"
 #include "logger/logger.h"
@@ -32,6 +33,8 @@ namespace actuary {
         unordered_map<string, int> shm_order_mapping;
 
         ShmStoreInfo shm_store_info;
+
+        binance::BinanceFuturesRestClient furures_rest_client;
     
     public:
         void init(ActuaryConfig& config);
@@ -46,6 +49,7 @@ namespace actuary {
         unordered_map<string, int>& get_shm_benchmark_ticker_mapping();
         unordered_map<string, int>& get_shm_follower_ticker_mapping();
         unordered_map<string, int>& get_shm_order_mapping();
+        binance::BinanceFuturesRestClient& get_furures_rest_client();
     };
 }
 #endif

@@ -4,6 +4,7 @@
 #include "binancecpp/binance.h"
 #include "binancecpp/binance_param.h"
 #include "binancecpp/binance_model.h"
+#include "binancecpp/binance_wallet.h"
 #include "binancecpp/binance_spot.h"
 #include "binancecpp/binance_futures.h"
 #include "binancecpp/binance_ws.h"
@@ -207,14 +208,15 @@ int main(int argc, char const *argv[]) {
     init_daily_file_log(config.logger_name, config.logger_file_path, logger_level, config.logger_max_files);
 
     // Create instance of rest
+    binance::BinanceWalletRestClient binanceRestWallet;
     binance::BinanceSpotRestClient binanceRestSpot;
     binance::BinanceFuturesRestClient binanceRestFutures;
     if (config.rest_local_ip.size() > 0) {
         binanceRestSpot.setLocalIP(config.rest_local_ip);
-    }
-    if (config.rest_local_ip.size() > 0) {
         binanceRestFutures.setLocalIP(config.rest_local_ip);
+        binanceRestWallet.setLocalIP(config.rest_local_ip);
     }
+    binanceRestWallet.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
     binanceRestSpot.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
     binanceRestFutures.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
 
@@ -396,20 +398,30 @@ int main(int argc, char const *argv[]) {
     // std::thread zmqReceiver(startZMQReceiver, std::ref(config.zmq_ipc));
 
     // Example: spot order by rest
-    binance::SpotNewOrder newOrder;
-    newOrder.symbol = "BNBETH";
-    newOrder.side = binance::ORDER_SIDE_BUY;
-    newOrder.type = binance::ORDER_TYPE_LIMIT;
-    newOrder.timeInForce = binance::TimeInForce_IOC;
-    newOrder.quantity = 0.5;
-    newOrder.price = 0.0001;
-    newOrder.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
-    newOrder.newClientOrderId = gen_client_order_id(true);
+    // binance::SpotNewOrder newOrder;
+    // newOrder.symbol = "ETHUSDC";
+    // newOrder.side = binance::ORDER_SIDE_SELL;
+    // newOrder.type = binance::ORDER_TYPE_LIMIT;
+    // newOrder.timeInForce = binance::TimeInForce_IOC;
+    // newOrder.quantity = 1.5;
+    // newOrder.price = 12605;
+    // newOrder.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+    // newOrder.newClientOrderId = gen_client_order_id(true);
 
-    binance::CommonRestResponse<binance::SpotNewOrderResult> newOrderResp;
-    binanceRestSpot.create_new_order(newOrder, newOrderResp);
-    std::cout << "code=" << newOrderResp.code << ",msg=" << newOrderResp.msg << std::endl;
-    std::cout << "order: status=" << newOrderResp.data.status << std::endl;
+    // binance::CommonRestResponse<binance::SpotNewOrderResult> newOrderResp;
+    // binanceRestSpot.create_new_order(newOrder, newOrderResp);
+    // std::cout << "code=" << newOrderResp.code << ",msg=" << newOrderResp.msg << std::endl;
+    // std::cout << "order: status=" << newOrderResp.data.status << std::endl;
+
+    // Example: univals transfer
+    // binance::WalletUniversalTransfer transfer;
+    // transfer.type = binance::UT_MAIN_UMFUTURE;
+    // transfer.asset = "BNB";
+    // transfer.amount = 0.499126;
+    // binance::CommonRestResponse<uint64_t> transferResponse;
+    // binanceRestWallet.universal_transfer(transfer, transferResponse);
+    // std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;
+    // std::cout << "tranId" << transferResponse.data << std::endl;
 
     while(true) {
         std::cout << "Keep Running..." << std::endl;
