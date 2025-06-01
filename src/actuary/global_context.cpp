@@ -153,4 +153,15 @@ namespace actuary {
     AccountBalancePositionComposite& GlobalContext::get_balance_position_composite() {
         return this->balance_position_composite;
     }
+    moodycamel::ConcurrentQueue<string>* GlobalContext::get_account_info_channel() {
+        return &(this->account_info_channel);
+    }
+    string GlobalContext::get_listen_key() {
+        std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
+        return (*(this->user_stream_listen_key));
+    }
+    void GlobalContext::set_listen_key(string listen_key) {
+        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
+        (*(this->user_stream_listen_key)) = listen_key;
+    }
 }

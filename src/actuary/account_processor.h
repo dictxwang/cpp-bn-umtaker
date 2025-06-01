@@ -6,7 +6,7 @@
 #include "config/actuary_config.h"
 #include "global_context.h"
 #include "binancecpp/binance_futures.h"
-#include "binancecpp/binance_spot.h"
+#include "binancecpp/binance_ws_futures.h"
 
 namespace actuary {
     void prepare_account_settings(ActuaryConfig &config, GlobalContext &context);
@@ -18,6 +18,11 @@ namespace actuary {
 
     void start_polling_load_balance_position(ActuaryConfig &config, GlobalContext &context);
     void load_balance_position(ActuaryConfig &config, GlobalContext &context);
+
+    void start_subscribe_balance_position(ActuaryConfig &config, GlobalContext &context);
+    void refresh_listen_key(ActuaryConfig &config, GlobalContext &context);
+    void subscribe_balance_position(ActuaryConfig &config, GlobalContext &context);
+    void process_balance_position(ActuaryConfig &config, GlobalContext &context);
 }
 
 #endif

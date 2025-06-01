@@ -130,4 +130,81 @@ namespace actuary {
             std::this_thread::sleep_for(std::chrono::seconds(10));
         }
     }
+
+    void start_subscribe_balance_position(ActuaryConfig &config, GlobalContext &context) {
+
+        std::thread listen_key_thread(refresh_listen_key, std::ref(config), std::ref(context));
+        listen_key_thread.detach();
+
+        std::thread subscribe_thread(subscribe_balance_position, std::ref(config), std::ref(context));
+        subscribe_thread.detach();
+
+        std::thread process_thread(process_balance_position, std::ref(config), std::ref(context));
+        process_thread.detach();
+    }
+
+    void refresh_listen_key(ActuaryConfig &config, GlobalContext &context) {
+
+        while (true) {
+            string original = context.get_listen_key();
+            if (original.size() == 0) {
+                // Get new listenKey
+                binance::CommonRestResponse<std::string> response;
+                context.get_furures_rest_client().start_userDataStream(response);
+                if (response.code != binance::RestCodeOK) {
+                    err_log("fail to get user listenKey {} {}", response.code, response.msg);
+                    std::this_thread::sleep_for(std::chrono::seconds(5));
+                    continue;
+                } else {
+                    context.set_listen_key(response.data);
+                    info_log("get new listen key: {}", response.data);
+                }
+            } else {
+                // Refresh listenKey
+                binance::CommonRestResponse<std::string> response;
+                context.get_furures_rest_client().keep_userDataStream(original, response);
+                if (response.code != binance::RestCodeOK) {
+                    err_log("fail to refresh user listenKey {} {}", response.code, response.msg);
+                    context.set_listen_key(""); // clear original listen key
+                    std::this_thread::sleep_for(std::chrono::seconds(5));
+                    continue;
+                } else {
+                    info_log("keep original listen key: {}", original);
+                }
+            }
+
+            std::this_thread::sleep_for(std::chrono::minutes(5));
+        }
+    }
+
+    void subscribe_balance_position(ActuaryConfig &config, GlobalContext &context) {
+        
+        binance::BinanceFuturesWsClient futuresWsClient;
+        if (config.rest_local_ip.size() > 0) {
+            futuresWsClient.setLocalIP(config.rest_local_ip);
+        }
+        futuresWsClient.initUserDataStreamV1(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
+        futuresWsClient.setMessageChannel(context.get_account_info_channel());
+
+        while (true) {
+            string listen_key = context.get_listen_key();
+            if (listen_key.size() > 0) {
+                std::pair<bool, string> result;
+                try {
+                    result = futuresWsClient.startUserDataStreamV1(listen_key);
+                } catch (std::exception &exp) {
+                    err_log("error occur while start user data stream v1: {}", std::string(exp.what()));
+                }
+
+                err_log("stop user data stream v1 subscribe: {}", result.second);
+            }
+
+            // wait for a while after exception
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }
+
+    void process_balance_position(ActuaryConfig &config, GlobalContext &context) {
+        // TODO
+    }
 }

@@ -25,7 +25,7 @@ namespace actuary {
             this->base_asset_list.push_back(this->doc_["base_asset_list"][i].asString());
         }
 
-        this->change_account_setting = this->doc_["change_account_setting"].asBool();
+        this->process_account_settings = this->doc_["process_account_settings"].asBool();
         this->initial_leverage = this->doc_["initial_leverage"].asInt();
         this->margin_type = this->doc_["margin_type"].asString();
         this->multi_assets_margin = this->doc_["multi_assets_margin"].asBool();

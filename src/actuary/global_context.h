@@ -2,6 +2,7 @@
 #define _ACTUARY_GLOBAL_CONTEXT_H_
 
 #include "binancecpp/binance_futures.h"
+#include "binancecpp/moodycamel/concurrentqueue.h"
 #include "config/actuary_config.h"
 #include "config/inst_config.h"
 #include "logger/logger.h"
@@ -11,6 +12,7 @@
 #include "shm/ticker_shm.h"
 #include "shm/order_shm.h"
 #include <unordered_map>
+#include <memory>
 #include <vector>
 #include <set>
 
@@ -38,6 +40,10 @@ namespace actuary {
         binance::BinanceFuturesRestClient furures_rest_client;
         AccountBalancePositionComposite balance_position_composite;
     
+        moodycamel::ConcurrentQueue<string> account_info_channel;
+        shared_ptr<string> user_stream_listen_key;
+        shared_mutex rw_lock;
+
     public:
         void init(ActuaryConfig& config);
         void init_shm_mapping(ActuaryConfig& config);
@@ -53,6 +59,10 @@ namespace actuary {
         unordered_map<string, int>& get_shm_order_mapping();
         binance::BinanceFuturesRestClient& get_furures_rest_client();
         AccountBalancePositionComposite& get_balance_position_composite();
+
+        moodycamel::ConcurrentQueue<string>* get_account_info_channel();
+        string get_listen_key();
+        void set_listen_key(string listen_key);
     };
 }
 #endif
