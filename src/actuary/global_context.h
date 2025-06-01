@@ -6,6 +6,7 @@
 #include "config/inst_config.h"
 #include "logger/logger.h"
 #include "basic_container.h"
+#include "account_container.h"
 #include "shm/threshold_shm.h"
 #include "shm/ticker_shm.h"
 #include "shm/order_shm.h"
@@ -35,6 +36,7 @@ namespace actuary {
         ShmStoreInfo shm_store_info;
 
         binance::BinanceFuturesRestClient furures_rest_client;
+        AccountBalancePositionComposite balance_position_composite;
     
     public:
         void init(ActuaryConfig& config);
@@ -50,6 +52,7 @@ namespace actuary {
         unordered_map<string, int>& get_shm_follower_ticker_mapping();
         unordered_map<string, int>& get_shm_order_mapping();
         binance::BinanceFuturesRestClient& get_furures_rest_client();
+        AccountBalancePositionComposite& get_balance_position_composite();
     };
 }
 #endif

@@ -10,6 +10,7 @@
 #include <string>
 #include <optional>
 #include "binancecpp/binance_futures.h"
+#include "binancecpp/binance_ws_model.h"
 
 using namespace std;
 
@@ -67,10 +68,12 @@ namespace actuary {
         shared_mutex rw_lock;
     
     public:
-        void init(vector<string> assets, vector<string> inst_ids);
+        void init(vector<string>& assets, vector<string>& inst_ids);
         bool update_meta(binance::FuturesAccount& meta);
-        bool update_balance(binance::FuturesAccountAsset& balance);
-        bool update_position(binance::FuturesAccountPosition& position);
+        bool update_exist_balance(binance::FuturesAccountAsset& balance);
+        bool update_exist_position(binance::FuturesAccountPosition& position);
+        bool update_exist_balance_event(binance::WsFuturesAccountUpdateBalanceEvent& event);
+        bool update_exist_position_event(binance::WsFuturesAccountUpdatePositionEvent& position);
         AccountMetaInfo copy_meta();
         optional<AccountBalanceInfo> copy_balance(string asset);
         optional<AccountPositionInfo> copy_position(string inst_id);

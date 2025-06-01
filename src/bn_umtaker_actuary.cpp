@@ -2,7 +2,7 @@
 #include "config/actuary_config.h"
 #include "actuary/global_context.h"
 #include "actuary/strategy_processor.h"
-#include "actuary/account_prepare.h"
+#include "actuary/account_processor.h"
 
 /*
     loop scan ticker and threshold like 'early-run' 'beta' from share memory
@@ -29,9 +29,10 @@ int main(int argc, char const *argv[]) {
     context.init(config);
 
     // account prepare
-    actuary::process_account_settings(config, context);
-    
-    actuary::load_account_info(config);
+    actuary::prepare_account_settings(config, context);
+
+    // refresh account balance and position
+    actuary::start_polling_load_balance_position(config, context);
 
     // create threads for per asset
     actuary::start_strategy_processors(config, context);

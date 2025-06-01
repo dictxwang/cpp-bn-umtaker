@@ -3,7 +3,7 @@
 using namespace std;
 
 namespace actuary {
-    void AccountBalancePositionComposite::init(vector<string> assets, vector<string> inst_ids) {
+    void AccountBalancePositionComposite::init(vector<string>& assets, vector<string>& inst_ids) {
         for (string asset : assets) {
             AccountBalanceInfo balance;
             this->balanceWrapper.balance_map.insert({asset, balance});
@@ -25,37 +25,107 @@ namespace actuary {
         this->meta.totalCrossUnPnl = meta.totalCrossUnPnl;
         this->meta.updateTimeMills = binance::get_current_ms_epoch();
         w_lock.unlock();
+        return true;
     }
     
-    bool AccountBalancePositionComposite::update_balance(binance::FuturesAccountAsset& balance) {
+    bool AccountBalancePositionComposite::update_exist_balance(binance::FuturesAccountAsset& balance) {
         
-        AccountBalanceInfo item;
-        item.asset = balance.asset;
-        item.walletBalance = balance.walletBalance;
-        item.crossWalletBalance = balance.crossWalletBalance;
-        item.crossUnPnl = balance.crossUnPnl;
-        item.updateTimeMills = balance.updateTime;
+        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        auto original = this->balanceWrapper.balance_map.find(balance.asset);
+        r_lock.unlock();
 
-        std::unique_lock<std::shared_mutex> w_lock(this->balanceWrapper.rw_lock);
-        this->balanceWrapper.balance_map[item.asset] = item;
-        w_lock.unlock();
+        if (original != this->balanceWrapper.balance_map.end()) {
+            AccountBalanceInfo item;
+            item.asset = balance.asset;
+            item.walletBalance = balance.walletBalance;
+            item.crossWalletBalance = balance.crossWalletBalance;
+            item.crossUnPnl = balance.crossUnPnl;
+            item.updateTimeMills = balance.updateTime;
+
+            std::unique_lock<std::shared_mutex> w_lock(this->balanceWrapper.rw_lock);
+            this->balanceWrapper.balance_map[item.asset] = item;
+            w_lock.unlock();
+            
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
-    bool AccountBalancePositionComposite::update_position(binance::FuturesAccountPosition& position) {
+    bool AccountBalancePositionComposite::update_exist_position(binance::FuturesAccountPosition& position) {
 
-        AccountPositionInfo item;
-        item.symbol = position.symbol;
-        item.initialMargin = position.initialMargin;
-        item.maintMargin = position.maintMargin;
-        item.unrealizedProfit = position.unrealizedProfit;
-        item.entryPrice = position.entryPrice;
-        item.positionSide = position.positionSide;
-        item.positionAmt = position.positionAmt;
-        item.updateTimeMills = position.updateTime;
+        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        auto original = this->positionWrapper.position_map.find(position.symbol);
+        r_lock.unlock();
 
-        std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
-        this->positionWrapper.position_map[item.symbol] = item;
-        w_lock.unlock();
+        if (original != this->positionWrapper.position_map.end()) {
+            AccountPositionInfo item;
+            item.symbol = position.symbol;
+            item.initialMargin = position.initialMargin;
+            item.maintMargin = position.maintMargin;
+            item.unrealizedProfit = position.unrealizedProfit;
+            item.entryPrice = position.entryPrice;
+            item.positionSide = position.positionSide;
+            item.positionAmt = position.positionAmt;
+            item.updateTimeMills = position.updateTime;
+
+            std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
+            this->positionWrapper.position_map[item.symbol] = item;
+            w_lock.unlock();
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool AccountBalancePositionComposite::update_exist_balance_event(binance::WsFuturesAccountUpdateBalanceEvent& event) {
+
+        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        auto original = this->balanceWrapper.balance_map.find(event.asset);
+        r_lock.unlock();
+
+        if (original != this->balanceWrapper.balance_map.end()) {
+            AccountBalanceInfo item;
+            item.asset = event.asset;
+            item.walletBalance = event.walletBalance;
+            item.crossWalletBalance = event.crossWalletBalance;
+            item.updateTimeMills = binance::get_current_ms_epoch();
+
+            std::unique_lock<std::shared_mutex> w_lock(this->balanceWrapper.rw_lock);
+            this->balanceWrapper.balance_map[item.asset] = item;
+            w_lock.unlock();
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    bool AccountBalancePositionComposite::update_exist_position_event(binance::WsFuturesAccountUpdatePositionEvent& event) {
+
+        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        auto original = this->positionWrapper.position_map.find(event.symbol);
+        r_lock.unlock();
+
+        if (original != this->positionWrapper.position_map.end()) {
+            AccountPositionInfo item;
+            item.symbol = event.symbol;
+            item.unrealizedProfit = event.unrealizedPnL;
+            item.entryPrice = event.entryPrice;
+            item.positionSide = event.positionSide;
+            item.positionAmt = event.postionAmout;
+            item.updateTimeMills = binance::get_current_ms_epoch();
+
+            std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
+            this->positionWrapper.position_map[item.symbol] = item;
+            w_lock.unlock();
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     AccountMetaInfo AccountBalancePositionComposite::copy_meta() {
@@ -90,6 +160,20 @@ namespace actuary {
 
     optional<AccountPositionInfo> AccountBalancePositionComposite::copy_position(string inst_id) {
         std::shared_lock<std::shared_mutex> lock(this->positionWrapper.rw_lock);
-        // TODO
+        auto item = this->positionWrapper.position_map.find(inst_id);
+        if (item != this->positionWrapper.position_map.end()) {
+            AccountPositionInfo info;
+            info.symbol = (*item).second.symbol;
+            info.initialMargin = (*item).second.initialMargin;
+            info.maintMargin = (*item).second.maintMargin;
+            info.unrealizedProfit = (*item).second.unrealizedProfit;
+            info.entryPrice = (*item).second.entryPrice;
+            info.positionSide = (*item).second.positionSide;
+            info.positionAmt = (*item).second.positionAmt;
+            info.updateTimeMills = (*item).second.updateTimeMills;
+            return info;
+        } else {
+            return nullopt;
+        }
     }
 }

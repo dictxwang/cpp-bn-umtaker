@@ -24,6 +24,16 @@ namespace actuary {
             this->furures_rest_client.setLocalIP(config.rest_local_ip);
         }
         this->furures_rest_client.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
+
+        // init balance & position composite
+        std::vector<std::string> balance_assets;
+        balance_assets.push_back(config.benchmark_quote_asset);
+        balance_assets.push_back(config.follower_quote_asset);
+        balance_assets.push_back("BNB");
+        for (std::string base : config.base_asset_list) {
+            balance_assets.push_back(base);
+        }
+        this->balance_position_composite.init(balance_assets, this->follower_inst_ids);
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -138,5 +148,9 @@ namespace actuary {
 
     binance::BinanceFuturesRestClient& GlobalContext::get_furures_rest_client() {
         return this->furures_rest_client;
+    }
+
+    AccountBalancePositionComposite& GlobalContext::get_balance_position_composite() {
+        return this->balance_position_composite;
     }
 }
