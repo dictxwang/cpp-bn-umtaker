@@ -17,6 +17,12 @@
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 
+    "process_account_setting": true,
+    "initial_leverage": 5,
+    "margin_type": "CROSSED",
+    "multi_assets_margin": true,
+    "position_side_dual": false,
+
     "share_memory_project_id": 65,
     "share_memory_path_benchmark_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_bechmark_ticker",
     "share_memory_path_follower_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_follower_ticker",

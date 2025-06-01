@@ -25,6 +25,12 @@ namespace actuary {
             this->base_asset_list.push_back(this->doc_["base_asset_list"][i].asString());
         }
 
+        this->change_account_setting = this->doc_["change_account_setting"].asBool();
+        this->initial_leverage = this->doc_["initial_leverage"].asInt();
+        this->margin_type = this->doc_["margin_type"].asString();
+        this->multi_assets_margin = this->doc_["multi_assets_margin"].asBool();
+        this->position_side_dual = this->doc_["position_side_dual"].asBool();
+
         this->share_memory_project_id = this->doc_["share_memory_project_id"].asInt();
         this->share_memory_path_benchmark_ticker = this->doc_["share_memory_path_benchmark_ticker"].asString();
         this->share_memory_path_follower_ticker = this->doc_["share_memory_path_follower_ticker"].asString();
