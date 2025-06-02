@@ -16,6 +16,7 @@ namespace shm_mng {
         (start + offset)->volume = 0.0;
         (start + offset)->update_time = 0;
         (start + offset)->version_number = 0;
+        (start + offset)->reduce_only = 0;
 
         atomic_init(&((start + offset)->lock), 0);
     }
@@ -40,6 +41,7 @@ namespace shm_mng {
                 memcpy((start + offset)->client_order_id, order.client_order_id, strlen(order.client_order_id) + 1);
                 (start + offset)->price = order.price;
                 (start + offset)->volume = order.volume;
+                (start + offset)->reduce_only= order.reduce_only;
                 (start + offset)->update_time = order.update_time;
                 long version_number = (*(start + offset)).version_number;
                 (start + offset)->version_number = version_number + 1;
@@ -69,6 +71,7 @@ namespace shm_mng {
         memcpy((*shared_instance).client_order_id, (start + offset)->client_order_id, strlen((start + offset)->client_order_id) + 1);
         (*shared_instance).price = (start + offset)->price;
         (*shared_instance).volume = (start + offset)->volume;
+        (*shared_instance).reduce_only = (start + offset)->reduce_only;
         (*shared_instance).update_time = (start + offset)->update_time;
         (*shared_instance).version_number = (start + offset)->version_number;
     

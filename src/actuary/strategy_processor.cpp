@@ -161,9 +161,25 @@ namespace actuary {
             //     inst_config.min_ticker_size
             // );
 
+            optional<AccountPositionInfo> position = context.get_balance_position_composite().copy_position(follower_inst_id);
+            if (!position.has_value()) {
+                warn_log("position not found for {}", follower_inst_id);
+                continue;
+            }
+
+            // TODO dynamic adjust threshold with position amount
+
             // TODO delete true condition
             if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
                 // make buy-side order
+                double order_size = inst_config.order_size;
+                int reduce_only = 0;
+                if ((*position).positionSide == binance::PositionSide_SHORT) {
+                    if (order_size > (*position).positionAmt) {
+                        order_size = (*position).positionAmt;
+                    }
+                    reduce_only = 1;
+                }
                 shm_mng::OrderShm order_buy;
                 strcpy(order_buy.inst_id, follower_inst_id.c_str());
                 strcpy(order_buy.type, binance::ORDER_TYPE_LIMIT.c_str());
@@ -171,7 +187,8 @@ namespace actuary {
                 // strcpy(order_buy.pos_side, binance::PositionSide_LONG.c_str());
                 strcpy(order_buy.time_in_force, binance::TimeInForce_IOC.c_str());
                 order_buy.price = (*benchmark_ticker).ask_price;
-                order_buy.volume = inst_config.order_size;
+                order_buy.volume = order_size;
+                order_buy.reduce_only = reduce_only;
                 std::string client_order_id = gen_client_order_id(true);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
                 order_buy.update_time = now;
@@ -184,6 +201,14 @@ namespace actuary {
             
             } else if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).ask_size > inst_config.max_ticker_size && (*follower_ticker).bid_size < inst_config.min_ticker_size) {
                 // make sell-side order
+                double order_size = inst_config.order_size;
+                int reduce_only = 0;
+                if ((*position).positionSide == binance::PositionSide_LONG) {
+                    if (order_size > (*position).positionAmt) {
+                        order_size = (*position).positionAmt;
+                    }
+                    reduce_only = 1;
+                }
                 shm_mng::OrderShm order_sell;
                 strcpy(order_sell.inst_id, follower_inst_id.c_str());
                 strcpy(order_sell.type, binance::ORDER_TYPE_LIMIT.c_str());
@@ -191,7 +216,8 @@ namespace actuary {
                 // strcpy(order_buy.pos_side, binance::PositionSide_SHORT.c_str());
                 strcpy(order_sell.time_in_force, binance::TimeInForce_IOC.c_str());
                 order_sell.price = (*benchmark_ticker).bid_price;
-                order_sell.volume = inst_config.order_size;
+                order_sell.volume = order_size;
+                order_sell.reduce_only = reduce_only;
                 std::string client_order_id = gen_client_order_id(false);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 order_sell.update_time = now;

@@ -66,8 +66,15 @@ namespace actuary {
             item.maintMargin = position.maintMargin;
             item.unrealizedProfit = position.unrealizedProfit;
             item.entryPrice = position.entryPrice;
-            item.positionSide = position.positionSide;
             item.positionAmt = position.positionAmt;
+            item.positionSide = position.positionSide;
+            if (position.positionSide == binance::PositionSide_BOTH) {
+                if (position.positionAmt < 0) {
+                    item.positionSide = binance::PositionSide_SHORT;
+                } else if (position.positionAmt > 0) {
+                    item.positionSide = binance::PositionSide_LONG;
+                }
+            }
             item.updateTimeMills = position.updateTime;
 
             std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
@@ -114,8 +121,16 @@ namespace actuary {
             item.symbol = event.symbol;
             item.unrealizedProfit = event.unrealizedPnL;
             item.entryPrice = event.entryPrice;
+            item.positionAmt = event.positionAmout;
             item.positionSide = event.positionSide;
-            item.positionAmt = event.postionAmout;
+
+            if (event.positionSide == binance::PositionSide_BOTH) {
+                if (event.positionAmout < 0) {
+                    item.positionSide = binance::PositionSide_SHORT;
+                } else if (event.positionAmout > 0) {
+                    item.positionSide = binance::PositionSide_LONG;
+                }
+            }
             item.updateTimeMills = binance::get_current_ms_epoch();
 
             std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);

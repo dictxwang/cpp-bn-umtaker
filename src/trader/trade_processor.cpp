@@ -80,6 +80,7 @@ namespace trader {
             order.timeInForce = std::string((*shm_order).time_in_force);
             order.newClientOrderId = std::string((*shm_order).client_order_id);
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+            order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
 
             pair<bool, string> result;
             if (config.open_place_order) {
@@ -87,11 +88,11 @@ namespace trader {
                 result = context.get_order_service().placeOrder(order);
             } else {
                 result.first = false;
-                result.second = "config stop place order";
+                result.second = "config stop";
             }
             
-            info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={})",
-                result.first, result.second, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId);
+            info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only)",
+                result.first, result.second, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
         }
     }
 

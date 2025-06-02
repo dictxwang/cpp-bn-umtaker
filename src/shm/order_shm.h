@@ -14,6 +14,7 @@ namespace shm_mng {
         char client_order_id[40];
         double price = 0;
         double volume = 0;
+        int reduce_only = 0;
         long update_time = 0;
         long version_number = 0;
         std::atomic_int lock = std::atomic_int(0);
