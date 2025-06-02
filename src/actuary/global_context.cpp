@@ -36,6 +36,8 @@ namespace actuary {
         this->balance_position_composite.init(balance_assets, this->follower_inst_ids);
 
         this->user_stream_listen_key = make_shared<string>("");
+
+        this->tg_bot.init("https://api.telegram.org", config.tg_bot_token);
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -165,5 +167,8 @@ namespace actuary {
     void GlobalContext::set_listen_key(string listen_key) {
         std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
         (*(this->user_stream_listen_key)) = listen_key;
+    }
+    tgbot::TgApi& GlobalContext::get_tg_bot() {
+        return this->tg_bot;
     }
 }

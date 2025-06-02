@@ -28,6 +28,8 @@ int main(int argc, char const *argv[]) {
     actuary::GlobalContext context;
     context.init(config);
 
+    // context.get_tg_bot().send_message(config.tg_chat_id, "123456");
+
     // account prepare
     actuary::prepare_account_settings(config, context);
 

@@ -6,6 +6,9 @@
 
     "inst_config_file": "config/inst_config.json.sample",
 
+    "tg_bot_token": ":-",
+    "tg_chat_id": -1,
+
     "api_key_hmac": "",
     "secret_key_hmac": "",
     "rest_use_intranet": false,

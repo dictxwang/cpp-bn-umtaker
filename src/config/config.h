@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <cstdint>
 #include <stdexcept>
 #include "binancecpp/json/json.h"
 

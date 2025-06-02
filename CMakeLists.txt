@@ -47,6 +47,11 @@ FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/config/*")
 add_library(config ${LIB_CONFIG_SRC})
 
+# tgboy
+FILE(GLOB_RECURSE LIB_TGBOT_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/tgbot/*")
+add_library(tgbot ${LIB_TGBOT_SRC})
+
 # shm
 FILE(GLOB_RECURSE LIB_SHM_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/shm/*")
@@ -85,6 +90,7 @@ target_link_libraries(actuary
     common
     config
     shm
+    tgbot
 )
 
 # trader

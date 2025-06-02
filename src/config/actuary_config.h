@@ -15,6 +15,9 @@ namespace actuary {
     
     public:
         string inst_config_file;
+
+        string tg_bot_token;
+        int64_t tg_chat_id;
         
         string api_key_hmac;
         string secret_key_hmac;

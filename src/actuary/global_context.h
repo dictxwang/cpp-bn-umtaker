@@ -11,6 +11,7 @@
 #include "shm/threshold_shm.h"
 #include "shm/ticker_shm.h"
 #include "shm/order_shm.h"
+#include "tgbot/api.h"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -43,6 +44,8 @@ namespace actuary {
         moodycamel::ConcurrentQueue<string> account_info_channel;
         shared_ptr<string> user_stream_listen_key;
         shared_mutex rw_lock;
+        
+        tgbot::TgApi tg_bot;
 
     public:
         void init(ActuaryConfig& config);
@@ -63,6 +66,7 @@ namespace actuary {
         moodycamel::ConcurrentQueue<string>* get_account_info_channel();
         string get_listen_key();
         void set_listen_key(string listen_key);
+        tgbot::TgApi& get_tg_bot();
     };
 }
 #endif
