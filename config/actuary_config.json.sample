@@ -17,7 +17,7 @@
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 
-    "process_account_setting": true,
+    "process_account_settings": true,
     "initial_leverage": 5,
     "margin_type": "CROSSED",
     "multi_assets_margin": true,
