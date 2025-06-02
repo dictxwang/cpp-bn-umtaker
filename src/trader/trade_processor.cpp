@@ -91,7 +91,7 @@ namespace trader {
                 result.second = "config stop";
             }
             
-            info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only)",
+            info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
                 result.first, result.second, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
         }
     }
