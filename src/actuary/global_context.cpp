@@ -34,6 +34,8 @@ namespace actuary {
             balance_assets.push_back(base);
         }
         this->balance_position_composite.init(balance_assets, this->follower_inst_ids);
+
+        this->user_stream_listen_key = make_shared<string>("");
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {

@@ -96,8 +96,13 @@ namespace actuary {
         binance::CommonRestResponse<bool> response;
         context.get_furures_rest_client().change_positionSideDual(config.position_side_dual, response);
          if (response.code != binance::RestCodeOK || !response.data) {
-            err_log("fail to change position side daul {} {}", response.code, response.msg);
-            return false;
+            if (response.code == -4059) {
+                warn_log("{}", response.msg);
+                return true;
+            } else {
+                err_log("fail to change position side daul {} {}", response.code, response.msg);
+                return false;
+            }
         } else {
             info_log("succ to change position side dual to {}", config.position_side_dual);
         }
@@ -118,8 +123,7 @@ namespace actuary {
                 err_log("fail to load account info: {} {}", response.code, response.msg);
             } else {
                 context.get_balance_position_composite().update_meta(response.data);
-                info_log("update account meta: multiAssetsMargin={} totalInitialMargin={} totalMaintMargin={} \
-                    totalWalletBalance={} totalUnrealizedProfit={} totalCrossWalletBalance={} totalCrossUnPnl={}",
+                info_log("update account meta: multiAssetsMargin={} totalInitialMargin={} totalMaintMargin={} totalWalletBalance={} totalUnrealizedProfit={} totalCrossWalletBalance={} totalCrossUnPnl={}",
                     response.data.multiAssetsMargin, response.data.totalInitialMargin, response.data.totalMaintMargin,
                     response.data.totalWalletBalance, response.data.totalUnrealizedProfit, response.data.totalCrossWalletBalance,
                     response.data.totalCrossUnPnl
@@ -141,8 +145,7 @@ namespace actuary {
                     for (size_t i = 0; i <= response.data.positions.size(); ++i) {
                         updated = context.get_balance_position_composite().update_exist_position(response.data.positions[i]);
                         if (updated) {
-                            info_log("update account position: symbol={} initialMargin={} maintMargin={} unrealizedProfit={} \
-                                entryPrice={} positionSide={} positionAmt={}",
+                            info_log("update account position: symbol={} initialMargin={} maintMargin={} unrealizedProfit={} entryPrice={} positionSide={} positionAmt={}",
                                 response.data.positions[i].symbol, response.data.positions[i].initialMargin,
                                 response.data.positions[i].maintMargin, response.data.positions[i].unrealizedProfit,
                                 response.data.positions[i].entryPrice, response.data.positions[i].positionSide,
@@ -214,6 +217,7 @@ namespace actuary {
         while (true) {
             string listen_key = context.get_listen_key();
             if (listen_key.size() > 0) {
+                info_log("start subscribe user data stream by {}", listen_key);
                 std::pair<bool, string> result;
                 try {
                     result = futuresWsClient.startUserDataStreamV1(listen_key);
@@ -225,6 +229,7 @@ namespace actuary {
             }
 
             // wait for a while after exception
+            warn_log("wait subscribe user data strean after 5 seconds");
             std::this_thread::sleep_for(std::chrono::seconds(5));
         }
     }
