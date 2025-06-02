@@ -29,8 +29,14 @@ namespace actuary {
         binance::CommonRestResponse<bool> response;
         context.get_furures_rest_client().toggle_bnbFeeBurn(true, response);
         if (response.code != binance::RestCodeOK) {
-            err_log("fail to toggle bnbFeeBurn: {} {}", response.code, response.msg);
-            return false;
+            if (response.code == -4145) {
+                // no need toggle
+                warn_log("{}", response.msg);
+                return true;
+            } else {
+                err_log("fail to toggle bnbFeeBurn: {} {}", response.code, response.msg);
+                return false;
+            }
         } else {
             return response.data;
         }
@@ -41,8 +47,10 @@ namespace actuary {
             binance::CommonRestResponse<binance::FuturesChangeLeverageResult> response;
             context.get_furures_rest_client().change_initialLeverage(follower_inst, config.initial_leverage, response);
             if (response.code != binance::RestCodeOK) {
-                err_log("fail to change initial leverage for {}", follower_inst);
+                err_log("fail to change initial leverage for {} {} {}", follower_inst, response.code, response.msg);
                 return false;
+            } else {
+                info_log("succ to change initial leverage for {}", follower_inst);
             }
         }
         return true;
@@ -52,8 +60,16 @@ namespace actuary {
             binance::CommonRestResponse<bool> response;
             context.get_furures_rest_client().change_marginType(follower_inst, config.margin_type, response);
             if (response.code != binance::RestCodeOK || !response.data) {
-                err_log("fail to change margin type for {}", follower_inst);
-                return false;
+                if (response.code == -4046) {
+                    // no need change
+                    warn_log("{}", response.msg);
+                    return true;
+                } else {
+                    err_log("fail to change margin type for {} {} {}", follower_inst, response.code, response.msg);
+                    return false;
+                }
+            } else {
+                info_log("succ to change margin type for {} {}", follower_inst, config.margin_type);
             }
         }
         return true;
@@ -63,8 +79,15 @@ namespace actuary {
         binance::CommonRestResponse<bool> response;
         context.get_furures_rest_client().change_multiAssetsMargin(config.multi_assets_margin, response);
          if (response.code != binance::RestCodeOK || !response.data) {
-            err_log("fail to change multi assets margin");
-            return false;
+            if (response.code == -4171) {
+                warn_log("{}", response.msg);
+                return true;
+            } else {
+                err_log("fail to change multi assets margin {} {}", response.code, response.msg);
+                return false;
+            }
+        } else {
+            info_log("succ to change multi assets margin to {}", config.multi_assets_margin);
         }
         return true;
     }
@@ -73,8 +96,10 @@ namespace actuary {
         binance::CommonRestResponse<bool> response;
         context.get_furures_rest_client().change_positionSideDual(config.position_side_dual, response);
          if (response.code != binance::RestCodeOK || !response.data) {
-            err_log("fail to change position side daul");
+            err_log("fail to change position side daul {} {}", response.code, response.msg);
             return false;
+        } else {
+            info_log("succ to change position side dual to {}", config.position_side_dual);
         }
         return true;
     }
