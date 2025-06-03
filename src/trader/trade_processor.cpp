@@ -133,9 +133,13 @@ namespace trader {
 
                 binance::WsFuturesOrderCallbackEvent event = binance::convertJsonToWsFuturesOrderCallbackEvent(json_result);
                 if (event.status == binance::WsCallbackStatusOK) {
-                    // TODO normal message
+                    info_log("receive order event: inst_id={} client_id={} status={} side={} position_side={} orig_qty={} executed_qty={} price={}",
+                        event.result.symbol, event.result.clientOrderId, event.result.status,
+                        event.result.side, event.result.positionSide, event.result.origQty,
+                        event.result.executedQty, event.result.price
+                    );
                 } else {
-                    // TODO error message
+                    err_log("error occur receive order event: id={} code={} msg={}", event.id, event.error.code, event.error.msg);
                 }
 
             } catch (std::exception &exp) {

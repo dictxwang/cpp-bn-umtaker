@@ -15,6 +15,12 @@ namespace actuary {
         this->tg_chat_id = this->doc_["tg_chat_id"].asInt64();
         this->tg_send_message = this->doc_["tg_send_message"].asBool();
 
+        this->margin_ratio_thresholds[0] = this->doc_["margin_ratio_thresholds"][0].asDouble();
+        this->margin_ratio_thresholds[1] = this->doc_["margin_ratio_thresholds"][1].asDouble();
+
+        this->bnb_balance_thresholds[0] = this->doc_["bnb_balance_thresholds"][0].asDouble();
+        this->bnb_balance_thresholds[1] = this->doc_["bnb_balance_thresholds"][1].asDouble();
+
         this->api_key_hmac = this->doc_["api_key_hmac"].asString();
         this-> secret_key_hmac = this->doc_["secret_key_hmac"].asString();
         this->rest_use_intranet = this->doc_["rest_use_intranet"].asBool();

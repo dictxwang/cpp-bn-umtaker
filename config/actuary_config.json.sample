@@ -5,12 +5,15 @@
     "logger_max_files": 7,
 
     "account_flag": "test001",
-    
+
     "inst_config_file": "config/inst_config.json.sample",
 
     "tg_bot_token": ":-",
     "tg_chat_id": -1,
     "tg_send_message": true,
+
+    "margin_ratio_thresholds": [0.7, 0.9],
+    "bnb_balance_thresholds": [0.05, 0.2],
 
     "api_key_hmac": "",
     "secret_key_hmac": "",

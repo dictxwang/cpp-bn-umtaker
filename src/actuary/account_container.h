@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include <mutex>
+#include <cmath>
 #include <shared_mutex>
 #include <unordered_map>
 #include <string>

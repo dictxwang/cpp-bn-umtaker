@@ -167,7 +167,15 @@ namespace actuary {
                 continue;
             }
 
-            // TODO dynamic adjust threshold with position amount
+            // dynamic adjust threshold with position amount
+            bool stop_buy, stop_sell = false;
+            if ((*position).positionAmt >= inst_config.max_position) {
+                if ((*position).positionSide == binance::PositionSide_LONG) {
+                    stop_buy = true;
+                } else {
+                    stop_sell = true;
+                }
+            }
 
             // TODO delete true condition
             if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
@@ -195,13 +203,13 @@ namespace actuary {
 
                 int updated = 0;
                 bool make_order = context.could_make_order();
-                if (make_order) {
+                if (!stop_buy && make_order) {
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 }
 
                 // TODO reduce too many logs
-                info_log("update buy order: make_order={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}",
-                    make_order, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
+                info_log("update buy order: make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}",
+                    make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
                     benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
             
             } else if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).ask_size > inst_config.max_ticker_size && (*follower_ticker).bid_size < inst_config.min_ticker_size) {
@@ -229,13 +237,13 @@ namespace actuary {
                 
                 int updated = 0;
                 bool make_order = context.could_make_order();
-                if (make_order) {
+                if (!stop_sell && make_order) {
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 }
 
                 // TODO reduce too many logs
-                info_log("update sell order: make_order={} updated={} inst_id={} price={} size={} client_id={}ticker_version={}/{} threshold_version={}/{}",
-                    make_order, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
+                info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={}ticker_version={}/{} threshold_version={}/{}",
+                    make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
                     benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
             }
         }

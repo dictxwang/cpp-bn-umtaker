@@ -17,7 +17,7 @@ namespace actuary {
     void watch_account_meta(ActuaryConfig& config, GlobalContext& context);
     void watch_bnb_balance(ActuaryConfig& config, GlobalContext& context);
 
-    void send_warning_message(ActuaryConfig& config, GlobalContext& context);
+    void send_warning_message(ActuaryConfig& config, GlobalContext& context, string message);
 }
 
 #endif

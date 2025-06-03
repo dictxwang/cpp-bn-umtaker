@@ -20,6 +20,9 @@ namespace actuary {
         string tg_bot_token;
         int64_t tg_chat_id;
         bool tg_send_message;
+
+        double margin_ratio_thresholds[2];
+        double bnb_balance_thresholds[2];
         
         string api_key_hmac;
         string secret_key_hmac;

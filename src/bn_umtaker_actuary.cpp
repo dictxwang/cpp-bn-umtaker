@@ -3,6 +3,7 @@
 #include "actuary/global_context.h"
 #include "actuary/strategy_processor.h"
 #include "actuary/account_processor.h"
+#include "actuary/risk_control.h"
 
 /*
     loop scan ticker and threshold like 'early-run' 'beta' from share memory
@@ -28,8 +29,6 @@ int main(int argc, char const *argv[]) {
     actuary::GlobalContext context;
     context.init(config);
 
-    // context.get_tg_bot().send_message(config.tg_chat_id, "123456");
-
     // account prepare
     actuary::prepare_account_settings(config, context);
 
@@ -41,6 +40,9 @@ int main(int argc, char const *argv[]) {
 
     // create threads for per asset
     actuary::start_strategy_processors(config, context);
+
+    // start watchdog
+    actuary::start_watchdog(config, context);
 
     std::cout << "<< this is acturay process >>" << std::endl;
     info_log("acturay processor started.");
