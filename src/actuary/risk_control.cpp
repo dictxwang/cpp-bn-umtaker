@@ -45,7 +45,7 @@ namespace actuary {
 
             if (!context.could_make_order() && marginUseRatio < config.margin_ratio_thresholds[0]) {
                 context.start_make_order();
-                send_warning_message(config, context, string("start make order: margin ratio has been recovery"));
+                // send_warning_message(config, context, string("start make order: margin ratio has been recovery"));
                 err_log("start make order as margin ratio has been recovery {}", config.margin_ratio_thresholds[0]);
                 continue;
             }
@@ -85,7 +85,7 @@ namespace actuary {
             if (!context.could_make_order() && (*balance).crossWalletBalance > config.bnb_balance_thresholds[1]) {
                 // enough
                 context.start_make_order();
-                send_warning_message(config, context, string("start make order: has enough balance of bnb"));
+                // send_warning_message(config, context, string("start make order: has enough balance of bnb"));
                 err_log("start make order as has enough balance of bnb {}", (*balance).crossWalletBalance);
                 continue;
             }
