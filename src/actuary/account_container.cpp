@@ -40,7 +40,7 @@ namespace actuary {
             item.walletBalance = balance.walletBalance;
             item.crossWalletBalance = balance.crossWalletBalance;
             item.crossUnPnl = balance.crossUnPnl;
-            item.updateTimeMills = balance.updateTime;
+            item.updateTimeMills = binance::get_current_ms_epoch();
 
             std::unique_lock<std::shared_mutex> w_lock(this->balanceWrapper.rw_lock);
             this->balanceWrapper.balance_map[item.asset] = item;
