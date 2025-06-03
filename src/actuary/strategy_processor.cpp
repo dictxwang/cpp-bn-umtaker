@@ -193,10 +193,15 @@ namespace actuary {
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
                 order_buy.update_time = now;
 
-                int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
+                int updated = 0;
+                bool make_order = context.could_make_order();
+                if (make_order) {
+                    updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
+                }
+
                 // TODO reduce too many logs
-                info_log("update buy order: inst_id={} price={} size={} client_id={} updated={} ticker_version={}/{} threshold_version={}/{}",
-                    follower_inst_id, order_buy.price, order_buy.volume, client_order_id, updated,
+                info_log("update buy order: make_order={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}",
+                    make_order, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
                     benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
             
             } else if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).ask_size > inst_config.max_ticker_size && (*follower_ticker).bid_size < inst_config.min_ticker_size) {
@@ -222,10 +227,15 @@ namespace actuary {
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 order_sell.update_time = now;
                 
-                int updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
+                int updated = 0;
+                bool make_order = context.could_make_order();
+                if (make_order) {
+                    updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
+                }
+
                 // TODO reduce too many logs
-                info_log("update sell order: inst_id={} price={} size={} client_id={} updated={} ticker_version={}/{} threshold_version={}/{}",
-                    follower_inst_id, order_sell.price, order_sell.volume, client_order_id, updated,
+                info_log("update sell order: make_order={} updated={} inst_id={} price={} size={} client_id={}ticker_version={}/{} threshold_version={}/{}",
+                    make_order, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
                     benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
             }
         }

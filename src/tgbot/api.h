@@ -5,9 +5,13 @@
 #include <cstdint>
 #include <vector>
 #include <curl/curl.h>
+#include <stdexcept>
+#include "binancecpp/json/json.h"
+#include "binancecpp/util/string_helper.h"
 
 namespace tgbot {
 
+    const std::string API_Endpoint = "https://api.telegram.org";
     static size_t curl_write_callback(void* contents, size_t size, size_t nmemb, std::string* userData);
 
     class TgApi {
@@ -15,7 +19,8 @@ namespace tgbot {
         TgApi() {}
         ~TgApi() {}
 
-        void init(const std::string& url, const std::string& token);
+        void init(const std::string& endpoint, const std::string& token);
+        void init_default_endpoint(const std::string& token);
         std::pair<int, std::string> send_message(int64_t chat_id, const std::string& text);
     
     private:
@@ -23,7 +28,7 @@ namespace tgbot {
     
     protected:
         std::string _token;
-        std::string _url;
+        std::string _endpoint;
     };
 
 }

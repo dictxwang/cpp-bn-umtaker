@@ -8,10 +8,12 @@ namespace actuary {
         }
 
         // Parse own configuration properties
+        this->account_flag = this->doc_["account_flag"].asString();
         this->inst_config_file = this->doc_["inst_config_file"].asString();
 
         this->tg_bot_token = this->doc_["tg_bot_token"].asString();
         this->tg_chat_id = this->doc_["tg_chat_id"].asInt64();
+        this->tg_send_message = this->doc_["tg_send_message"].asBool();
 
         this->api_key_hmac = this->doc_["api_key_hmac"].asString();
         this-> secret_key_hmac = this->doc_["secret_key_hmac"].asString();

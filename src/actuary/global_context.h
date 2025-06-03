@@ -16,6 +16,7 @@
 #include <memory>
 #include <vector>
 #include <set>
+#include <atomic>
 
 using namespace std;
 
@@ -46,6 +47,7 @@ namespace actuary {
         shared_mutex rw_lock;
         
         tgbot::TgApi tg_bot;
+        bool continue_make_order = true;
 
     public:
         void init(ActuaryConfig& config);
@@ -67,6 +69,9 @@ namespace actuary {
         string get_listen_key();
         void set_listen_key(string listen_key);
         tgbot::TgApi& get_tg_bot();
+        void stop_make_order();
+        void start_make_order();
+        bool could_make_order();
     };
 }
 #endif

@@ -14,10 +14,12 @@ namespace actuary {
         bool loadActuaryConfig(const char* inputfile);
     
     public:
+        string account_flag;
         string inst_config_file;
 
         string tg_bot_token;
         int64_t tg_chat_id;
+        bool tg_send_message;
         
         string api_key_hmac;
         string secret_key_hmac;

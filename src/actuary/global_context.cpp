@@ -37,7 +37,7 @@ namespace actuary {
 
         this->user_stream_listen_key = make_shared<string>("");
 
-        this->tg_bot.init("https://api.telegram.org", config.tg_bot_token);
+        this->tg_bot.init_default_endpoint(config.tg_bot_token);
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -170,5 +170,19 @@ namespace actuary {
     }
     tgbot::TgApi& GlobalContext::get_tg_bot() {
         return this->tg_bot;
+    }
+
+    void GlobalContext::stop_make_order() {
+        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
+        this->continue_make_order = false;
+    }
+
+    void GlobalContext::start_make_order() {
+        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
+        this->continue_make_order = true;
+    }
+
+    bool GlobalContext::could_make_order() {
+        return this->continue_make_order;
     }
 }
