@@ -15,6 +15,14 @@
         "tcp://127.0.0.1:22001"
     ],
     
+    "use_udp_ticker": false,
+    "ticker_udp_ipcs": [
+        {
+            "host": "127.0.0.1",
+            "port": 9800
+        }
+    ],
+
     "calculate_sma_interval_seconds": 300,
     "stats_interval_seconds": 300,
 

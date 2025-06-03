@@ -21,6 +21,9 @@ namespace receiver {
         bool normal_ticker_use_intranet;
         string normal_ticker_local_ip;
 
+        bool use_udp_ticker;
+        std::vector<std::pair<string, int>> ticker_udp_ipcs;
+
         uint64_t calculate_sma_interval_seconds;
         uint64_t stats_interval_seconds;
 

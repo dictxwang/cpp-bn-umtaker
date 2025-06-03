@@ -1,5 +1,7 @@
 #include "receiver_config.h"
 
+using namespace std;
+
 namespace receiver {
     bool ReceiverConfig::loadReceiverConfig(const char* inputfile) {
         bool loadFileResult = Config::load_config(inputfile);
@@ -18,6 +20,15 @@ namespace receiver {
         this->use_normal_ticker = this->doc_["use_normal_ticker"].asBool();
         this->normal_ticker_use_intranet = this->doc_["normal_ticker_use_intranet"].asBool();
         this->normal_ticker_local_ip = this->doc_["normal_ticker_local_ip"].asString();
+
+        this->use_udp_ticker = this->doc_["use_udp_ticker"].asBool();
+        Json::Value json_udp_ipcs = this->doc_["ticker_udp_ipcs"];
+        for (int i = 0; i < json_udp_ipcs.size(); i++) {
+            string host = json_udp_ipcs[i]["host"].asString();
+            int port = json_udp_ipcs[i]["port"].asInt();
+            pair<string, int> ipc = pair<string, int>(host, port);
+            this->ticker_udp_ipcs.push_back(ipc);
+        }
 
         this->calculate_sma_interval_seconds = this->doc_["calculate_sma_interval_seconds"].asUInt64();
         this->stats_interval_seconds = this->doc_["stats_interval_seconds"].asUInt64();

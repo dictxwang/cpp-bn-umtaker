@@ -25,6 +25,30 @@ namespace receiver {
         }
     }
 
+    void start_subscribe_udp_ticker(ReceiverConfig& config, GlobalContext& context) {
+        
+        for (size_t i = 0; i < config.ticker_udp_ipcs.size(); ++i) {
+            std::thread subscribe_and_process(subscribe_process_udp_ticker, std::ref(config), std::ref(context), i);
+            subscribe_and_process.detach();
+        }
+    }
+
+    void subscribe_process_udp_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index) {
+        
+        std::string host = config.ticker_udp_ipcs[ipc_index].first;
+        int port = config.ticker_udp_ipcs[ipc_index].second;
+
+        while (true) {
+
+            // TODO
+
+            err_log("will re-connect udp ticker after 5 secs");
+
+            // wait for a while after exception
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }
+
     void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role) {
         moodycamel::ConcurrentQueue<string> *channel;
         if (role == TickerRole::Benchmark) {
@@ -237,6 +261,11 @@ namespace receiver {
                     err_log("error occur while parse zmq message");
                     break;
                 }
+
+                err_log("will re-subscribe zmq ticker after 5 secs");
+
+                // wait for a while after exception
+                std::this_thread::sleep_for(std::chrono::seconds(5));
             }
         }
     }

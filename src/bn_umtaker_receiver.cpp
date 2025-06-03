@@ -31,16 +31,19 @@ int main(int argc, char const *argv[]) {
     context.init(config);
 
     // start ticker calculate thread
-    start_ticker_calculate(config, context);
+    receiver::start_ticker_calculate(config, context);
     info_log("start ticker calculate.");
     
     // subscribe ticker message
     if (config.use_normal_ticker) {
-        start_subscribe_normal_ticker(config, context);
+        receiver::start_subscribe_normal_ticker(config, context);
         info_log("start subscribe normal ticker.");
     } else if (config.use_best_ticker) {
-        start_subscribe_zmq_best_ticker(config, context);
+        receiver::start_subscribe_zmq_best_ticker(config, context);
         info_log("start subscribe best ticker.");
+    } else if (config.use_udp_ticker) {
+        receiver::start_subscribe_udp_ticker(config, context);
+        info_log("start subscribe udp ticker.");
     }
 
     std::cout << "<< this is receiver process >>" << std::endl;

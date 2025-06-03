@@ -16,6 +16,16 @@
 
 namespace receiver {
 
+    struct UdpBookTicker {
+        uint64_t update_id;
+        uint64_t ets;
+        float buy_price;
+        float buy_num;
+        float sell_price;
+        float sell_num;
+        char name[16];
+    };
+
     void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role);
     void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids, TickerRole role);
     void start_subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context);
@@ -23,6 +33,8 @@ namespace receiver {
     void subscribe_process_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index);
     void start_subscribe_zmq_best_ticker(ReceiverConfig& config, GlobalContext& context);
 
+    void subscribe_process_udp_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index);
+    void start_subscribe_udp_ticker(ReceiverConfig& config, GlobalContext& context);
 }
 
 #endif
