@@ -180,7 +180,7 @@ namespace actuary {
             // TODO delete true condition
             if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
                 // make buy-side order
-                double order_size = inst_config.order_size;
+                double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_SHORT) {
                     if (order_size > (*position).positionAmt) {
@@ -214,7 +214,7 @@ namespace actuary {
             
             } else if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).ask_size > inst_config.max_ticker_size && (*follower_ticker).bid_size < inst_config.min_ticker_size) {
                 // make sell-side order
-                double order_size = inst_config.order_size;
+                double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_LONG) {
                     if (order_size > (*position).positionAmt) {
