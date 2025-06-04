@@ -235,6 +235,49 @@ namespace actuary {
     }
 
     void process_balance_position(ActuaryConfig &config, GlobalContext &context) {
-        // TODO
+        
+        moodycamel::ConcurrentQueue<string>* channel = context.get_account_info_channel();
+        while (true) {
+            std::string messageJson;
+            while (!channel->try_dequeue(messageJson)) {
+                // Retry if the queue is empty
+            }
+
+            try {
+                // process message
+                Json::Value json_result;
+                Json::Reader reader;
+                json_result.clear();
+                reader.parse(messageJson.c_str(), json_result);
+
+                if (json_result.isMember("e")) {
+                    if (json_result["e"] == binance::FuturesUserDataAccountUpdate) {
+                        binance::WsFuturesAccountUpdateEvent event = binance::convertJsonToWsFuturesAccountUpdateEvent(json_result);
+                        if (event.balances.size() > 0) {
+                            for (size_t i = 0; i < event.balances.size(); ++i) {
+                                bool updated = context.get_balance_position_composite().update_exist_balance_event(event.balances[i]);
+                                info_log("update balance by event for {} {} {}", event.balances[i].asset, event.balances[i].crossWalletBalance, updated);
+                            }
+                        }
+                        if (event.positions.size() > 0) {
+                            for (size_t i = 0; i < event.positions.size(); ++i) {
+                                bool updated = context.get_balance_position_composite().update_exist_position_event(event.positions[i]);
+                                info_log("update position by event for {} {} {} {}", event.positions[i].symbol, event.positions[i].positionSide, event.positions[i].positionAmout, updated);
+                            }
+                        }
+                    } else if (json_result["e"] == binance::FuturesUserDataOrderTradeUpdate) {
+                        binance::WsFuturesOrderTradeUpdateEvent event = binance::convertJsonToWsFuturesOrderTradeUpdateEvent(json_result);
+                        // TODO data stat
+                    } else {
+                        warn_log("receive unknown user data stream message: {}", messageJson);
+                    }
+                } else {
+                    // maybe receive invalid mesage
+                    warn_log("receive invalid user data stream message: {}", messageJson);
+                }
+            } catch (std::exception &exp) {
+                err_log("fail to process user data stream message: {}", std::string( exp.what()));
+            }
+        }
     }
 }

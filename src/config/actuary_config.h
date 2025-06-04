@@ -24,6 +24,7 @@ namespace actuary {
         double margin_ratio_thresholds[2];
         double bnb_balance_thresholds[2];
         int order_size_zoom;
+        int max_position_zoom;
         
         string api_key_hmac;
         string secret_key_hmac;

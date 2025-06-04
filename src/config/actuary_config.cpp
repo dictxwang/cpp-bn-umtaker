@@ -22,6 +22,7 @@ namespace actuary {
         this->bnb_balance_thresholds[1] = this->doc_["bnb_balance_thresholds"][1].asDouble();
 
         this->order_size_zoom = this->doc_["order_size_zoom"].asInt();
+        this->max_position_zoom = this->doc_["max_position_zoom"].asInt();
 
         this->api_key_hmac = this->doc_["api_key_hmac"].asString();
         this-> secret_key_hmac = this->doc_["secret_key_hmac"].asString();

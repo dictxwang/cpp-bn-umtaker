@@ -169,7 +169,7 @@ namespace actuary {
 
             // dynamic adjust threshold with position amount
             bool stop_buy, stop_sell = false;
-            if ((*position).positionAmt >= inst_config.max_position) {
+            if ((*position).positionAmt >= inst_config.max_position * config.max_position_zoom) {
                 if ((*position).positionSide == binance::PositionSide_LONG) {
                     stop_buy = true;
                 } else {
