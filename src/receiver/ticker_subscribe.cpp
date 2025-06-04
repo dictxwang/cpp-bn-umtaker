@@ -93,6 +93,8 @@ namespace receiver {
 
                 while (true) {
                     
+                    int rand_value = rand.randInt();
+
                     char buffer[sizeof(int)];
                     struct sockaddr_in sender_addr;
                     socklen_t addr_len = sizeof(sender_addr);
@@ -104,7 +106,13 @@ namespace receiver {
                         int data_idx = g_data->coin_update_idx[coin_idx] % UDP_COIN_SLOT_COUNT;
                         struct UDPBookTicker *book_ticker = &g_data->data[coin_idx][data_idx];
 
-                        std::cout << book_ticker->name <<"," << book_ticker->update_id <<","<< book_ticker->buy_price << "," << book_ticker->buy_num << "," << book_ticker->sell_price << ","  << book_ticker->sell_num << std::endl;
+                        // std::cout << book_ticker->name <<"," << book_ticker->update_id <<","<< book_ticker->buy_price << "," << book_ticker->buy_num << "," << book_ticker->sell_price << ","  << book_ticker->sell_num << std::endl;
+                        if (rand_value < 5) {
+                            info_log("read udp shm data: name={} update_id={} bid={} bid_sz={} ask={} ask_sz={}",
+                                book_ticker->name, book_ticker->update_id, book_ticker->buy_price,
+                                book_ticker->buy_num, book_ticker->sell_price, book_ticker->sell_num
+                            );
+                        }
 
                         UmTickerInfo info;
                         info.inst_id = book_ticker->name;
@@ -124,7 +132,6 @@ namespace receiver {
                         info_shm.update_id = book_ticker->update_id;
                         info_shm.update_time = book_ticker->ets;
 
-                        int rand_value = rand.randInt();
                         int update_shm = 0;
                         bool valid_ticker = false;
 
