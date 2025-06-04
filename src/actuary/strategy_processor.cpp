@@ -107,13 +107,19 @@ namespace actuary {
             std::shared_ptr<shm_mng::EarlyRunThresholdShm> early_run_threshold = shm_mng::early_run_shm_reader_get(context.get_shm_store_info().early_run_start, threshold_shm_index);
             std::shared_ptr<shm_mng::BetaThresholdShm> beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, threshold_shm_index);
             
-            if (beta_threshold == nullptr || (*beta_threshold).version_number == 0 ||
-                early_run_threshold == nullptr || (*early_run_threshold).version_number == 0) {
+            if (early_run_threshold == nullptr || (*early_run_threshold).version_number == 0) {
                 if (rnd_number < 10) {
-                    warn_log("threshold in share memory not found or version is zero for {}", base_asset);
+                    warn_log("threshold early run in share memory not found or version is zero for {}", base_asset);
                 }
                 continue;
             }
+            if (beta_threshold == nullptr || (*beta_threshold).version_number == 0) {
+                if (rnd_number < 10) {
+                    warn_log("threshold beta in share memory not found or version is zero for {}", base_asset);
+                }
+                continue;
+            }
+
             if ((*beta_threshold).version_number == beta_version && (*early_run_threshold).version_number == early_run_version ||
                 (*beta_threshold).version_number < beta_version || (*early_run_threshold).version_number < early_run_version) {
                 if ((*beta_threshold).version_number > beta_version) {
@@ -136,7 +142,7 @@ namespace actuary {
                 now > (*beta_threshold).time_mills + config.ticker_valid_millis ||
                 now > (*early_run_threshold).time_mills + config.ticker_valid_millis) {
                 if (rnd_number < 10) {
-                    warn_log(" ticker or threshold timestamp expired for {}", base_asset);
+                    warn_log("ticker or threshold timestamp expired for {}", base_asset);
                 }
                 continue;
             }

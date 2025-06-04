@@ -172,6 +172,14 @@ namespace receiver {
                                 warn_log("can not enqueue ticker info: {}", info.inst_id);
                             }
                         }
+                        if (valid_ticker) {
+                            bool result = (*context.get_beta_calculation_channel()).try_enqueue(info.inst_id);
+                            if (!result) {
+                                if (rand_value < 10) {
+                                    warn_log("can not enqueue beta calculation: {}", info.inst_id);
+                                }
+                            }
+                        }
 
                         if (rand_value < 20) {
                             info_log("process udp ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={} update_shm={}",
@@ -267,7 +275,9 @@ namespace receiver {
                 // put info queue for price offset
                 bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
                 if (!result) {
-                    warn_log("can not enqueue ticker info: {}", messageJson);
+                    if (rand_value < 10) {
+                        warn_log("can not enqueue ticker info: {}", messageJson);
+                    }
                 }
 
                 result = (*context.get_beta_calculation_channel()).try_enqueue(info.inst_id);
@@ -394,7 +404,17 @@ namespace receiver {
                         // put info queue for price offset
                         bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
                         if (!result) {
-                            warn_log("can not enqueue ticker info: {}", info.inst_id);
+                            if (rand_value < 10) {
+                                warn_log("can not enqueue ticker info: {}", info.inst_id);
+                            }
+                        }
+                    }
+                    if (valid_ticker) {
+                        bool result = (*context.get_beta_calculation_channel()).try_enqueue(info.inst_id);
+                        if (!result) {
+                            if (rand_value < 10) {
+                                warn_log("can not enqueue beta calculation: {}", info.inst_id);
+                            }
                         }
                     }
 

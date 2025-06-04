@@ -91,6 +91,7 @@ namespace receiver {
                 // Retry if the queue is empty
             }
 
+            int rand_value = rand.randInt();
             uint64_t now = binance::get_current_ms_epoch();
             std::string base_asset;
             std::vector<UmTickerInfo> ticker_list;
@@ -103,7 +104,9 @@ namespace receiver {
             }
 
             if (ticker_list.size() < config.calculate_sma_interval_seconds) {
-                // warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
+                if (rand_value < 10) {
+                    warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
+                }
                 continue;
             }
 
@@ -198,7 +201,7 @@ namespace receiver {
                 update_shm = shm_mng::beta_shm_writer_update(context.get_shm_store_info().beta_start, (*address).second, threshold_shm);
             }
 
-            if (rand.randInt() < 20) {
+            if (rand_value < 20) {
                 // shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, (*address).second);
                 // std::cout << "shm asset: " << (*shared_shm).asset << "," << (*shared_shm).bid_beta_threshold << "," << (*shared_shm).time_mills << std::endl;
                 info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
