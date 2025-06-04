@@ -294,6 +294,11 @@ int main(int argc, char const *argv[]) {
     // binanceRestFutures.get_exchangeInfo(futuresResponse);
     // std::cout << "Response code: " << futuresResponse.code << std::endl;
     // std::cout << "Response symbols-0.symbol: " << futuresResponse.data[0].symbol << std::endl;
+    // for (binance::FuturesExchangeInfo info : futuresResponse.data) {
+    //     if (info.quoteAsset == "USDC") {
+    //         std::cout << "symbol=" << info.symbol << ",minPrice=" << info.minPrice << ",tickSize=" << info.tickSize << ",minQty=" << info.minQty << ",maxQty=" << info.maxQty << ",stepSize=" << info.stepSize << std::endl;
+    //     }
+    // }
 
     // Example: get_account_v2
     // binance::CommonRestResponse<binance::FuturesAccount> fururesAcccountResponse;
