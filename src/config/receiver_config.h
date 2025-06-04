@@ -2,8 +2,10 @@
 #define _CONFIG_RECEIVER_CONFIG_H_
 
 #include "config.h"
+#include "common/shm_udp_ticker.container.h"
 
 namespace receiver {
+
     class ReceiverConfig : public Config
     {
     public:
@@ -22,7 +24,7 @@ namespace receiver {
         string normal_ticker_local_ip;
 
         bool use_udp_ticker;
-        std::vector<std::pair<string, int>> ticker_udp_ipcs;
+        std::vector<UDPTickerIPC> ticker_udp_ipcs;
 
         uint64_t calculate_sma_interval_seconds;
         uint64_t stats_interval_seconds;

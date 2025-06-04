@@ -33,11 +33,28 @@ namespace receiver {
 
     void subscribe_process_udp_ticker(ReceiverConfig& config, GlobalContext& context, size_t ipc_index) {
         
-        std::string host = config.ticker_udp_ipcs[ipc_index].first;
-        int port = config.ticker_udp_ipcs[ipc_index].second;
+        std::string mmap_file = config.ticker_udp_ipcs[ipc_index].mmap_file;
+        std::string host = config.ticker_udp_ipcs[ipc_index].host;
+        int port = config.ticker_udp_ipcs[ipc_index].port;
 
         RandomIntGen rand;
         rand.init(0, 10000);
+
+        // open share memory
+        int mmap_fd = open(mmap_file.c_str(), O_RDONLY);
+        if (mmap_fd < 0) {
+            err_log("fail to open shm file {} {}", mmap_file, mmap_fd);
+            return;
+        }
+
+        // create mapping for shm
+        UDPMapData *g_data = (UDPMapData *)mmap(NULL, sizeof(UDPMapData), PROT_READ, MAP_SHARED, mmap_fd, 0);
+        if (g_data == MAP_FAILED) {
+            err_log("fail to mapping shm");
+            close(mmap_fd);
+            return;
+        }
+
 
         while (true) {
 
@@ -45,7 +62,7 @@ namespace receiver {
 
             // wait for a while after exception
             std::this_thread::sleep_for(std::chrono::seconds(5));
-            
+
             // create udp socket
             int sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
             if (sock_fd < 0) {
@@ -54,11 +71,12 @@ namespace receiver {
             }
 
             // make subscribe request
-            struct UdpBookTicker subscribe_request;
+            struct UDPBookTicker subscribe_request;
             memset(&subscribe_request, 0, sizeof(subscribe_request));
             subscribe_request.update_id = 0;
             subscribe_request.ets = 1;
 
+            // make receiver address
             struct sockaddr_in receiver_addr;
             memset(&receiver_addr, 0, sizeof(receiver_addr));
             receiver_addr.sin_family = AF_INET;
@@ -74,14 +92,17 @@ namespace receiver {
                 sendto(sock_fd, &subscribe_request, sizeof(subscribe_request), 0, (struct sockaddr *)&receiver_addr, sizeof(receiver_addr));
 
                 while (true) {
-                    char buffer[128];
+                    
+                    char buffer[sizeof(int)];
                     struct sockaddr_in sender_addr;
                     socklen_t addr_len = sizeof(sender_addr);
                     // receive udp ticker data
                     ssize_t recv_len = recvfrom(sock_fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&sender_addr, &addr_len);
-                    if (recv_len == sizeof(UdpBookTicker)) {
+                    if (recv_len == sizeof(int)) {
 
-                        struct UdpBookTicker *book_ticker = (struct UdpBookTicker *)buffer;
+                        int coin_idx = *(int *)buffer;
+                        int data_idx = g_data->coin_update_idx[coin_idx] % UDP_COIN_SLOT_COUNT;
+                        struct UDPBookTicker *book_ticker = &g_data->data[coin_idx][data_idx];
 
                         std::cout << book_ticker->name <<"," << book_ticker->update_id <<","<< book_ticker->buy_price << "," << book_ticker->buy_num << "," << book_ticker->sell_price << ","  << book_ticker->sell_num << std::endl;
 
@@ -105,8 +126,10 @@ namespace receiver {
 
                         int rand_value = rand.randInt();
                         int update_shm = 0;
+                        bool valid_ticker = false;
 
                         if (str_ends_with(info.inst_id, config.benchmark_quote_asset)) {
+                            valid_ticker = true;
                             // std::cout << "ticker for benchmark: " << event.symbol << std::endl;
                             context.get_benchmark_ticker_composite().update_ticker(info);
 
@@ -119,7 +142,8 @@ namespace receiver {
                                     info_log("get benchmark shm udp ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
                                 }
                             }
-                        } else {
+                        } else if (str_ends_with(info.inst_id, config.follower_quote_asset)) {
+                            valid_ticker = true;
                             // std::cout << "ticker for follower: " << event.symbol << std::endl;
                             context.get_follower_ticker_composite().update_ticker(info);
                         
@@ -134,10 +158,12 @@ namespace receiver {
                             }
                         }
 
-                        // put info queue for price offset
-                        bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
-                        if (!result) {
-                            warn_log("can not enqueue ticker info: {}", info.inst_id);
+                        if (valid_ticker) {
+                            // put info queue for price offset
+                            bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
+                            if (!result) {
+                                warn_log("can not enqueue ticker info: {}", info.inst_id);
+                            }
                         }
 
                         if (rand_value < 20) {
@@ -325,8 +351,10 @@ namespace receiver {
 
                     int rand_value = rand.randInt();
                     int update_shm = 0;
+                    bool valid_ticker = false;
 
                     if (str_ends_with(info.inst_id, config.benchmark_quote_asset)) {
+                        valid_ticker = true;
                         // std::cout << "ticker for benchmark: " << event.symbol << std::endl;
                         context.get_benchmark_ticker_composite().update_ticker(info);
 
@@ -339,7 +367,8 @@ namespace receiver {
                                 info_log("get benchmark shm zmq ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
                             }
                         }
-                    } else {
+                    } else if (str_ends_with(info.inst_id, config.follower_quote_asset)) {
+                        valid_ticker = true;
                         // std::cout << "ticker for follower: " << event.symbol << std::endl;
                         context.get_follower_ticker_composite().update_ticker(info);
                        
@@ -354,16 +383,19 @@ namespace receiver {
                         }
                     }
 
-                    // put info queue for price offset
-                    bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
-                    if (!result) {
-                        warn_log("can not enqueue ticker info: {}", info.inst_id);
+                    if (valid_ticker) {
+                        // put info queue for price offset
+                        bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
+                        if (!result) {
+                            warn_log("can not enqueue ticker info: {}", info.inst_id);
+                        }
                     }
 
                     if (rand_value < 20) {
                         info_log("process zmq best ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={} update_shm={}",
                             info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis, update_shm);
                     }
+                    
                 } catch (std::exception &exp) {
                     err_log("error occur while parse zmq message");
                     break;

@@ -24,9 +24,10 @@ namespace receiver {
         this->use_udp_ticker = this->doc_["use_udp_ticker"].asBool();
         Json::Value json_udp_ipcs = this->doc_["ticker_udp_ipcs"];
         for (int i = 0; i < json_udp_ipcs.size(); i++) {
-            string host = json_udp_ipcs[i]["host"].asString();
-            int port = json_udp_ipcs[i]["port"].asInt();
-            pair<string, int> ipc = pair<string, int>(host, port);
+            UDPTickerIPC ipc;
+            ipc.mmap_file = json_udp_ipcs[i]["mmap_file"].asString();
+            ipc.host = json_udp_ipcs[i]["host"].asString();
+            ipc.port = json_udp_ipcs[i]["port"].asInt();
             this->ticker_udp_ipcs.push_back(ipc);
         }
 

@@ -4,6 +4,7 @@
 #include "common/constant.h"
 #include "common/tools.h"
 #include "common/random.h"
+#include "common/shm_udp_ticker.container.h"
 #include "logger/logger.h"
 #include "zmq/zmq_client.h"
 #include "config/receiver_config.h"
@@ -17,18 +18,9 @@
 #include <chrono>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/mman.h>
 
 namespace receiver {
-
-    struct UdpBookTicker {
-        uint64_t update_id;
-        uint64_t ets;
-        float buy_price;
-        float buy_num;
-        float sell_price;
-        float sell_num;
-        char name[16];
-    };
 
     void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role);
     void subscribe_normal_ticker(ReceiverConfig& config, GlobalContext& context, vector<string> &inst_ids, TickerRole role);
