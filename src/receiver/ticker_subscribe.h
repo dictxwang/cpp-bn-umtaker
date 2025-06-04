@@ -13,6 +13,10 @@
 #include "binancecpp/binance_ws_futures.h"
 #include "binancecpp/util/string_helper.h"
 #include "binancecpp/binance_ws_model.h"
+#include <thread>
+#include <chrono>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 
 namespace receiver {
 

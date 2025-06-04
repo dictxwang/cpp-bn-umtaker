@@ -1,5 +1,3 @@
-#include <thread>
-#include <chrono>
 #include "ticker_subscribe.h"
 
 namespace receiver {
@@ -38,14 +36,123 @@ namespace receiver {
         std::string host = config.ticker_udp_ipcs[ipc_index].first;
         int port = config.ticker_udp_ipcs[ipc_index].second;
 
+        RandomIntGen rand;
+        rand.init(0, 10000);
+
         while (true) {
 
-            // TODO
-
-            err_log("will re-connect udp ticker after 5 secs");
+            err_log("will connect udp ticker after 5 secs");
 
             // wait for a while after exception
             std::this_thread::sleep_for(std::chrono::seconds(5));
+            
+            // create udp socket
+            int sock_fd = socket(AF_INET, SOCK_DGRAM, 0);
+            if (sock_fd < 0) {
+                err_log("fail to create udp socket: {}", strerror(errno));
+                continue;
+            }
+
+            // make subscribe request
+            struct UdpBookTicker subscribe_request;
+            memset(&subscribe_request, 0, sizeof(subscribe_request));
+            subscribe_request.update_id = 0;
+            subscribe_request.ets = 1;
+
+            struct sockaddr_in receiver_addr;
+            memset(&receiver_addr, 0, sizeof(receiver_addr));
+            receiver_addr.sin_family = AF_INET;
+            receiver_addr.sin_port = htons(port);
+            if (inet_pton(AF_INET, host.c_str(), &receiver_addr.sin_addr) <= 0) {
+                err_log("udp invalid address or address not support");
+                close(sock_fd);
+                continue;
+            }
+
+            try {
+                // send subscribe request
+                sendto(sock_fd, &subscribe_request, sizeof(subscribe_request), 0, (struct sockaddr *)&receiver_addr, sizeof(receiver_addr));
+
+                while (true) {
+                    char buffer[128];
+                    struct sockaddr_in sender_addr;
+                    socklen_t addr_len = sizeof(sender_addr);
+                    // receive udp ticker data
+                    ssize_t recv_len = recvfrom(sock_fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&sender_addr, &addr_len);
+                    if (recv_len == sizeof(UdpBookTicker)) {
+
+                        struct UdpBookTicker *book_ticker = (struct UdpBookTicker *)buffer;
+
+                        std::cout << book_ticker->name <<"," << book_ticker->update_id <<","<< book_ticker->buy_price << "," << book_ticker->buy_num << "," << book_ticker->sell_price << ","  << book_ticker->sell_num << std::endl;
+
+                        UmTickerInfo info;
+                        info.inst_id = book_ticker->name;
+                        info.bid_price = book_ticker->buy_price;
+                        info.bid_volume = book_ticker->buy_num;
+                        info.ask_price = book_ticker->sell_price;
+                        info.ask_volume = book_ticker->sell_num;
+                        info.avg_price = (book_ticker->buy_price) / 2;
+                        info.update_time_millis = book_ticker->ets;
+                        info.is_from_trade = false;
+
+                        shm_mng::TickerInfoShm info_shm;
+                        info_shm.bid_price = book_ticker->buy_price;
+                        info_shm.bid_size = book_ticker->buy_num;
+                        info_shm.ask_price = book_ticker->sell_price;
+                        info_shm.ask_size = book_ticker->sell_num;
+                        info_shm.update_id = book_ticker->update_id;
+                        info_shm.update_time = book_ticker->ets;
+
+                        int rand_value = rand.randInt();
+                        int update_shm = 0;
+
+                        if (str_ends_with(info.inst_id, config.benchmark_quote_asset)) {
+                            // std::cout << "ticker for benchmark: " << event.symbol << std::endl;
+                            context.get_benchmark_ticker_composite().update_ticker(info);
+
+                            auto address = context.get_shm_benchmark_ticker_mapping().find(info.inst_id);
+                            if (address != context.get_shm_benchmark_ticker_mapping().end()) {
+                                update_shm = shm_mng::ticker_shm_writer_update(context.get_shm_store_info().benchmark_start, (*address).second, info_shm);
+
+                                if (rand_value < 20) {
+                                    std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, (*address).second);
+                                    info_log("get benchmark shm udp ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
+                                }
+                            }
+                        } else {
+                            // std::cout << "ticker for follower: " << event.symbol << std::endl;
+                            context.get_follower_ticker_composite().update_ticker(info);
+                        
+                            auto address = context.get_shm_follower_ticker_mapping().find(info.inst_id);
+                            if (address != context.get_shm_follower_ticker_mapping().end()) {
+                                update_shm = shm_mng::ticker_shm_writer_update(context.get_shm_store_info().follower_start, (*address).second, info_shm);
+        
+                                if (rand_value < 20) {
+                                    std::shared_ptr<shm_mng::TickerInfoShm> ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, (*address).second);
+                                    info_log("get follower shm udp ticker: {}, {}, {}, {}", (*ticker).inst_id, (*ticker).bid_price, (*ticker).version_number, (*ticker).update_time);
+                                }
+                            }
+                        }
+
+                        // put info queue for price offset
+                        bool result = (*context.get_ticker_info_channel()).try_enqueue(info);
+                        if (!result) {
+                            warn_log("can not enqueue ticker info: {}", info.inst_id);
+                        }
+
+                        if (rand_value < 20) {
+                            info_log("process udp ticker: symbol={} bid={} bid_size={} ask={} ask_size={} up_ts={} update_shm={}",
+                                info.inst_id, info.bid_price, info.bid_volume, info.ask_price, info.ask_volume, info.update_time_millis, update_shm);
+                        }
+                    }
+                }
+            } catch (std::exception &exp) {
+                err_log("exception occur while udp comminication: {}", std::string(exp.what()));
+            }
+
+            if (sock_fd > 0) {
+                close(sock_fd);
+            }
         }
     }
 
