@@ -47,7 +47,7 @@ FILE(GLOB_RECURSE LIB_CONFIG_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/config/*")
 add_library(config ${LIB_CONFIG_SRC})
 
-# tgboy
+# tgbot
 FILE(GLOB_RECURSE LIB_TGBOT_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/tgbot/*")
 add_library(tgbot ${LIB_TGBOT_SRC})
