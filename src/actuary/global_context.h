@@ -12,6 +12,7 @@
 #include "shm/ticker_shm.h"
 #include "shm/order_shm.h"
 #include "tgbot/api.h"
+#include "dynamic_config.h"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -47,7 +48,7 @@ namespace actuary {
         shared_mutex rw_lock;
         
         tgbot::TgApi tg_bot;
-        bool continue_make_order = true;
+        shared_ptr<DynamicConfig> dynamic_config;
 
     public:
         void init(ActuaryConfig& config);
@@ -69,9 +70,8 @@ namespace actuary {
         string get_listen_key();
         void set_listen_key(string listen_key);
         tgbot::TgApi& get_tg_bot();
-        void stop_make_order();
-        void start_make_order();
-        bool could_make_order();
+        shared_ptr<DynamicConfig> get_dynamic_config();
+        bool dynamic_could_make_order();
     };
 }
 #endif

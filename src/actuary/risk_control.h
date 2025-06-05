@@ -1,5 +1,5 @@
-#ifndef _ACTUARY_WATCHDOG_H_
-#define _ACTUARY_WATCHDOG_H_
+#ifndef _ACTUARY_RISK_CONTROL_H_
+#define _ACTUARY_RISK_CONTROL_H_
 
 #include <thread>
 #include <chrono>

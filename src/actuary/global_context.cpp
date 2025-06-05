@@ -38,6 +38,8 @@ namespace actuary {
         this->user_stream_listen_key = make_shared<string>("");
 
         this->tg_bot.init_default_endpoint(config.tg_bot_token);
+
+        this->dynamic_config = make_shared<DynamicConfig>();
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -171,18 +173,11 @@ namespace actuary {
     tgbot::TgApi& GlobalContext::get_tg_bot() {
         return this->tg_bot;
     }
-
-    void GlobalContext::stop_make_order() {
-        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
-        this->continue_make_order = false;
+    shared_ptr<DynamicConfig> GlobalContext::get_dynamic_config() {
+        return this->dynamic_config;
     }
 
-    void GlobalContext::start_make_order() {
-        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
-        this->continue_make_order = true;
-    }
-
-    bool GlobalContext::could_make_order() {
-        return this->continue_make_order;
+    bool GlobalContext::dynamic_could_make_order() {
+        return !(*(this->dynamic_config)).is_stop_make_order();
     }
 }

@@ -208,7 +208,7 @@ namespace actuary {
                 order_buy.update_time = now;
 
                 int updated = 0;
-                bool make_order = context.could_make_order();
+                bool make_order = context.dynamic_could_make_order();
                 if (!stop_buy && make_order) {
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 }
@@ -242,7 +242,7 @@ namespace actuary {
                 order_sell.update_time = now;
                 
                 int updated = 0;
-                bool make_order = context.could_make_order();
+                bool make_order = context.dynamic_could_make_order();
                 if (!stop_sell && make_order) {
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 }

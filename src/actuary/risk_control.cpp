@@ -23,8 +23,10 @@ namespace actuary {
             uint64_t now = binance::get_current_ms_epoch();
             if (meta.updateTimeMills + 300*100 < now) {
                 // expired
-                context.stop_make_order();
-                send_warning_message(config, context, string("stop make order: account meta is expired"));
+                if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_ACCOUNT_META)) {
+                    (*(context.get_dynamic_config())).stop_make_order(STOP_REASON_ACCOUNT_META);
+                    send_warning_message(config, context, string("stop make order: account meta is expired."));
+                }
                 err_log("stop make order as meta info is expired, latest update time {} now is {}", meta.updateTimeMills, now);
                 continue;
             }
@@ -37,17 +39,22 @@ namespace actuary {
 			}
 
             if (marginUseRatio > config.margin_ratio_thresholds[1]) {
-                context.stop_make_order();
-                send_warning_message(config, context, string("stop make order: margin ratio exceeds limit"));
+                if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_MARGIN_LIMITED)) {
+                    (*(context.get_dynamic_config())).stop_make_order(STOP_REASON_MARGIN_LIMITED);
+                    send_warning_message(config, context, string("stop make order: margin ratio exceeds limit."));
+                }
                 err_log("stop make order as margin ratio exceeds limit {}", config.margin_ratio_thresholds[1]);
                 continue;
             }
 
-            if (!context.could_make_order() && marginUseRatio < config.margin_ratio_thresholds[0]) {
-                context.start_make_order();
-                // send_warning_message(config, context, string("start make order: margin ratio has been recovery"));
-                err_log("start make order as margin ratio has been recovery {}", config.margin_ratio_thresholds[0]);
-                continue;
+            if (marginUseRatio < config.margin_ratio_thresholds[0]) {
+                if ((*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_MARGIN_LIMITED)) {
+                    bool resumed = (*(context.get_dynamic_config())).resume_make_order(STOP_REASON_MARGIN_LIMITED);
+                    if (resumed) {
+                        send_warning_message(config, context, string("resume make order: margin ratio has been recovery."));
+                    }
+                    err_log("resume make order as margin ratio has been recovery {} {}", config.margin_ratio_thresholds[0], resumed);
+                }
             }
 
             info_log("finish to watch account margin ratio");
@@ -61,33 +68,43 @@ namespace actuary {
             optional<AccountBalanceInfo> balance = context.get_balance_position_composite().copy_balance("BNB");
             if (!balance.has_value()) {
                 // null
-                context.stop_make_order();
-                send_warning_message(config, context, string("stop make order: balance of bnb not found"));
+                if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_BNB)) {
+                    (*(context.get_dynamic_config())).stop_make_order(STOP_REASON_BNB);
+                    send_warning_message(config, context, string("stop make order: balance of bnb not found."));
+                }
                 err_log("stop make order as balance of bnb not found");
                 continue;
             }
             uint64_t now = binance::get_current_ms_epoch();
             if ((*balance).updateTimeMills + 300*100 < now) {
+
                 // expired
-                context.stop_make_order();
-                send_warning_message(config, context, string("stop make order: balance of bnb is expired"));
+                if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_BNB)) {
+                    (*(context.get_dynamic_config())).stop_make_order(STOP_REASON_BNB);
+                    send_warning_message(config, context, string("stop make order: balance of bnb is expired."));
+                }
                 err_log("stop make order as balance of bnb is expired, latest update time {} now is {}", (*balance).updateTimeMills, now);
                 continue;
             }
 
             if ((*balance).crossWalletBalance < config.bnb_balance_thresholds[0]) {
                 // too little
-                context.stop_make_order();
-                send_warning_message(config, context, string("stop make order: only few balance of bnb"));
+                if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_BNB_SHORTAGE)) {
+                    (*(context.get_dynamic_config())).stop_make_order(STOP_REASON_BNB_SHORTAGE);
+                    send_warning_message(config, context, string("stop make order: only few balance of bnb."));
+                }
                 err_log("stop make order as only few balance of bnb {}", (*balance).crossWalletBalance);
                 continue;
             }
-            if (!context.could_make_order() && (*balance).crossWalletBalance > config.bnb_balance_thresholds[1]) {
+            if ((*balance).crossWalletBalance > config.bnb_balance_thresholds[1]) {
                 // enough
-                context.start_make_order();
-                // send_warning_message(config, context, string("start make order: has enough balance of bnb"));
-                err_log("start make order as has enough balance of bnb {}", (*balance).crossWalletBalance);
-                continue;
+                if ((*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_BNB_SHORTAGE)) {
+                    bool resumed = (*(context.get_dynamic_config())).resume_make_order(STOP_REASON_BNB_SHORTAGE);
+                    if (resumed) {
+                        send_warning_message(config, context, string("resume make order: has enough balance of bnb."));
+                    }
+                    err_log("resume make order as has enough balance of bnb {} {}", (*balance).crossWalletBalance, resumed);
+                }
             }
         }
     }

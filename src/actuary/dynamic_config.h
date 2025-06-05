@@ -1,0 +1,37 @@
+#ifndef _ACTUARY_DYANAMIC_H_
+#define _ACTUARY_DYANAMIC_H_
+
+#include <set>
+#include <iostream>
+#include <mutex>
+#include <shared_mutex>
+
+using namespace std;
+
+namespace actuary {
+
+    const string STOP_REASON_ACCOUNT_META = "STOP_ORDER_ACCOUNT_META";
+    const string STOP_REASON_MARGIN_LIMITED = "STOP_REASON_MARGIN_LIMITED";
+    const string STOP_REASON_BNB = "STOP_REASON_BNB";
+    const string STOP_REASON_BNB_SHORTAGE = "STOP_REASON_BNB_SHORTAGE";
+
+    class DynamicConfig {
+    public:
+        DynamicConfig() {
+            this->stop_order = false;
+        }
+        ~DynamicConfig() {}
+    
+    private:
+        bool stop_order;
+        set<string> stop_reasons;
+        shared_mutex rw_lock;
+    
+    public:
+        void stop_make_order(const string& stopReason);
+        bool resume_make_order(const string& stopReason);
+        bool is_stop_make_order();
+        bool is_stop_make_order_as_reason(string stopReason);
+    };
+}
+#endif
