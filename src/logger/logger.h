@@ -23,7 +23,7 @@ inline void init_console_log(std::string &logger_name) {
 
 inline void init_rotating_file_log(std::string &logger_name, std::string &logger_file_path, spdlog::level::level_enum log_level, int max_files) {
     auto max_size = 1048576 * 5;
-    auto logger = spdlog::rotating_logger_mt(logger_name, logger_file_path, max_size, max_files);
+    auto logger = spdlog::rotating_logger_mt(logger_name, logger_file_path, max_size, max_files, true);
     spdlog::set_level(log_level);
     spdlog::flush_every(std::chrono::seconds(1));
     spdlog::set_default_logger(logger);
@@ -40,7 +40,7 @@ inline void init_daily_file_log(std::string &logger_name, std::string &logger_fi
    
     spdlog::init_thread_pool(8192, 1); // Queue size: 8192, 1 worker thread
     // Create an asynchronous daily logger
-    auto async_daily_logger = spdlog::daily_logger_mt<spdlog::async_factory>(logger_name, logger_file_path, max_files=max_files);
+    auto async_daily_logger = spdlog::daily_logger_mt<spdlog::async_factory>(logger_name, logger_file_path, 0, 0, true, max_files=max_files);
     async_daily_logger->set_level(log_level);
     spdlog::flush_every(std::chrono::seconds(1));
     spdlog::set_default_logger(async_daily_logger);
