@@ -56,7 +56,8 @@ namespace actuary {
         return true;
     }
 
-    bool change_margin_type(ActuaryConfig &config, GlobalContext &context) {for (std::string follower_inst : context.get_follower_inst_ids()) {
+    bool change_margin_type(ActuaryConfig &config, GlobalContext &context) {
+        for (std::string follower_inst : context.get_follower_inst_ids()) {
             binance::CommonRestResponse<bool> response;
             context.get_furures_rest_client().change_marginType(follower_inst, config.margin_type, response);
             if (response.code != binance::RestCodeOK || !response.data) {
