@@ -110,7 +110,7 @@ namespace trader {
     }
 
     void process_order_message(TraderConfig& config, GlobalContext& context) {
-        moodycamel::ConcurrentQueue<string> *channel = context.get_order_chanel();
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> channel = context.get_order_chanel();
 
         RandomIntGen rand;
         rand.init(0, 10000);

@@ -237,7 +237,7 @@ namespace actuary {
 
     void process_balance_position(ActuaryConfig &config, GlobalContext &context) {
         
-        moodycamel::ConcurrentQueue<string>* channel = context.get_account_info_channel();
+        shared_ptr<moodycamel::ConcurrentQueue<string>> channel = context.get_account_info_channel();
         while (true) {
             std::string messageJson;
             while (!channel->try_dequeue(messageJson)) {

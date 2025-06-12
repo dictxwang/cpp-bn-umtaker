@@ -24,6 +24,9 @@ namespace receiver {
 
         this->init_shm_mapping(config);
         this->init_shm(config);
+
+        this->benchmark_ticker_channel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
+        this->follower_ticker_channel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
     };
 
     void GlobalContext::init_shm(ReceiverConfig& config) {
@@ -136,11 +139,11 @@ namespace receiver {
         return this->inst_ids_set;
     }
     
-    moodycamel::ConcurrentQueue<string> *GlobalContext::get_benchmark_ticker_channel() {
-        return &(this->benchmark_ticker_channel);
+    shared_ptr<moodycamel::ConcurrentQueue<std::string>> GlobalContext::get_benchmark_ticker_channel() {
+        return this->benchmark_ticker_channel;
     }
-    moodycamel::ConcurrentQueue<string> *GlobalContext::get_follower_ticker_channel() {
-        return &(this->follower_ticker_channel);
+    shared_ptr<moodycamel::ConcurrentQueue<std::string>> GlobalContext::get_follower_ticker_channel() {
+        return this->follower_ticker_channel;
     }
     moodycamel::ConcurrentQueue<UmTickerInfo> *GlobalContext::get_ticker_info_channel() {
         return &(this->ticker_info_channel);

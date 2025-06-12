@@ -43,7 +43,7 @@ namespace actuary {
         binance::BinanceFuturesRestClient furures_rest_client;
         AccountBalancePositionComposite balance_position_composite;
     
-        moodycamel::ConcurrentQueue<string> account_info_channel;
+        shared_ptr<moodycamel::ConcurrentQueue<string>> account_info_channel;
         shared_ptr<string> user_stream_listen_key;
         shared_mutex rw_lock;
         
@@ -66,7 +66,7 @@ namespace actuary {
         binance::BinanceFuturesRestClient& get_furures_rest_client();
         AccountBalancePositionComposite& get_balance_position_composite();
 
-        moodycamel::ConcurrentQueue<string>* get_account_info_channel();
+        shared_ptr<moodycamel::ConcurrentQueue<string>> get_account_info_channel();
         string get_listen_key();
         void set_listen_key(string listen_key);
         tgbot::TgApi& get_tg_bot();

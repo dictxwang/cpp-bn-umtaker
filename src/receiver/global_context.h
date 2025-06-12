@@ -8,6 +8,7 @@
 #include "config/inst_config.h"
 #include "binancecpp/moodycamel/concurrentqueue.h"
 #include <set>
+#include <memory>
 #include "shm/threshold_shm.h"
 #include "logger/logger.h"
 
@@ -20,18 +21,18 @@ namespace receiver {
     
     private:
         InstConfig inst_config;
-        vector<string> benchmark_inst_ids;
-        vector<string> follower_inst_ids;
-        set<string> inst_ids_set;
-        unordered_map<string, int> shm_threshold_mapping;
-        unordered_map<string, int> shm_benchmark_ticker_mapping;
-        unordered_map<string, int> shm_follower_ticker_mapping;
+        vector<std::string> benchmark_inst_ids;
+        vector<std::string> follower_inst_ids;
+        set<std::string> inst_ids_set;
+        unordered_map<std::string, int> shm_threshold_mapping;
+        unordered_map<std::string, int> shm_benchmark_ticker_mapping;
+        unordered_map<std::string, int> shm_follower_ticker_mapping;
 
         TickerComposite benchmark_ticker_composite;
         TickerComposite follower_ticker_composite;
 
-        moodycamel::ConcurrentQueue<string> benchmark_ticker_channel;
-        moodycamel::ConcurrentQueue<string> follower_ticker_channel;
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> benchmark_ticker_channel;
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> follower_ticker_channel;
 
         moodycamel::ConcurrentQueue<UmTickerInfo> ticker_info_channel;
         moodycamel::ConcurrentQueue<std::string> early_run_calculation_channel;
@@ -53,18 +54,18 @@ namespace receiver {
         PriceOffsetComposite& get_price_offset_composite();
         EarlyRunThresholdComposite& get_early_run_threshold_composite();
         BetaThresholdComposite& get_beta_threshold_composite();
-        moodycamel::ConcurrentQueue<string> *get_benchmark_ticker_channel();
-        moodycamel::ConcurrentQueue<string> *get_follower_ticker_channel();
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_benchmark_ticker_channel();
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_follower_ticker_channel();
         moodycamel::ConcurrentQueue<UmTickerInfo> *get_ticker_info_channel();
         moodycamel::ConcurrentQueue<std::string> *get_early_run_calculation_channel();
         moodycamel::ConcurrentQueue<std::string> *get_beta_calculation_channel();
-        vector<string>& get_benchmark_inst_ids();
-        vector<string>& get_follower_inst_ids();
-        set<string>& get_inst_ids_set();
+        vector<std::string>& get_benchmark_inst_ids();
+        vector<std::string>& get_follower_inst_ids();
+        set<std::string>& get_inst_ids_set();
         ShmStoreInfo& get_shm_store_info();
-        unordered_map<string, int>& get_shm_threshold_mapping();
-        unordered_map<string, int>& get_shm_benchmark_ticker_mapping();
-        unordered_map<string, int>& get_shm_follower_ticker_mapping();
+        unordered_map<std::string, int>& get_shm_threshold_mapping();
+        unordered_map<std::string, int>& get_shm_benchmark_ticker_mapping();
+        unordered_map<std::string, int>& get_shm_follower_ticker_mapping();
     };
 }
 

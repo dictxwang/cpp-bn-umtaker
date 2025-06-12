@@ -198,7 +198,7 @@ namespace receiver {
     }
 
     void process_normal_ticker_message(ReceiverConfig& config, GlobalContext &context, TickerRole role) {
-        moodycamel::ConcurrentQueue<string> *channel;
+        shared_ptr<moodycamel::ConcurrentQueue<string>> channel;
         if (role == TickerRole::Benchmark) {
             channel = context.get_benchmark_ticker_channel();
         } else {

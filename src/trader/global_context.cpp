@@ -13,6 +13,8 @@ namespace trader {
             this->inst_ids_set.insert(follower_inst);
         }
 
+        this->order_chanel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
+
         this->init_shm_mapping(config);
         this->init_shm(config);
         info_log("finish init share memory settings");
@@ -76,7 +78,7 @@ namespace trader {
     binance::BinanceFuturesWsClient& GlobalContext::get_order_service() {
         return this->order_service;
     }
-    moodycamel::ConcurrentQueue<std::string>* GlobalContext::get_order_chanel() {
-        return &(this->order_chanel);
+    shared_ptr<moodycamel::ConcurrentQueue<std::string>> GlobalContext::get_order_chanel() {
+        return this->order_chanel;
     }
 }

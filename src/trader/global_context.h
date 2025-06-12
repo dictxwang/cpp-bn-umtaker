@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <vector>
 #include <set>
+#include <memory>
 
 using namespace std;
 
@@ -29,7 +30,7 @@ namespace trader {
         ShmStoreInfo shm_store_info;
 
         binance::BinanceFuturesWsClient order_service;
-        moodycamel::ConcurrentQueue<std::string> order_chanel;
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> order_chanel;
     
     public:
         void init(TraderConfig& config);
@@ -42,7 +43,7 @@ namespace trader {
         ShmStoreInfo& get_shm_store_info();
         unordered_map<string, int>& get_shm_order_mapping();
         binance::BinanceFuturesWsClient& get_order_service();
-        moodycamel::ConcurrentQueue<std::string>* get_order_chanel();
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_chanel();
     };
 }
 #endif

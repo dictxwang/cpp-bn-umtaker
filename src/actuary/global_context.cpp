@@ -40,6 +40,8 @@ namespace actuary {
         this->tg_bot.init_default_endpoint(config.tg_bot_token);
 
         this->dynamic_config = make_shared<DynamicConfig>();
+
+        this->account_info_channel = make_shared<moodycamel::ConcurrentQueue<string>>();
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -159,8 +161,8 @@ namespace actuary {
     AccountBalancePositionComposite& GlobalContext::get_balance_position_composite() {
         return this->balance_position_composite;
     }
-    moodycamel::ConcurrentQueue<string>* GlobalContext::get_account_info_channel() {
-        return &(this->account_info_channel);
+    shared_ptr<moodycamel::ConcurrentQueue<string>> GlobalContext::get_account_info_channel() {
+        return this->account_info_channel;
     }
     string GlobalContext::get_listen_key() {
         std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
