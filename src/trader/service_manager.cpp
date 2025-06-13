@@ -176,16 +176,18 @@ namespace trader {
 
                 info_log("best path api response: {}", call_result);
 
-                for (int i = i; i < json_result.size(); i++) {
-                    BestPathInfo info;
-                    info.symbol = json_result[i]["symbol"].asString();
-                    info.action = json_result[i]["action"].asString();
-                    info.local_ip = json_result[i]["local_ip"].asString();
-                    info.remote_ip = json_result[i]["remote_ip"].asString();
-                    info.best_cost = json_result[i]["best_cost"].asUInt64();
-                    info.update_time_millis = json_result[i]["update_time_millis"].asUInt64();
+                if (json_result.isArray()) {
+                    for (int i = 0; i < json_result.size(); i++) {
+                        BestPathInfo info;
+                        info.symbol = json_result[i]["symbol"].asString();
+                        info.action = json_result[i]["action"].asString();
+                        info.local_ip = json_result[i]["local_ip"].asString();
+                        info.remote_ip = json_result[i]["remote_ip"].asString();
+                        info.best_cost = json_result[i]["best_cost"].asUInt64();
+                        info.update_time_millis = json_result[i]["update_time_millis"].asUInt64();
 
-                    result.push_back(info);
+                        result.push_back(info);
+                    }
                 }
             } catch (exception &exp) {
                 err_log("fail to parse call best path api response: {}", string(exp.what()));
