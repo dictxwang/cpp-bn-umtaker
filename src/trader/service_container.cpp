@@ -18,7 +18,7 @@ namespace trader {
         thread order_process_thread(start_process_trade_thread, this->id, this->is_stopped, this->ws_client);
         order_process_thread.detach();
 
-        thread message_process_thread(start_process_message_thread, this->id, this->is_stopped, this->ws_client);
+        thread message_process_thread(start_process_message_thread, this->id, this->is_stopped, message_channel);
         message_process_thread.detach();
     }
 
