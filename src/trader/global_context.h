@@ -5,6 +5,7 @@
 #include "binancecpp/moodycamel/concurrentqueue.h"
 #include "basic_container.h"
 #include "config/trader_config.h"
+#include "service_container.h"
 #include "logger/logger.h"
 #include "shm/order_shm.h"
 #include <unordered_map>
@@ -29,6 +30,8 @@ namespace trader {
         unordered_map<string, int> shm_order_mapping;
         ShmStoreInfo shm_store_info;
 
+        OrderServiceManager order_service_manager;
+
         binance::BinanceFuturesWsClient order_service;
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> order_chanel;
     
@@ -42,6 +45,7 @@ namespace trader {
         set<string>& get_inst_ids_set();
         ShmStoreInfo& get_shm_store_info();
         unordered_map<string, int>& get_shm_order_mapping();
+        OrderServiceManager &get_order_service_manager();
         binance::BinanceFuturesWsClient& get_order_service();
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_chanel();
     };

@@ -74,6 +74,9 @@ namespace trader {
     unordered_map<string, int>& GlobalContext::get_shm_order_mapping() {
         return this->shm_order_mapping;
     }
+    OrderServiceManager& GlobalContext::get_order_service_manager() {
+        return this->order_service_manager;
+    }
 
     binance::BinanceFuturesWsClient& GlobalContext::get_order_service() {
         return this->order_service;
