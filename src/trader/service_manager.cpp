@@ -166,7 +166,7 @@ namespace trader {
         vector<BestPathInfo> result;
 
         if (call_code != CURLE_OK) {
-            err_log("fail to call best path api: {}", call_code);
+            err_log("fail to call best path api: {}", strHelper::toString(call_code));
         } else {
             try {
                 Json::Value json_result;
