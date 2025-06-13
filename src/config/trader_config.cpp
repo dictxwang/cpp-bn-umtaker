@@ -27,6 +27,10 @@ namespace trader {
 
         this->share_memory_project_id = this->doc_["share_memory_project_id"].asInt();
         this->share_memory_path_order = this->doc_["share_memory_path_order"].asString();
+
+        this->best_path_rest_url = this->doc_["best_path_rest_url"].asString();
+        this->best_path_zmq_ipc = this->doc_["best_path_zmq_ipc"].asString();
+        this->trading_use_best_path = this->doc_["trading_use_best_path"].asBool();
         return true;
     }
 }

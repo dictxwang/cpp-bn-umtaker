@@ -31,6 +31,10 @@ namespace trader {
 
         int share_memory_project_id; // a single character or integer for the project identifier.
         string share_memory_path_order; // make sure the path is exists, and accessiable
+
+        string best_path_rest_url;
+        string best_path_zmq_ipc;
+        bool trading_use_best_path;
     };
 }
 

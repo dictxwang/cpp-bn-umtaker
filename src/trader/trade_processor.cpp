@@ -7,13 +7,17 @@ namespace trader {
 
     void start_trade_processors(TraderConfig& config, GlobalContext& context) {
         
-        std::thread thread_process_message(process_order_message, std::ref(config), std::ref(context));
-        thread_process_message.detach();
-        info_log("start thread of processing order message");
+        if (!config.trading_use_best_path) {
 
-        std::thread thread_order_service(start_order_service, std::ref(config), std::ref(context));
-        thread_order_service.detach();
-        info_log("start thread of starting order serice");
+            // not use best path for trading, require start normal order service
+            std::thread thread_process_message(process_order_message, std::ref(config), std::ref(context));
+            thread_process_message.detach();
+            info_log("start thread of processing order message");
+
+            std::thread thread_order_service(start_order_service, std::ref(config), std::ref(context));
+            thread_order_service.detach();
+            info_log("start thread of starting order serice");
+        }
 
         for (std::string base_asset : config.base_asset_list) {
             std::thread thread_scan(scan_and_send_order, std::ref(config), std::ref(context), base_asset);
@@ -84,8 +88,17 @@ namespace trader {
 
             pair<bool, string> result;
             if (config.open_place_order) {
-                // TODO select best order path
-                result = context.get_order_service().placeOrder(order);
+                if (config.trading_use_best_path) {
+                    optional<shared_ptr<WsClientWrapper>> best_service = context.get_order_service_manager().find_best_service(follower_inst_id);
+                    if (!best_service.has_value()) {
+                        // no available order service
+                        warn_log("not found available order server for {}", follower_inst_id);
+                    } else {
+                        result = best_service.value()->place_order(order);
+                    }
+                } else {
+                    result = context.get_order_service().placeOrder(order);
+                }
             } else {
                 result.first = false;
                 result.second = "config stop";

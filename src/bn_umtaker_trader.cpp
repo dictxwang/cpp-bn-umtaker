@@ -1,6 +1,7 @@
 #include <iostream>
 #include "config/trader_config.h"
 #include "trader/global_context.h"
+#include "trader/service_manager.h"
 #include "trader/trade_processor.h"
 /*
     loop scan new order from share memory
@@ -25,6 +26,9 @@ int main(int argc, char const *argv[]) {
 
     trader::GlobalContext context;
     context.init(config);
+
+    // start trading best path service management
+    trader::start_best_service_management(config, context);
 
     // create trader thread for per asset
     trader::start_trade_processors(config, context);

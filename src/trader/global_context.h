@@ -25,7 +25,7 @@ namespace trader {
     private:     
         vector<string> benchmark_inst_ids;
         vector<string> follower_inst_ids;
-        set<string> inst_ids_set;
+        set<string> follower_inst_id_set;
         
         unordered_map<string, int> shm_order_mapping;
         ShmStoreInfo shm_store_info;
@@ -42,7 +42,7 @@ namespace trader {
         void init_order_service(TraderConfig& config);
         vector<string>& get_benchmark_inst_ids();
         vector<string>& get_follower_inst_ids();
-        set<string>& get_inst_ids_set();
+        set<string>& get_follower_inst_id_set();
         ShmStoreInfo& get_shm_store_info();
         unordered_map<string, int>& get_shm_order_mapping();
         OrderServiceManager &get_order_service_manager();

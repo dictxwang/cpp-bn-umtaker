@@ -9,8 +9,7 @@ namespace trader {
             string follower_inst = base + config.follower_quote_asset;
             this->benchmark_inst_ids.push_back(benchmark_inst);
             this->follower_inst_ids.push_back(follower_inst);
-            this->inst_ids_set.insert(benchmark_inst);
-            this->inst_ids_set.insert(follower_inst);
+            this->follower_inst_id_set.insert(follower_inst);
         }
 
         this->order_chanel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
@@ -65,8 +64,8 @@ namespace trader {
     vector<string>& GlobalContext::get_follower_inst_ids() {
         return this->follower_inst_ids;
     }
-    set<string>& GlobalContext::get_inst_ids_set() {
-        return this->inst_ids_set;
+    set<string>& GlobalContext::get_follower_inst_id_set() {
+        return this->follower_inst_id_set;
     }
     ShmStoreInfo& GlobalContext::get_shm_store_info() {
         return this->shm_store_info;

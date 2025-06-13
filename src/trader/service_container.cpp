@@ -62,7 +62,7 @@ namespace trader {
     void WsClientWrapper::stop() {
         (*this->is_stopped) = true;
         this->ws_client->stop();
-        info_log("stop wc client wrapper {}", this->id);
+        info_log("stop ws client wrapper {}", this->id);
     }
 
     pair<bool, string> WsClientWrapper::place_order(binance::FuturesNewOrder &order) {
@@ -74,7 +74,7 @@ namespace trader {
         }
     }
 
-    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper>) {
+    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip) {
         
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
@@ -120,6 +120,37 @@ namespace trader {
             return nullopt;
         } else {
             return service_kv->second;
+        }
+    }
+
+    vector<string> OrderServiceManager::get_all_service_ip_pairs() {
+        vector<string> ip_pairs;
+        std::shared_lock<std::shared_mutex> r_lock(rw_lock);
+        for (auto [k, _] : this->ippair_service_map) {
+            ip_pairs.push_back(k);
+        }
+        return ip_pairs;
+    }
+
+    set<string> OrderServiceManager::get_in_use_ip_pairs() {
+        set<string> ip_pairs;
+        std::shared_lock<std::shared_mutex> r_lock(rw_lock);
+        for (auto [_, v] : this->symbol_best_ippair_map) {
+            ip_pairs.insert(v);
+        }
+        return ip_pairs;
+
+    }
+
+    void OrderServiceManager::stop_and_remove_service(const string& ip_pair) {
+
+        std::unique_lock<std::shared_mutex> w_lock(rw_lock);
+        auto original = this->ippair_service_map.find(ip_pair);
+        if (original != this->ippair_service_map.end()) {
+            if (!original->second->is_stopped) {
+                original->second->stop();
+            }
+            this->ippair_service_map.erase(ip_pair);
         }
     }
 }
