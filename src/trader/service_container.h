@@ -65,7 +65,7 @@ namespace trader {
         shared_mutex rw_lock;
 
     public:
-        void update_best_service(TraderConfig &config, string &symbol, string &local_ip, string &remote_ip);
+        void update_best_service(TraderConfig &config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper);
         optional<shared_ptr<WsClientWrapper>> find_best_service(string &symbol);
 
         vector<string> get_all_service_ip_pairs();

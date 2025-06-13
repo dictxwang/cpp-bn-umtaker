@@ -5,6 +5,7 @@ using namespace std;
 namespace trader {
 
     void WsClientWrapper::init_and_start(TraderConfig &config, string &local_ip, string &remote_ip) {
+        this->ws_client = make_shared<binance::BinanceFuturesWsClient>();
         this->ws_client->setLocalIP(local_ip);
         this->ws_client->setRemoteIP(remote_ip);
         this->ws_client->initOrderService(config.api_key_ed25519, config.secret_key_ed25519, config.trade_use_intranet);
@@ -74,7 +75,7 @@ namespace trader {
         }
     }
 
-    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip) {
+    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper) {
         
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
@@ -87,7 +88,7 @@ namespace trader {
 
         if (original_wrapper == nullptr) {
             // not exists, need create a new one
-            shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
+            // shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
             new_wrapper->init_and_start(config, local_ip, remote_ip);
 
             this->ippair_service_map[ip_pair] = new_wrapper;
