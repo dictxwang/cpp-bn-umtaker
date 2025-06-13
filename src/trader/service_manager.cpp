@@ -6,7 +6,7 @@ namespace trader {
     
     void start_best_service_management(TraderConfig &config, GlobalContext &context) {
 
-        if (!config.trading_use_best_path) {
+        if (config.trading_use_best_path) {
             thread polling_thread(polling_best_path_processor, ref(config), ref(context));
             polling_thread.detach();
             info_log("start polling best path api thread");
