@@ -101,6 +101,7 @@ target_link_libraries(trader
 
     ${_LIB_BINANCECPP}
     ${_LIB_SPDLOG}
+    ${_LIB_ZMQ}
     CURL::libcurl
     OpenSSL::SSL OpenSSL::Crypto
     common
