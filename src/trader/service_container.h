@@ -19,6 +19,9 @@ using namespace std;
 
 namespace trader {
 
+    void start_process_trade_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<binance::BinanceFuturesWsClient> futures_ws_client);
+    void start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel);
+
     class WsClientWrapper {
     public:
         WsClientWrapper() {
@@ -41,9 +44,6 @@ namespace trader {
     private:
         void init_and_start(TraderConfig &config, string &local_ip, string &remote_ip);
         void stop();
-
-        void start_process_trade_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<binance::BinanceFuturesWsClient> futures_ws_client);
-        void start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel);
 
         friend class OrderServiceManager;
     

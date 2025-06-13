@@ -22,7 +22,7 @@ namespace trader {
         message_process_thread.detach();
     }
 
-    void WsClientWrapper::start_process_trade_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<binance::BinanceFuturesWsClient> futures_ws_client) {
+    void start_process_trade_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<binance::BinanceFuturesWsClient> futures_ws_client) {
 
         // if order service not be stopped, should restart for itself when error occur
         while (!(*is_stopped)) {
@@ -35,7 +35,7 @@ namespace trader {
         info_log("order service {} processor thread stopped", service_id);
     }
 
-    void WsClientWrapper::start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel) {
+    void start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel) {
         
         if ((*is_stopped)) {
             warn_log("service {} is stopped before process order messaage", service_id);
