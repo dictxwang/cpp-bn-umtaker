@@ -64,7 +64,7 @@ namespace trader {
         }
     }
 
-    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel) {
+    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string method) {
         
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
@@ -86,7 +86,7 @@ namespace trader {
         }
 
         this->symbol_best_ippair_map[symbol] = ip_pair;
-        info_log("update symbol order service mapping {} => {}", symbol, ip_pair);
+        info_log("update symbol order service mapping {} => {} by {}", symbol, ip_pair, method);
     }
 
     optional<shared_ptr<WsClientWrapper>> OrderServiceManager::find_best_service(string &symbol) {

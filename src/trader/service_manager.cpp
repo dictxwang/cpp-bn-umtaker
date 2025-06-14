@@ -80,7 +80,7 @@ namespace trader {
                 }
 
                 shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
-                context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel());
+                context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "polling");
                 this_thread::sleep_for(chrono::seconds(1));
             }
 
@@ -123,7 +123,7 @@ namespace trader {
                     }
                     
                     shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
-                    context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel());
+                    context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "zmq");
                     
                 } catch (exception &exp) {
                     err_log("error occur while parse zmq message");
