@@ -55,7 +55,12 @@ namespace trader {
             warn_log("order service has stopped: for place order {}", order.newClientOrderId);
             return pair<bool, string>(false, "service has stopped");
         } else {
-            return this->ws_client->placeOrder(order);
+            try {
+                return this->ws_client->placeOrder(order);
+            } catch (exception &exp) {
+                err_log("exception occur while place order: {}", string(exp.what()));
+                return pair<bool, string>(false, string(exp.what()));
+            }
         }
     }
 
@@ -66,13 +71,18 @@ namespace trader {
         string ip_pair = local_ip + "_" + remote_ip;
         auto original = this->ippair_service_map.find(ip_pair);
 
+        uint64_t now = binance::get_current_ms_epoch();
         if (original == this->ippair_service_map.end()) {
             // not exists original service, need create a new one
             new_wrapper->init(config, order_channel, local_ip, remote_ip);
+            new_wrapper->update_time_millis = now;
             new_wrapper->start();
             this->ippair_service_map[ip_pair] = new_wrapper;
 
             info_log("put new order service {} wrapper for {}", new_wrapper->id, ip_pair);
+        } else {
+            original->second->update_time_millis = now;
+            info_log("refresh old order service {} wrapper for {}", new_wrapper->id, ip_pair);
         }
 
         this->symbol_best_ippair_map[symbol] = ip_pair;
@@ -119,7 +129,20 @@ namespace trader {
             mapping[k] = v;
         }
         return mapping;
+    }
 
+    vector<string> OrderServiceManager::find_update_expired_service(uint64_t expired_millis){
+
+        vector<string> ip_pairs;
+        std::shared_lock<std::shared_mutex> r_lock(rw_lock);
+        uint64_t now = binance::get_current_ms_epoch();
+        for (auto [k, v] : this->ippair_service_map) {
+            if (v->update_time_millis + expired_millis <= now) {
+                warn_log("order service {} update expired {} now={}", v->id, v->update_time_millis, now);
+                ip_pairs.push_back(k);
+            }
+        }
+        return ip_pairs;
     }
 
     void OrderServiceManager::stop_and_remove_service(const string& ip_pair) {
@@ -127,7 +150,7 @@ namespace trader {
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
         auto original = this->ippair_service_map.find(ip_pair);
         if (original != this->ippair_service_map.end()) {
-            if (!original->second->is_stopped) {
+            if (!(*original->second->is_stopped)) {
                 original->second->stop();
             }
             this->ippair_service_map.erase(ip_pair);

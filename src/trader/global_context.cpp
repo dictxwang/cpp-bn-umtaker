@@ -21,6 +21,12 @@ namespace trader {
         // init trading service
         this->init_order_service(config);
         info_log("finish init order service");
+
+        // init auto reset counter
+        this->counter_boss.init(10, 1);
+        this->api_second_limiter = this->counter_boss.create_new_counter(config.order_limit_per_10seconds, 10*1000).value();
+        this->api_minute_limiter = this->counter_boss.create_new_counter(config.order_limit_per_minute, 60*1000).value();
+        this->counter_boss.start();
     }
 
     void GlobalContext::init_order_service(TraderConfig& config) {
@@ -82,5 +88,11 @@ namespace trader {
     }
     shared_ptr<moodycamel::ConcurrentQueue<std::string>> GlobalContext::get_order_channel() {
         return this->order_channel;
+    }
+    shared_ptr<AutoResetCounter> GlobalContext::get_api_second_limiter() {
+        return this->api_second_limiter;
+    }
+    shared_ptr<AutoResetCounter> GlobalContext::get_api_minute_limiter() {
+        return this->api_minute_limiter;
     }
 }

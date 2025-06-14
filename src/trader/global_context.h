@@ -7,6 +7,7 @@
 #include "config/trader_config.h"
 #include "service_container.h"
 #include "logger/logger.h"
+#include "common/auto_reset_counter.h"
 #include "shm/order_shm.h"
 #include <unordered_map>
 #include <vector>
@@ -34,6 +35,10 @@ namespace trader {
 
         binance::BinanceFuturesWsClient order_service;
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> order_channel;
+
+        AutoResetCounterBoss counter_boss;
+        shared_ptr<AutoResetCounter> api_second_limiter;
+        shared_ptr<AutoResetCounter> api_minute_limiter;
     
     public:
         void init(TraderConfig& config);
@@ -48,6 +53,8 @@ namespace trader {
         OrderServiceManager &get_order_service_manager();
         binance::BinanceFuturesWsClient& get_order_service();
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_channel();
+        shared_ptr<AutoResetCounter> get_api_second_limiter();
+        shared_ptr<AutoResetCounter> get_api_minute_limiter();
     };
 }
 #endif

@@ -13,6 +13,9 @@
     "order_valid_millis": 8000,
     "loop_pause_time_seconds": 5,
 
+    "order_limit_per_minute": 1200,
+    "order_limit_per_10seconds": 300,
+
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 

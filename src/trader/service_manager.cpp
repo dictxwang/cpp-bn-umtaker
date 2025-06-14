@@ -26,7 +26,7 @@ namespace trader {
     void service_zookeeper_processor(TraderConfig &config, GlobalContext &context) {
 
         while (true) {
-            this_thread::sleep_for(chrono::seconds(60));
+            this_thread::sleep_for(chrono::seconds(120));
             info_log("zookeeper start work");
             vector<string> all_ip_pairs = context.get_order_service_manager().get_all_service_ip_pairs();
             unordered_map<string, string> symbol_ip_mapping = context.get_order_service_manager().get_inuse_symol_ip_mapping();
@@ -50,10 +50,16 @@ namespace trader {
             }
 
             info_log("zookeeper find unused service keys {}", strHelper::joinStrings(unused_ip_pairs, ","));
-           
             for (string ip_pair : unused_ip_pairs) {
                 context.get_order_service_manager().stop_and_remove_service(ip_pair);
                 info_log("zookeeper stop unused service which key is {}", ip_pair);
+            }
+
+            vector<string> expired_ip_pairs = context.get_order_service_manager().find_update_expired_service(5400*1000);
+            info_log("zookeeper find update expired service keys {}", strHelper::joinStrings(expired_ip_pairs, ","));
+            for (string ip_pair : expired_ip_pairs) {
+                context.get_order_service_manager().stop_and_remove_service(ip_pair);
+                info_log("zookeeper stop update expired service which key is {}", ip_pair);
             }
         }
     }

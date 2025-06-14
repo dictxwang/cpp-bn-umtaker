@@ -28,6 +28,7 @@ namespace trader {
             this->id = binance::generate_uuid();
             this->has_init_started = false;
             this->is_stopped = make_shared<bool>(false);
+            this->update_time_millis = 0;
         }
         ~WsClientWrapper() {
         }
@@ -37,6 +38,7 @@ namespace trader {
         shared_ptr<binance::BinanceFuturesWsClient> ws_client;
         bool has_init_started;
         shared_ptr<bool> is_stopped;
+        uint64_t update_time_millis;
         shared_mutex rw_lock;
     
     private:
@@ -69,6 +71,7 @@ namespace trader {
 
         vector<string> get_all_service_ip_pairs();
         unordered_map<string, string> get_inuse_symol_ip_mapping();
+        vector<string> find_update_expired_service(uint64_t expired_millis);
         void stop_and_remove_service(const string& ip_pair);
     };
 }

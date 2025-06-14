@@ -25,6 +25,9 @@ namespace trader {
         uint64_t order_valid_millis;
         long loop_pause_time_seconds;
 
+        int order_limit_per_minute;
+        int order_limit_per_10seconds;
+
         string benchmark_quote_asset;
         string follower_quote_asset;
         std::vector<string> base_asset_list;

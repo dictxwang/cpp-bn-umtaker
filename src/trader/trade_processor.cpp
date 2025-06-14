@@ -88,18 +88,24 @@ namespace trader {
 
             pair<bool, string> result;
             if (config.open_place_order) {
-                if (config.trading_use_best_path) {
-                    optional<shared_ptr<WsClientWrapper>> best_service = context.get_order_service_manager().find_best_service(follower_inst_id);
-                    if (!best_service.has_value()) {
-                        // no available order service
-                        warn_log("not found available order service for {}", follower_inst_id);
-                        result.first = false;
-                        result.second = "no order service";
-                    } else {
-                        result = best_service.value()->place_order(order);
-                    }
+                if (!context.get_api_minute_limiter()->get_semaphore(1) || !context.get_api_second_limiter()->get_semaphore(1)) {
+                    warn_log("no more semaphore for place order");
+                    result.first = false;
+                    result.second = "no semephore";
                 } else {
-                    result = context.get_order_service().placeOrder(order);
+                    if (config.trading_use_best_path) {
+                        optional<shared_ptr<WsClientWrapper>> best_service = context.get_order_service_manager().find_best_service(follower_inst_id);
+                        if (!best_service.has_value()) {
+                            // no available order service
+                            warn_log("not found available order service for {}", follower_inst_id);
+                            result.first = false;
+                            result.second = "no order service";
+                        } else {
+                            result = best_service.value()->place_order(order);
+                        }
+                    } else {
+                        result = context.get_order_service().placeOrder(order);
+                    }
                 }
             } else {
                 result.first = false;
