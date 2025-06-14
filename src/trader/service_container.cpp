@@ -22,7 +22,7 @@ namespace trader {
             return;
         }
 
-        (*is_stopped) = false;
+        (*this->is_stopped) = false;
 
         thread order_process_thread(start_process_trade_thread, this->id, this->is_stopped, this->ws_client);
         order_process_thread.detach();
@@ -47,7 +47,7 @@ namespace trader {
     void WsClientWrapper::stop() {
         (*this->is_stopped) = true;
         this->ws_client->stop();
-        info_log("stop ws client wrapper {}", this->id);
+        info_log("stop order service ws client wrapper {}", this->id);
     }
 
     pair<bool, string> WsClientWrapper::place_order(binance::FuturesNewOrder &order) {
@@ -64,14 +64,10 @@ namespace trader {
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
         string ip_pair = local_ip + "_" + remote_ip;
-        shared_ptr<WsClientWrapper> original_wrapper = nullptr;
         auto original = this->ippair_service_map.find(ip_pair);
-        if (original != this->ippair_service_map.end()) {
-            original_wrapper = original->second;
-        }
 
-        if (original_wrapper == nullptr) {
-            // not exists, need create a new one
+        if (original == this->ippair_service_map.end()) {
+            // not exists original service, need create a new one
             new_wrapper->init(config, order_channel, local_ip, remote_ip);
             new_wrapper->start();
             this->ippair_service_map[ip_pair] = new_wrapper;

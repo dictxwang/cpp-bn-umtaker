@@ -53,6 +53,7 @@ namespace trader {
            
             for (string ip_pair : unused_ip_pairs) {
                 context.get_order_service_manager().stop_and_remove_service(ip_pair);
+                info_log("zookeeper stop unused service which key is {}", ip_pair);
             }
         }
     }

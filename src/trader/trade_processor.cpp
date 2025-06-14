@@ -92,7 +92,9 @@ namespace trader {
                     optional<shared_ptr<WsClientWrapper>> best_service = context.get_order_service_manager().find_best_service(follower_inst_id);
                     if (!best_service.has_value()) {
                         // no available order service
-                        warn_log("not found available order server for {}", follower_inst_id);
+                        warn_log("not found available order service for {}", follower_inst_id);
+                        result.first = false;
+                        result.second = "no order service";
                     } else {
                         result = best_service.value()->place_order(order);
                     }
