@@ -9,7 +9,8 @@ namespace actuary {
 
         // Parse own configuration properties
         this->account_flag = this->doc_["account_flag"].asString();
-        this->inst_config_file = this->doc_["inst_config_file"].asString();
+        this->benchmark_inst_config_file = this->doc_["benchmark_inst_config_file"].asString();
+        this->follower_inst_config_file = this->doc_["follower_inst_config_file"].asString();
 
         this->tg_bot_token = this->doc_["tg_bot_token"].asString();
         this->tg_chat_id = this->doc_["tg_chat_id"].asInt64();
@@ -49,7 +50,8 @@ namespace actuary {
         this->share_memory_path_benchmark_ticker = this->doc_["share_memory_path_benchmark_ticker"].asString();
         this->share_memory_path_follower_ticker = this->doc_["share_memory_path_follower_ticker"].asString();
         this->share_memory_path_early_run = this->doc_["share_memory_path_early_run"].asString();
-        this->share_memory_path_beta = this->doc_["share_memory_path_beta"].asString();
+        this->share_memory_path_benchmark_beta = this->doc_["share_memory_path_benchmark_beta"].asString();
+        this->share_memory_path_follower_beta = this->doc_["share_memory_path_follower_beta"].asString();
         this->share_memory_path_order = this->doc_["share_memory_path_order"].asString();
 
         return true;

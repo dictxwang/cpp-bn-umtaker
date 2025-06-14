@@ -6,7 +6,8 @@
 
     "account_flag": "test001",
 
-    "inst_config_file": "config/inst_config.json.sample",
+    "benchmark_inst_config_file": "config/benchmark_inst_config.json.sample",
+    "follower_inst_config_file": "config/follower_inst_config.json.sample",
 
     "tg_bot_token": ":-",
     "tg_chat_id": -1,
@@ -38,7 +39,8 @@
     "share_memory_path_benchmark_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_bechmark_ticker",
     "share_memory_path_follower_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_follower_ticker",
     "share_memory_path_early_run": "/home/ubuntu/code/shm_space/shm_umtaker_early_run",
-    "share_memory_path_beta": "/home/ubuntu/code/shm_space/shm_umtaker_beta",
+    "share_memory_path_benchmark_beta": "/home/ubuntu/code/shm_space/shm_umtaker_benchmark_beta",
+    "share_memory_path_follower_beta": "/home/ubuntu/code/shm_space/shm_umtaker_follower_beta",
     "share_memory_path_order": "/home/ubuntu/code/shm_space/shm_umtaker_order",
 
     "base_asset_list": [

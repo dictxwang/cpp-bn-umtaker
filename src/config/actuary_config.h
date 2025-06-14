@@ -15,7 +15,8 @@ namespace actuary {
     
     public:
         string account_flag;
-        string inst_config_file;
+        string benchmark_inst_config_file;
+        string follower_inst_config_file;
 
         string tg_bot_token;
         int64_t tg_chat_id;
@@ -48,7 +49,8 @@ namespace actuary {
         string share_memory_path_benchmark_ticker; // make sure the path is exists, and accessiable
         string share_memory_path_follower_ticker;
         string share_memory_path_early_run;
-        string share_memory_path_beta;
+        string share_memory_path_benchmark_beta;
+        string share_memory_path_follower_beta;
         string share_memory_path_order;
     };
 }

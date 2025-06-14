@@ -29,7 +29,8 @@ namespace actuary {
         ~GlobalContext() {};
         
     private:
-        InstConfig inst_config;
+        InstConfig benchmark_inst_config;
+        InstConfig follower_inst_config;
         vector<string> benchmark_inst_ids;
         vector<string> follower_inst_ids;
         set<string> inst_ids_set;
@@ -54,7 +55,8 @@ namespace actuary {
         void init(ActuaryConfig& config);
         void init_shm_mapping(ActuaryConfig& config);
         void init_shm(ActuaryConfig& config);
-        InstConfig &get_inst_config();
+        InstConfig &get_benchmark_inst_config();
+        InstConfig &get_follower_inst_config();
         vector<string>& get_benchmark_inst_ids();
         vector<string>& get_follower_inst_ids();
         set<string>& get_inst_ids_set();

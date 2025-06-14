@@ -10,7 +10,8 @@ namespace receiver {
         }
 
         // Parse own configuration properties
-        this->inst_config_file = this->doc_["inst_config_file"].asString();
+        this->benchmark_inst_config_file = this->doc_["benchmark_inst_config_file"].asString();
+        this->follower_inst_config_file = this->doc_["follower_inst_config_file"].asString();
 
         for (int i = 0; i < this->doc_["ticker_zmq_ipcs"].size(); i++) {
             this->ticker_zmq_ipcs.push_back(this->doc_["ticker_zmq_ipcs"][i].asString());
@@ -45,7 +46,8 @@ namespace receiver {
         this->share_memory_path_benchmark_ticker = this->doc_["share_memory_path_benchmark_ticker"].asString();
         this->share_memory_path_follower_ticker = this->doc_["share_memory_path_follower_ticker"].asString();
         this->share_memory_path_early_run = this->doc_["share_memory_path_early_run"].asString();
-        this->share_memory_path_beta = this->doc_["share_memory_path_beta"].asString();
+        this->share_memory_path_benchmark_beta = this->doc_["share_memory_path_benchmark_beta"].asString();
+        this->share_memory_path_follower_beta = this->doc_["share_memory_path_follower_beta"].asString();
 
         return true;
     }

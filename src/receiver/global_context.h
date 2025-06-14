@@ -20,7 +20,8 @@ namespace receiver {
         ~GlobalContext() {};
     
     private:
-        InstConfig inst_config;
+        InstConfig benchmark_inst_config;
+        InstConfig follower_inst_config;
         vector<std::string> benchmark_inst_ids;
         vector<std::string> follower_inst_ids;
         set<std::string> inst_ids_set;
@@ -40,7 +41,8 @@ namespace receiver {
 
         PriceOffsetComposite price_offset_composite;
         EarlyRunThresholdComposite early_run_threshold_composite;
-        BetaThresholdComposite beta_threshold_composite;
+        BetaThresholdComposite benchmark_beta_threshold_composite;
+        BetaThresholdComposite follower_beta_threshold_composite;
 
         ShmStoreInfo shm_store_info;
     
@@ -48,12 +50,14 @@ namespace receiver {
         void init(ReceiverConfig& config);
         void init_shm(ReceiverConfig& config);
         void init_shm_mapping(ReceiverConfig& config);
-        InstConfig &get_inst_config();
+        InstConfig &get_benchmark_inst_config();
+        InstConfig &get_follower_inst_config();
         TickerComposite& get_benchmark_ticker_composite();
         TickerComposite& get_follower_ticker_composite();
         PriceOffsetComposite& get_price_offset_composite();
         EarlyRunThresholdComposite& get_early_run_threshold_composite();
-        BetaThresholdComposite& get_beta_threshold_composite();
+        BetaThresholdComposite& get_benchmark_beta_threshold_composite();
+        BetaThresholdComposite& get_follower_beta_threshold_composite();
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_benchmark_ticker_channel();
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_follower_ticker_channel();
         moodycamel::ConcurrentQueue<UmTickerInfo> *get_ticker_info_channel();

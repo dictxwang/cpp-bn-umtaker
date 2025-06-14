@@ -93,14 +93,17 @@ namespace receiver {
 
             int rand_value = rand.randInt();
             uint64_t now = binance::get_current_ms_epoch();
+            TickerRole role;
             std::string base_asset;
             std::vector<UmTickerInfo> ticker_list;
             if (str_ends_with(inst_id, config.benchmark_quote_asset)) {
                 base_asset = inst_id.substr(0, inst_id.size() - config.benchmark_quote_asset.size());
                 ticker_list = context.get_benchmark_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
+                role = TickerRole::Benchmark;
             } else {
                 base_asset = inst_id.substr(0, inst_id.size() - config.follower_quote_asset.size());
                 ticker_list = context.get_follower_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
+                role = TickerRole::Follower;
             }
 
             if (ticker_list.size() < config.calculate_sma_interval_seconds) {
@@ -110,10 +113,21 @@ namespace receiver {
                 continue;
             }
 
-            auto inst_config = context.get_inst_config().inst_map.find(base_asset);
-            if (inst_config == context.get_inst_config().inst_map.end()) {
-                warn_log("not found inst config for {}/{}", base_asset, inst_id);
-                continue;
+            InstConfigItem inst_config;
+            if (role == TickerRole::Benchmark) {
+                auto inst_config_auto = context.get_benchmark_inst_config().inst_map.find(base_asset);
+                if (inst_config_auto == context.get_benchmark_inst_config().inst_map.end()) {
+                    warn_log("not found benchmark inst config for {}/{}", base_asset, inst_id);
+                    continue;
+                }
+                inst_config = inst_config_auto->second;
+            } else {
+                auto inst_config_auto = context.get_follower_inst_config().inst_map.find(base_asset);
+                if (inst_config_auto == context.get_follower_inst_config().inst_map.end()) {
+                    warn_log("not found follower inst config for {}/{}", base_asset, inst_id);
+                    continue;
+                }
+                inst_config = inst_config_auto->second;
             }
 
             // double volatility_a = (*inst_config).second.volatility_a;
@@ -152,15 +166,15 @@ namespace receiver {
             }
 
             double bid_volatility = (max_bid - min_bid) / min_bid;
-            double bid_volatility_multiplier = calculate_volatility_multiplier(bid_volatility, (*inst_config).second);
+            double bid_volatility_multiplier = calculate_volatility_multiplier(bid_volatility, inst_config);
             double ask_volatility = (max_ask - min_ask) / min_ask;
-            double ask_volatility_multiplier = calculate_volatility_multiplier(ask_volatility, (*inst_config).second);
+            double ask_volatility_multiplier = calculate_volatility_multiplier(ask_volatility, inst_config);
             double avg_volatility = (max_avg - min_avg) / min_avg;
-            double avg_volatility_multiplier = calculate_volatility_multiplier(avg_volatility, (*inst_config).second);
+            double avg_volatility_multiplier = calculate_volatility_multiplier(avg_volatility, inst_config);
 
-            double bid_beta_threshold = calculate_beta_threshold(bid_volatility, (*inst_config).second);
-            double ask_beta_threshold = calculate_beta_threshold(ask_volatility, (*inst_config).second);
-            double avg_beta_threshold = calculate_beta_threshold(avg_volatility, (*inst_config).second);
+            double bid_beta_threshold = calculate_beta_threshold(bid_volatility, inst_config);
+            double ask_beta_threshold = calculate_beta_threshold(ask_volatility, inst_config);
+            double avg_beta_threshold = calculate_beta_threshold(avg_volatility, inst_config);
 
             BetaThreshold threshold;
             // TODO not found how to set parameter of sam
@@ -175,10 +189,17 @@ namespace receiver {
             threshold.beta_threshold = avg_beta_threshold;
             threshold.current_time_mills = now;
 
-            context.get_beta_threshold_composite().update(base_asset, threshold);
+            shm_mng::BetaThresholdShm* shm_start = nullptr;
+
+            if (role == TickerRole::Benchmark) {
+                context.get_benchmark_beta_threshold_composite().update(base_asset, threshold);
+                shm_start = context.get_shm_store_info().benchmark_beta_start;
+            } else {
+                context.get_follower_beta_threshold_composite().update(base_asset, threshold);
+                shm_start = context.get_shm_store_info().follower_beta_start;
+            }
 
             // store into share memory
-
             auto address = context.get_shm_threshold_mapping().find(base_asset);
             int update_shm = 0;
             if (address != context.get_shm_threshold_mapping().end()) {
@@ -198,16 +219,19 @@ namespace receiver {
                 threshold_shm.ask_volatility_multiplier = threshold.ask_volatility_multiplier;
                 threshold_shm.ask_beta_threshold = threshold.ask_beta_threshold;
                 threshold_shm.time_mills = threshold.current_time_mills;
-                update_shm = shm_mng::beta_shm_writer_update(context.get_shm_store_info().beta_start, (*address).second, threshold_shm);
+
+
+                update_shm = shm_mng::beta_shm_writer_update(shm_start, (*address).second, threshold_shm);
             }
 
             if (rand_value < 20) {
-                // shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, (*address).second);
+                // shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(shm_start, (*address).second);
                 // std::cout << "shm asset: " << (*shared_shm).asset << "," << (*shared_shm).bid_beta_threshold << "," << (*shared_shm).time_mills << std::endl;
-                info_log("process beta threshold: inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
-                    inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier, threshold.bid_beta_threshold,
-                    threshold.ask_volatility, threshold.ask_volatility_multiplier, threshold.ask_beta_threshold,
-                    threshold.volatility, threshold.volatility_multiplier, threshold.beta_threshold, update_shm);
+                info_log("process beta threshold: role={} inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
+                    strHelper::toString(role), inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier,
+                    threshold.bid_beta_threshold, threshold.ask_volatility, threshold.ask_volatility_multiplier,
+                    threshold.ask_beta_threshold, threshold.volatility, threshold.volatility_multiplier,
+                    threshold.beta_threshold, update_shm);
             }
         }
     }

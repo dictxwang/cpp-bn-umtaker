@@ -26,8 +26,10 @@ namespace receiver {
     struct ShmStoreInfo {
         int early_run_shm_id;
         shm_mng::EarlyRunThresholdShm* early_run_start;
-        int beta_shm_id;
-        shm_mng::BetaThresholdShm* beta_start;
+        int benchmark_beta_shm_id;
+        shm_mng::BetaThresholdShm* benchmark_beta_start;
+        int follower_beta_shm_id;
+        shm_mng::BetaThresholdShm* follower_beta_start;
 
         int benchmark_shm_id;
         shm_mng::TickerInfoShm* benchmark_start;

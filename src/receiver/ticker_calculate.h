@@ -6,6 +6,7 @@
 #include <cstdint>
 #include "config/receiver_config.h"
 #include "receiver/global_context.h"
+#include "common/constant.h"
 #include "common/tools.h"
 #include "common/random.h"
 #include "logger/logger.h"

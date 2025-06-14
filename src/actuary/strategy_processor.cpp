@@ -54,8 +54,8 @@ namespace actuary {
             exit(-1);
         }
 
-        auto inst_config_auto = context.get_inst_config().inst_map.find(base_asset);
-        if (inst_config_auto == context.get_inst_config().inst_map.end()) {
+        auto inst_config_auto = context.get_follower_inst_config().inst_map.find(base_asset);
+        if (inst_config_auto == context.get_follower_inst_config().inst_map.end()) {
             warn_log("inst config not found for {}", base_asset);
             exit(-1);
         }
@@ -63,7 +63,7 @@ namespace actuary {
         RandomIntGen rand;
         rand.init(0, 10000);
         InstConfigItem inst_config = (*inst_config_auto).second;
-        long benchmark_ticker_version, follower_ticker_version, early_run_version, beta_version = 0;
+        long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
         while (true) {
 
             if (config.loop_pause_time_seconds > 0) {
@@ -105,7 +105,8 @@ namespace actuary {
             follower_ticker_version = (*follower_ticker).version_number;
 
             std::shared_ptr<shm_mng::EarlyRunThresholdShm> early_run_threshold = shm_mng::early_run_shm_reader_get(context.get_shm_store_info().early_run_start, threshold_shm_index);
-            std::shared_ptr<shm_mng::BetaThresholdShm> beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().beta_start, threshold_shm_index);
+            std::shared_ptr<shm_mng::BetaThresholdShm> benchmark_beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().benchmark_beta_start, threshold_shm_index);
+            std::shared_ptr<shm_mng::BetaThresholdShm> follower_beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().follower_beta_start, threshold_shm_index);
             
             if (early_run_threshold == nullptr || (*early_run_threshold).version_number == 0) {
                 if (rnd_number < 10) {
@@ -113,17 +114,30 @@ namespace actuary {
                 }
                 continue;
             }
-            if (beta_threshold == nullptr || (*beta_threshold).version_number == 0) {
+            if (benchmark_beta_threshold == nullptr || benchmark_beta_threshold->version_number == 0) {
                 if (rnd_number < 10) {
-                    warn_log("threshold beta in share memory not found or version is zero for {}", base_asset);
+                    warn_log("benchmark threshold beta in share memory not found or version is zero for {}", base_asset);
+                }
+                continue;
+            }
+            if (follower_beta_threshold == nullptr || follower_beta_threshold->version_number == 0) {
+                if (rnd_number < 10) {
+                    warn_log("follower threshold beta in share memory not found or version is zero for {}", base_asset);
                 }
                 continue;
             }
 
-            if ((*beta_threshold).version_number == beta_version && (*early_run_threshold).version_number == early_run_version ||
-                (*beta_threshold).version_number < beta_version || (*early_run_threshold).version_number < early_run_version) {
-                if ((*beta_threshold).version_number > beta_version) {
-                    beta_version = (*beta_threshold).version_number;
+            if (benchmark_beta_threshold->version_number == benchmark_beta_version
+                && follower_beta_threshold->version_number == follower_beta_version
+                && early_run_threshold->version_number == early_run_version
+                || benchmark_beta_threshold->version_number < benchmark_beta_version
+                || follower_beta_threshold->version_number < follower_beta_version
+                || early_run_threshold->version_number < early_run_version) {
+                if (benchmark_beta_threshold->version_number > benchmark_beta_version) {
+                    benchmark_beta_version = benchmark_beta_threshold->version_number;
+                }
+                if (follower_beta_threshold->version_number > follower_beta_version) {
+                    follower_beta_version = follower_beta_threshold->version_number;
                 }
                 if ((*early_run_threshold).version_number > early_run_version) {
                     early_run_version = (*early_run_threshold).version_number;
@@ -134,12 +148,14 @@ namespace actuary {
                 continue;
             }
 
-            beta_version = (*beta_threshold).version_number;
+            benchmark_beta_version = benchmark_beta_threshold->version_number;
+            follower_beta_version = follower_beta_threshold->version_number;
             early_run_version = (*early_run_threshold).version_number;
 
             if (now > (*benchmark_ticker).update_time + config.ticker_valid_millis ||
                 now > (*follower_ticker).update_time + config.ticker_valid_millis ||
-                now > (*beta_threshold).time_mills + config.ticker_valid_millis ||
+                now > (*benchmark_beta_threshold).time_mills + config.ticker_valid_millis ||
+                now > (*follower_beta_threshold).time_mills + config.ticker_valid_millis ||
                 now > (*early_run_threshold).time_mills + config.ticker_valid_millis) {
                 if (rnd_number < 10) {
                     warn_log("ticker or threshold timestamp expired for {}", base_asset);
@@ -147,25 +163,31 @@ namespace actuary {
                 continue;
             }
 
-            // info_log("parameters: {} {}, {}, {}, {}, {}, {}",
-            //     base_asset,
-            //     (*benchmark_ticker).bid_price,
-            //     ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta),
-            //     (*benchmark_ticker).bid_size,
-            //     inst_config.max_ticker_size,
-            //     (*follower_ticker).ask_size,
-            //     inst_config.min_ticker_size
-            // );
+            info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                base_asset,
+                (*benchmark_ticker).bid_price,
+                (*follower_ticker).ask_price,
+                (*early_run_threshold).bid_ask_median,
+                (*follower_beta_threshold).volatility_multiplier,
+                inst_config.beta,
+                (*benchmark_ticker).bid_size,
+                inst_config.max_ticker_size,
+                (*follower_ticker).ask_size,
+                inst_config.min_ticker_size
+            );
 
-            // info_log("parameters: {} {}, {}, {}, {}, {}, {}",
-            //     base_asset,
-            //     (*benchmark_ticker).ask_price,
-            //     ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta),
-            //     (*benchmark_ticker).ask_size,
-            //     inst_config.max_ticker_size,
-            //     (*follower_ticker).bid_size,
-            //     inst_config.min_ticker_size
-            // );
+            info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                base_asset,
+                (*benchmark_ticker).ask_price,
+                (*follower_ticker).bid_price,
+                (*early_run_threshold).ask_bid_median,
+                (*follower_beta_threshold).volatility_multiplier,
+                inst_config.beta,
+                (*benchmark_ticker).ask_size,
+                inst_config.max_ticker_size,
+                (*follower_ticker).bid_size,
+                inst_config.min_ticker_size
+            );
 
             optional<AccountPositionInfo> position = context.get_balance_position_composite().copy_position(follower_inst_id);
             if (!position.has_value()) {
@@ -184,7 +206,21 @@ namespace actuary {
             }
 
             // TODO delete true condition
-            if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).bid_size > inst_config.max_ticker_size && (*follower_ticker).ask_size < inst_config.min_ticker_size) {
+            /*
+            if (bnTicker.BidPrice/(1+benchmarkThreshold.BidBetaThreshold*(1+positionReduceRatio)) >=
+				(okxTicker.AskPrice+earlyRunThreshold.BnBidOkxAskPriceDiffMedian)*(1+instdBetaThreshold.AskBetaThreshold*(1+positionReduceRatio))) &&
+				bnTicker.BidVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.AskVolume < instConfig.MaxTickerSize
+            */
+            
+            if ((benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold)) 
+                >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold))
+                && (*benchmark_ticker).bid_size > inst_config.min_ticker_size
+                && (*follower_ticker).ask_size < inst_config.max_ticker_size
+            ) {
+
+            // if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta)
+            //     && (*benchmark_ticker).bid_size > inst_config.min_ticker_size
+            //     && (*follower_ticker).ask_size < inst_config.max_ticker_size) {
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
@@ -214,11 +250,26 @@ namespace actuary {
                 }
 
                 // TODO reduce too many logs
-                info_log("update buy order: make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}",
+                info_log("update buy order: make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
                     make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
-                    benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
+                    benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
             
-            } else if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta) && (*benchmark_ticker).ask_size > inst_config.max_ticker_size && (*follower_ticker).bid_size < inst_config.min_ticker_size) {
+            }
+
+            /*
+             (bnTicker.AskPrice*(1+benchmarkThreshold.AskBetaThreshold*(1-positionReduceRatio)) <=
+				(okxTicker.BidPrice+earlyRunThreshold.BnAskOkxBidPriceDiffMedian)/(1+instdBetaThreshold.BidBetaThreshold*(1-positionReduceRatio))) &&
+				bnTicker.AskVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.BidVolume < instConfig.MaxTickerSize
+            */
+            if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold)) 
+                <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold))
+                && benchmark_ticker->ask_size > inst_config.min_ticker_size
+                && follower_ticker->bid_size < inst_config.max_ticker_size
+            ) {
+
+            // if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta)
+            //     && (*benchmark_ticker).ask_size > inst_config.min_ticker_size
+            //     && (*follower_ticker).bid_size < inst_config.max_ticker_size) {
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
@@ -248,9 +299,9 @@ namespace actuary {
                 }
 
                 // TODO reduce too many logs
-                info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={}ticker_version={}/{} threshold_version={}/{}",
+                info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={}ticker_version={}/{} threshold_version={}/{}/{}",
                     make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
-                    benchmark_ticker_version, follower_ticker_version, beta_version, early_run_version);
+                    benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
             }
         }
     }

@@ -16,7 +16,8 @@ namespace receiver {
         bool loadReceiverConfig(const char* inputfile);
 
     public:
-        string inst_config_file;
+        string benchmark_inst_config_file;
+        string follower_inst_config_file;
         bool use_best_ticker;
         std::vector<string> ticker_zmq_ipcs;
         bool use_normal_ticker;
@@ -40,7 +41,8 @@ namespace receiver {
         string share_memory_path_benchmark_ticker; // make sure the path is exists, and accessiable
         string share_memory_path_follower_ticker;
         string share_memory_path_early_run;
-        string share_memory_path_beta;
+        string share_memory_path_benchmark_beta;
+        string share_memory_path_follower_beta;
     };
 }
 #endif  

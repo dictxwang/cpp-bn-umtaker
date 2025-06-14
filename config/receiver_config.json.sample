@@ -4,7 +4,8 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
-    "inst_config_file": "config/inst_config.json.sample",
+    "benchmark_inst_config_file": "config/benchmark_inst_config.json.sample",
+    "follower_inst_config_file": "config/follower_inst_config.json.sample",
 
     "use_normal_ticker": true,
     "normal_ticker_use_intranet": false,
@@ -37,7 +38,8 @@
     "share_memory_path_benchmark_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_bechmark_ticker",
     "share_memory_path_follower_ticker": "/home/ubuntu/code/shm_space/shm_umtaker_follower_ticker",
     "share_memory_path_early_run": "/home/ubuntu/code/shm_space/shm_umtaker_early_run",
-    "share_memory_path_beta": "/home/ubuntu/code/shm_space/shm_umtaker_beta",
+    "share_memory_path_benchmark_beta": "/home/ubuntu/code/shm_space/shm_umtaker_benchmark_beta",
+    "share_memory_path_follower_beta": "/home/ubuntu/code/shm_space/shm_umtaker_follower_beta",
 
     "base_asset_list": [
         "BTC",
