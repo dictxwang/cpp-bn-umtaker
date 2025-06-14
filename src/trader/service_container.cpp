@@ -76,11 +76,11 @@ namespace trader {
             new_wrapper->start();
             this->ippair_service_map[ip_pair] = new_wrapper;
 
-            info_log("put new service client wrapper for {}", ip_pair);
+            info_log("put new order service {} wrapper for {}", new_wrapper->id, ip_pair);
         }
 
         this->symbol_best_ippair_map[symbol] = ip_pair;
-        info_log("update symbol ip_pair mapping {} => {}", symbol, ip_pair);
+        info_log("update symbol order service mapping {} => {}", symbol, ip_pair);
     }
 
     optional<shared_ptr<WsClientWrapper>> OrderServiceManager::find_best_service(string &symbol) {
@@ -116,13 +116,13 @@ namespace trader {
         return ip_pairs;
     }
 
-    set<string> OrderServiceManager::get_in_use_ip_pairs() {
-        set<string> ip_pairs;
+    unordered_map<string, string> OrderServiceManager::get_inuse_symol_ip_mapping() {
+        unordered_map<string, string> mapping;
         std::shared_lock<std::shared_mutex> r_lock(rw_lock);
-        for (auto [_, v] : this->symbol_best_ippair_map) {
-            ip_pairs.insert(v);
+        for (auto [k, v] : this->symbol_best_ippair_map) {
+            mapping[k] = v;
         }
-        return ip_pairs;
+        return mapping;
 
     }
 

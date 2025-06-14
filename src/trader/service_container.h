@@ -68,7 +68,7 @@ namespace trader {
         optional<shared_ptr<WsClientWrapper>> find_best_service(string &symbol);
 
         vector<string> get_all_service_ip_pairs();
-        set<string> get_in_use_ip_pairs();
+        unordered_map<string, string> OrderServiceManager::get_inuse_symol_ip_mapping();
         void stop_and_remove_service(const string& ip_pair);
     };
 }
