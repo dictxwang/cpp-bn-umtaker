@@ -7,13 +7,13 @@ namespace trader {
 
     void start_trade_processors(TraderConfig& config, GlobalContext& context) {
         
+        // normal type or bestpath type both use the same message channel
+        std::thread thread_process_message(process_order_message, std::ref(config), std::ref(context));
+        thread_process_message.detach();
+        info_log("start thread of processing normal order message");
+
         if (!config.trading_use_best_path) {
-
             // not use best path for trading, require start normal order service
-            std::thread thread_process_message(process_order_message, std::ref(config), std::ref(context));
-            thread_process_message.detach();
-            info_log("start thread of processing normal order message");
-
             std::thread thread_order_service(start_order_service, std::ref(config), std::ref(context));
             thread_order_service.detach();
             info_log("start thread of starting normal order serice");
@@ -123,7 +123,7 @@ namespace trader {
     }
 
     void process_order_message(TraderConfig& config, GlobalContext& context) {
-        shared_ptr<moodycamel::ConcurrentQueue<std::string>> channel = context.get_order_chanel();
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> channel = context.get_order_channel();
 
         RandomIntGen rand;
         rand.init(0, 10000);

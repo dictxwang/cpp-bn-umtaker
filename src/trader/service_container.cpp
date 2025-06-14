@@ -4,23 +4,31 @@ using namespace std;
 
 namespace trader {
 
-    void WsClientWrapper::init_and_start(TraderConfig &config, string &local_ip, string &remote_ip) {
+    void WsClientWrapper::init(TraderConfig &config, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string &local_ip, string &remote_ip) {
+        
         this->ws_client = make_shared<binance::BinanceFuturesWsClient>();
         this->ws_client->setLocalIP(local_ip);
         this->ws_client->setRemoteIP(remote_ip);
         this->ws_client->initOrderService(config.api_key_ed25519, config.secret_key_ed25519, config.trade_use_intranet);
-        (*this->is_stopped) = false;
+        this->ws_client->setMessageChannel(order_channel);
+    }
 
-        shared_ptr<moodycamel::ConcurrentQueue<string>> message_channel;
-        this->ws_client->setMessageChannel(message_channel);
+    void WsClientWrapper::start() {
+        
+        std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
-        this->order_channel = message_channel;
+        // avoid start repeatly
+        if (has_init_started) {
+            return;
+        }
+
+        (*is_stopped) = false;
 
         thread order_process_thread(start_process_trade_thread, this->id, this->is_stopped, this->ws_client);
         order_process_thread.detach();
 
-        thread message_process_thread(start_process_message_thread, this->id, this->is_stopped, message_channel);
-        message_process_thread.detach();
+        has_init_started = true;
+        info_log("start order process thread for service {}", this->id);
     }
 
     void start_process_trade_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<binance::BinanceFuturesWsClient> futures_ws_client) {
@@ -34,30 +42,6 @@ namespace trader {
             this_thread::sleep_for(chrono::seconds(1));
         }
         info_log("order service {} processor thread stopped", service_id);
-    }
-
-    void start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel) {
-        
-        if ((*is_stopped)) {
-            warn_log("service {} is stopped before process order messaage", service_id);
-        } else {
-            info_log("service {} is not stopped before process order messaage", service_id);
-        }
-        while (!(*is_stopped)) {
-            std::string messageJson;
-            while (!(*is_stopped) && !order_channel->try_dequeue(messageJson)) {
-                // Retry if the queue is empty
-            }
-
-            if (messageJson.size() == 0) {
-                continue;
-            }
-
-            // only logging, datastat in actuary process
-            info_log("receive order json message: {}", messageJson);
-        }
-
-        info_log("order message processor {} stopped", service_id);
     }
 
     void WsClientWrapper::stop() {
@@ -75,7 +59,7 @@ namespace trader {
         }
     }
 
-    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper) {
+    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel) {
         
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
@@ -88,9 +72,8 @@ namespace trader {
 
         if (original_wrapper == nullptr) {
             // not exists, need create a new one
-            // shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
-            new_wrapper->init_and_start(config, local_ip, remote_ip);
-
+            new_wrapper->init(config, order_channel, local_ip, remote_ip);
+            new_wrapper->start();
             this->ippair_service_map[ip_pair] = new_wrapper;
 
             info_log("put new service client wrapper for {}", ip_pair);

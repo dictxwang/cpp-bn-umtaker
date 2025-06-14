@@ -20,29 +20,28 @@ using namespace std;
 namespace trader {
 
     void start_process_trade_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<binance::BinanceFuturesWsClient> futures_ws_client);
-    void start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel);
+    // void start_process_message_thread(const string service_id, shared_ptr<bool> is_stopped, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel);
 
     class WsClientWrapper {
     public:
         WsClientWrapper() {
             this->id = binance::generate_uuid();
+            this->has_init_started = false;
             this->is_stopped = make_shared<bool>(false);
         }
         ~WsClientWrapper() {
-            if (this->order_channel) {
-                string temp;
-                while (this->order_channel != nullptr && this->order_channel->try_dequeue(temp)) {}
-            }
         }
     
     private:
         string id;
         shared_ptr<binance::BinanceFuturesWsClient> ws_client;
-        shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel;
+        bool has_init_started;
         shared_ptr<bool> is_stopped;
+        shared_mutex rw_lock;
     
     private:
-        void init_and_start(TraderConfig &config, string &local_ip, string &remote_ip);
+        void init(TraderConfig &config, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string &local_ip, string &remote_ip);
+        void start();
         void stop();
 
         friend class OrderServiceManager;
@@ -65,7 +64,7 @@ namespace trader {
         shared_mutex rw_lock;
 
     public:
-        void update_best_service(TraderConfig &config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper);
+        void update_best_service(TraderConfig &config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel);
         optional<shared_ptr<WsClientWrapper>> find_best_service(string &symbol);
 
         vector<string> get_all_service_ip_pairs();

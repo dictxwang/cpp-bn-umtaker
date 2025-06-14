@@ -33,7 +33,7 @@ namespace trader {
         OrderServiceManager order_service_manager;
 
         binance::BinanceFuturesWsClient order_service;
-        shared_ptr<moodycamel::ConcurrentQueue<std::string>> order_chanel;
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> order_channel;
     
     public:
         void init(TraderConfig& config);
@@ -47,7 +47,7 @@ namespace trader {
         unordered_map<string, int>& get_shm_order_mapping();
         OrderServiceManager &get_order_service_manager();
         binance::BinanceFuturesWsClient& get_order_service();
-        shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_chanel();
+        shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_channel();
     };
 }
 #endif
