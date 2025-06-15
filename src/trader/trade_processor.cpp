@@ -40,7 +40,7 @@ namespace trader {
 
         long order_version = 0;
         RandomIntGen rand;
-        rand.init(0, 10000);
+        rand.init(0, 100000);
 
         while (true) {
 
