@@ -163,31 +163,31 @@ namespace actuary {
                 continue;
             }
 
-            info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
-                base_asset,
-                (*benchmark_ticker).bid_price,
-                (*follower_ticker).ask_price,
-                (*early_run_threshold).bid_ask_median,
-                (*follower_beta_threshold).volatility_multiplier,
-                inst_config.beta,
-                (*benchmark_ticker).bid_size,
-                inst_config.max_ticker_size,
-                (*follower_ticker).ask_size,
-                inst_config.min_ticker_size
-            );
+            // info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
+            //     base_asset,
+            //     (*benchmark_ticker).bid_price,
+            //     (*follower_ticker).ask_price,
+            //     (*early_run_threshold).bid_ask_median,
+            //     (*follower_beta_threshold).volatility_multiplier,
+            //     inst_config.beta,
+            //     (*benchmark_ticker).bid_size,
+            //     inst_config.max_ticker_size,
+            //     (*follower_ticker).ask_size,
+            //     inst_config.min_ticker_size
+            // );
 
-            info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
-                base_asset,
-                (*benchmark_ticker).ask_price,
-                (*follower_ticker).bid_price,
-                (*early_run_threshold).ask_bid_median,
-                (*follower_beta_threshold).volatility_multiplier,
-                inst_config.beta,
-                (*benchmark_ticker).ask_size,
-                inst_config.max_ticker_size,
-                (*follower_ticker).bid_size,
-                inst_config.min_ticker_size
-            );
+            // info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
+            //     base_asset,
+            //     (*benchmark_ticker).ask_price,
+            //     (*follower_ticker).bid_price,
+            //     (*early_run_threshold).ask_bid_median,
+            //     (*follower_beta_threshold).volatility_multiplier,
+            //     inst_config.beta,
+            //     (*benchmark_ticker).ask_size,
+            //     inst_config.max_ticker_size,
+            //     (*follower_ticker).bid_size,
+            //     inst_config.min_ticker_size
+            // );
 
             optional<AccountPositionInfo> position = context.get_balance_position_composite().copy_position(follower_inst_id);
             if (!position.has_value()) {
@@ -205,7 +205,6 @@ namespace actuary {
                 }
             }
 
-            // TODO delete true condition
             /*
             if (bnTicker.BidPrice/(1+benchmarkThreshold.BidBetaThreshold*(1+positionReduceRatio)) >=
 				(okxTicker.AskPrice+earlyRunThreshold.BnBidOkxAskPriceDiffMedian)*(1+instdBetaThreshold.AskBetaThreshold*(1+positionReduceRatio))) &&
@@ -299,7 +298,7 @@ namespace actuary {
                 }
 
                 // TODO reduce too many logs
-                info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={}ticker_version={}/{} threshold_version={}/{}/{}",
+                info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
                     make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
                     benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
             }
