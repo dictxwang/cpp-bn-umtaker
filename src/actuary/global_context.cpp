@@ -18,6 +18,16 @@ namespace actuary {
         this->follower_inst_config.loadInstConfig(config.follower_inst_config_file);
         info_log("finiish load follower inst config file.");
 
+        // load exchange info
+        vector<ExchangeInfoLite> exchangeLites = load_exchangeInfo(config, this->furures_rest_client);
+        for (int i = 0; i < exchangeLites.size(); i++) {
+            if (this->inst_ids_set.find(exchangeLites[i].symbol) != this->inst_ids_set.end()) {
+                info_log("put exchange info of {} into map", exchangeLites[i].symbol);
+                this->exchange_info_map.insert({exchangeLites[i].symbol, exchangeLites[i]});
+            }
+        }
+        info_log("finish load exchange info map");
+
         this->init_shm_mapping(config);
         this->init_shm(config);
 
@@ -144,6 +154,15 @@ namespace actuary {
 
     set<string>& GlobalContext::get_inst_ids_set() {
         return this->inst_ids_set;
+    }
+
+    optional<ExchangeInfoLite> GlobalContext::get_exchange_info(const string& symbol) {
+        auto original = this->exchange_info_map.find(symbol);
+        if (original == this->exchange_info_map.end()) {
+            return nullopt;
+        } else {
+            return original->second;
+        }
     }
 
     ShmStoreInfo& GlobalContext::get_shm_store_info() {

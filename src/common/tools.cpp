@@ -20,3 +20,25 @@ std::string gen_client_order_id(bool is_buy_side) {
         return 's' + std::to_string(now);
     }
 }
+
+double decimal_process(double value, int precision) {
+    if (precision == 0) {
+        return int(value);
+    } else {
+        int64_t pow = std::pow(10, precision);
+        return double(int64_t(value * pow)) / double(pow);
+    }
+}
+
+int calculate_precision_by_min_step(double min_step) {
+    if (min_step >= 1) {
+        return 0;
+    } else {
+        int precision = 0;
+        do {
+            precision = precision + 1;
+            min_step = min_step * 10;
+        } while (min_step < 1);
+        return precision;
+    }
+}

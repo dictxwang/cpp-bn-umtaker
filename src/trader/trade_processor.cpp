@@ -99,7 +99,7 @@ namespace trader {
                             // no available order service
                             warn_log("not found available order service for {}", follower_inst_id);
                             result.first = false;
-                            result.second = "no order service";
+                            result.second = "no best service";
                         } else {
                             result = best_service.value()->place_order(order);
                         }

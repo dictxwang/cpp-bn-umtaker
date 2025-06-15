@@ -13,6 +13,7 @@
 #include "shm/order_shm.h"
 #include "tgbot/api.h"
 #include "dynamic_config.h"
+#include "market_processor.h"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -34,6 +35,7 @@ namespace actuary {
         vector<string> benchmark_inst_ids;
         vector<string> follower_inst_ids;
         set<string> inst_ids_set;
+        unordered_map<string, ExchangeInfoLite> exchange_info_map;
         unordered_map<string, int> shm_threshold_mapping;
         unordered_map<string, int> shm_benchmark_ticker_mapping;
         unordered_map<string, int> shm_follower_ticker_mapping;
@@ -60,6 +62,7 @@ namespace actuary {
         vector<string>& get_benchmark_inst_ids();
         vector<string>& get_follower_inst_ids();
         set<string>& get_inst_ids_set();
+        optional<ExchangeInfoLite> get_exchange_info(const string& symbol);
         ShmStoreInfo& get_shm_store_info();
         unordered_map<string, int>& get_shm_threshold_mapping();
         unordered_map<string, int>& get_shm_benchmark_ticker_mapping();

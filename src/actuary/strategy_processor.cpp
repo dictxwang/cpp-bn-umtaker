@@ -21,6 +21,14 @@ namespace actuary {
         std::string benchmark_inst_id = base_asset + config.benchmark_quote_asset;
         std::string follower_inst_id = base_asset + config.follower_quote_asset;
 
+        optional<ExchangeInfoLite> exchange_opt = context.get_exchange_info(follower_inst_id);
+        if (!exchange_opt.has_value()) {
+            err_log("exchange info not found for {}", follower_inst_id);
+            this_thread::sleep_for(chrono::seconds(3));
+            exit(-1);
+        }
+        ExchangeInfoLite follower_exchange_info = exchange_opt.value();
+
         int benchmark_shm_index = -1;
         int follower_shm_index = -1;
         int threshold_shm_index = -1;
@@ -51,12 +59,14 @@ namespace actuary {
         );
         if (benchmark_shm_index < 0 || follower_shm_index < 0 || threshold_shm_index < 0 || order_shm_index < 0) {
             err_log("fail to find shm mapping index for {}", base_asset);
+            this_thread::sleep_for(chrono::seconds(3));
             exit(-1);
         }
 
         auto inst_config_auto = context.get_follower_inst_config().inst_map.find(base_asset);
         if (inst_config_auto == context.get_follower_inst_config().inst_map.end()) {
             warn_log("inst config not found for {}", base_asset);
+            this_thread::sleep_for(chrono::seconds(3));
             exit(-1);
         }
 
@@ -229,13 +239,21 @@ namespace actuary {
                     }
                     reduce_only = 1;
                 }
+
+                double buy_price = follower_ticker->ask_price * (1 + config.order_price_margin);
+				// make sure buy price not higher than the threshold
+                if (buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
+					buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
+				}
+                buy_price = decimal_process(buy_price, follower_exchange_info.pricePrecision);
+
                 shm_mng::OrderShm order_buy;
                 strcpy(order_buy.inst_id, follower_inst_id.c_str());
                 strcpy(order_buy.type, binance::ORDER_TYPE_LIMIT.c_str());
                 strcpy(order_buy.side, binance::ORDER_SIDE_BUY.c_str());
                 // strcpy(order_buy.pos_side, binance::PositionSide_LONG.c_str());
                 strcpy(order_buy.time_in_force, binance::TimeInForce_IOC.c_str());
-                order_buy.price = (*benchmark_ticker).ask_price;
+                order_buy.price = buy_price;
                 order_buy.volume = order_size;
                 order_buy.reduce_only = reduce_only;
                 std::string client_order_id = gen_client_order_id(true);
@@ -278,13 +296,21 @@ namespace actuary {
                     }
                     reduce_only = 1;
                 }
+
+                double sell_price = follower_ticker->bid_price * (1 - config.order_price_margin);
+				// make sure sell price not lower than the threshold
+                if (sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
+					sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
+				}
+                sell_price = decimal_process(sell_price, follower_exchange_info.pricePrecision);
+
                 shm_mng::OrderShm order_sell;
                 strcpy(order_sell.inst_id, follower_inst_id.c_str());
                 strcpy(order_sell.type, binance::ORDER_TYPE_LIMIT.c_str());
                 strcpy(order_sell.side, binance::ORDER_SIDE_SELL.c_str());
                 // strcpy(order_buy.pos_side, binance::PositionSide_SHORT.c_str());
                 strcpy(order_sell.time_in_force, binance::TimeInForce_IOC.c_str());
-                order_sell.price = (*benchmark_ticker).bid_price;
+                order_sell.price = sell_price;
                 order_sell.volume = order_size;
                 order_sell.reduce_only = reduce_only;
                 std::string client_order_id = gen_client_order_id(false);
