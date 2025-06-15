@@ -106,7 +106,7 @@ namespace actuary {
                     follower_ticker_version = (*follower_ticker).version_number;
                 }
                 if (rnd_number < 10) {
-                    warn_log("ticker version is old in share memory for {}", base_asset);
+                    // warn_log("ticker version is old in share memory for {}", base_asset);
                 }
                 continue;
             }
