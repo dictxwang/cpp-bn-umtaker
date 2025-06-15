@@ -251,6 +251,8 @@ namespace actuary {
                 json_result.clear();
                 reader.parse(messageJson.c_str(), json_result);
 
+                info_log("receive balance position ws event: {}", messageJson);
+
                 if (json_result.isMember("e")) {
                     if (json_result["e"] == binance::FuturesUserDataAccountUpdate) {
                         binance::WsFuturesAccountUpdateEvent event = binance::convertJsonToWsFuturesAccountUpdateEvent(json_result);
