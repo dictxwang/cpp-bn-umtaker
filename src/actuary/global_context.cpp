@@ -18,6 +18,15 @@ namespace actuary {
         this->follower_inst_config.loadInstConfig(config.follower_inst_config_file);
         info_log("finiish load follower inst config file.");
 
+        this->init_shm_mapping(config);
+        this->init_shm(config);
+
+        // init rest client
+        if (config.rest_local_ip.size() > 0) {
+            this->furures_rest_client.setLocalIP(config.rest_local_ip);
+        }
+        this->furures_rest_client.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
+
         // load exchange info
         vector<ExchangeInfoLite> exchangeLites = load_exchangeInfo(config, this->furures_rest_client);
         for (int i = 0; i < exchangeLites.size(); i++) {
@@ -27,15 +36,6 @@ namespace actuary {
             }
         }
         info_log("finish load exchange info map");
-
-        this->init_shm_mapping(config);
-        this->init_shm(config);
-
-        // init rest client
-        if (config.rest_local_ip.size() > 0) {
-            this->furures_rest_client.setLocalIP(config.rest_local_ip);
-        }
-        this->furures_rest_client.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
 
         // init balance & position composite
         std::vector<std::string> balance_assets;
