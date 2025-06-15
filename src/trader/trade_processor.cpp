@@ -44,8 +44,8 @@ namespace trader {
 
         while (true) {
 
-            if (config.loop_pause_time_seconds > 0) {
-                std::this_thread::sleep_for(std::chrono::seconds(config.loop_pause_time_seconds));
+            if (config.loop_pause_time_millis > 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
             }
 
             int rnd_number = rand.randInt();

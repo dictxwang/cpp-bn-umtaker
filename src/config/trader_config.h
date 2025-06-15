@@ -23,7 +23,7 @@ namespace trader {
 
         bool open_place_order;
         uint64_t order_valid_millis;
-        long loop_pause_time_seconds;
+        long loop_pause_time_millis;
 
         int order_limit_per_minute;
         int order_limit_per_10seconds;

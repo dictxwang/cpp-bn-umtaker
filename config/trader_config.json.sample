@@ -11,7 +11,7 @@
 
     "open_place_order": false,
     "order_valid_millis": 8000,
-    "loop_pause_time_seconds": 5,
+    "loop_pause_time_millis": 5000,
 
     "order_limit_per_minute": 1200,
     "order_limit_per_10seconds": 300,
