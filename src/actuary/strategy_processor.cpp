@@ -76,8 +76,8 @@ namespace actuary {
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
         while (true) {
 
-            if (config.loop_pause_time_seconds > 0) {
-                std::this_thread::sleep_for(std::chrono::seconds(config.loop_pause_time_seconds));
+            if (config.loop_pause_time_millis > 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
             }
             int rnd_number = rand.randInt();
             uint64_t now = binance::get_current_ms_epoch();

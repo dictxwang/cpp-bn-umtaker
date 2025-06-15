@@ -33,7 +33,7 @@ namespace actuary {
         string rest_local_ip;
 
         uint64_t ticker_valid_millis;
-        long loop_pause_time_seconds;
+        long loop_pause_time_millis;
         double order_price_margin;
 
         string benchmark_quote_asset;
