@@ -17,10 +17,10 @@ struct UDPTickerIPC {
 struct UDPBookTicker {
     uint64_t update_id;
     uint64_t ets;
-    float buy_price;
-    float buy_num;
-    float sell_price;
-    float sell_num;
+    double buy_price;
+    double buy_num;
+    double sell_price;
+    double sell_num;
     char name[16];
 };
 

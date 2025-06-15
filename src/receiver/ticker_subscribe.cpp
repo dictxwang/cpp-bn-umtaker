@@ -120,7 +120,7 @@ namespace receiver {
                         info.bid_volume = book_ticker->buy_num;
                         info.ask_price = book_ticker->sell_price;
                         info.ask_volume = book_ticker->sell_num;
-                        info.avg_price = (book_ticker->buy_price) / 2;
+                        info.avg_price = (book_ticker->buy_price + book_ticker->sell_price) / 2;
                         info.update_time_millis = book_ticker->ets;
                         info.is_from_trade = false;
 

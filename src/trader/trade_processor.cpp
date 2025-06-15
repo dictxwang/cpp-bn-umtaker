@@ -84,7 +84,7 @@ namespace trader {
             order.timeInForce = std::string((*shm_order).time_in_force);
             order.newClientOrderId = std::string((*shm_order).client_order_id);
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
-            order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
+            // order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
 
             pair<bool, string> result;
             if (config.open_place_order) {

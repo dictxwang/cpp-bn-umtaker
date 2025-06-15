@@ -24,3 +24,6 @@ git checkout v0.0.1
 
 # tg chat
 https://web.telegram.org/a/#-4958151325
+
+# start udp ticker test processor
+taskset -c 16 ./main_ws ./ws_test.conf > /data/dc/ticker/test.nohup
