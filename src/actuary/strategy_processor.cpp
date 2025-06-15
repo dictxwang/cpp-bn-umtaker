@@ -71,7 +71,7 @@ namespace actuary {
         }
 
         RandomIntGen rand;
-        rand.init(0, 10000);
+        rand.init(0, 100000);
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
         while (true) {
