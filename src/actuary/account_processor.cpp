@@ -270,10 +270,10 @@ namespace actuary {
                         }
                     } else if (json_result["e"] == binance::FuturesUserDataOrderTradeUpdate) {
                         binance::WsFuturesOrderTradeUpdateEvent event = binance::convertJsonToWsFuturesOrderTradeUpdateEvent(json_result);
-                        // if (strHelper::startsWith(event.clientOrderId, "temp")) {
-                        //     // ignore testing order
-                        //     continue;
-                        // }
+                        if (strHelper::startsWith(event.clientOrderId, "temp")) {
+                            // ignore testing order
+                            continue;
+                        }
                         if (event.filledVolume == 0) {
                             // ignore no filled order
                             continue;

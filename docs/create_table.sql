@@ -22,15 +22,14 @@ CREATE TABLE `tb_bnum_order` (
 CREATE TABLE `tb_bnum_pnl` (
   `tid` bigint NOT NULL AUTO_INCREMENT,
   `account_flag` varchar(32) NOT NULL DEFAULT '',
-  `total_eq` float(16,6) NOT NULL DEFAULT '0.000000',
-  `init_eq` float(16,6) NOT NULL DEFAULT '0.000000',
-  `gross_profit` float(16,6) NOT NULL DEFAULT '0.000000',
-  `gross_pnl` float(16,6) NOT NULL DEFAULT '0.000000',
+  `init_balance` float(16,6) NOT NULL DEFAULT '0.000000',
+  `cross_balance` float(16,6) NOT NULL DEFAULT '0.000000',
+  `corss_un_pnl` float(16,6) NOT NULL DEFAULT '0.000000',
   `log_ts` bigint NOT NULL DEFAULT '0',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`tid`),
   UNIQUE KEY `uidx_logts_af` (`account_flag`,`log_ts`),
   KEY `ct_idx` (`create_time`) USING BTREE,
   KEY `idx_ctaf` (`account_flag`,`create_time`),
-  KEY `idx_acc` (`account_flag`)
+  KEY `idx_af` (`account_flag`)
 );
