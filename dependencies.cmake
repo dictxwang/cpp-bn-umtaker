@@ -57,3 +57,12 @@ FIND_LIBRARY(_LIB_ZMQ
     NO_SYSTEM_ENVIRONMENT_PATH
     NO_CMAKE_SYSTEM_PATH
 )
+FIND_LIBRARY(_LIB_MYSQL
+    NAMES mysqlclient mysql mariadbclient
+    PATHS
+    /usr/lib
+    /usr/local/lib
+    /opt/homebrew/lib
+    /usr/lib/x86_64-linux-gnu
+    /usr/lib64
+)

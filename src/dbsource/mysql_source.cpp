@@ -31,9 +31,9 @@ namespace db_source {
                         const std::string& user,
                         const std::string& password,
                         const std::string& database,
-                        unsigned int port = 3306,
-                        size_t initial_size = 5,
-                        size_t max_size = 20)
+                        unsigned int port,
+                        size_t initial_size,
+                        size_t max_size)
         : pool_size(0), max_pool_size(max_size), is_shutdown(false) {
 
         conn_info = {host, user, password, database, port};

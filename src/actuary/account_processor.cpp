@@ -270,13 +270,34 @@ namespace actuary {
                         }
                     } else if (json_result["e"] == binance::FuturesUserDataOrderTradeUpdate) {
                         binance::WsFuturesOrderTradeUpdateEvent event = binance::convertJsonToWsFuturesOrderTradeUpdateEvent(json_result);
-                        if (strHelper::startsWith(event.clientOrderId, "temp")) {
-                            // ignore testing order
-                            continue;
-                        }
+                        // if (strHelper::startsWith(event.clientOrderId, "temp")) {
+                        //     // ignore testing order
+                        //     continue;
+                        // }
                         if (event.filledVolume == 0) {
                             // ignore no filled order
                             continue;
+                        }
+
+                        string sql = fmt::format("insert ignore into tb_bnum_order(account_flag, symbol, order_side, order_id, client_order_id, order_type, order_status, order_size, filled_size, average_price) values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {})",
+                            config.account_flag, event.symbol, event.side, event.id, event.clientOrderId, event.originalOrderType, event.orderStatus, event.volume, event.filledVolume, event.averagePrice
+                        );
+
+                        info_log("save order sql: {}", sql);
+                        MYSQL* my_conn = context.get_mysql_source()->getConnection();
+                        if (my_conn != nullptr) {
+                            try {
+                                if (mysql_query(my_conn, sql.c_str()) != 0) {
+                                    int my_no = mysql_errno(my_conn);
+                                    string my_err = mysql_error(my_conn);
+                                    err_log("fail to insert order: {} {}", my_no, my_err);
+                                }
+                            } catch (exception &exp) {
+                                err_log("exception occur while insert order: {}", string(exp.what()));
+                            }
+                            context.get_mysql_source()->releaseConnection(my_conn);
+                        } else {
+                            warn_log("no mysql connection created");
                         }
                     } else {
                         warn_log("receive unknown user data stream message: {}", messageJson);

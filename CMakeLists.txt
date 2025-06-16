@@ -88,6 +88,7 @@ target_link_libraries(actuary
 
     ${_LIB_BINANCECPP}
     ${_LIB_SPDLOG}
+    ${_LIB_MYSQL}
     # ${_LIB_ZMQ}
     # ${_PROTOBUF_LIBPROTOBUF}
     CURL::libcurl

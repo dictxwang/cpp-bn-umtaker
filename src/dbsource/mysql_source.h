@@ -37,8 +37,8 @@ namespace db_source {
                             const std::string& password,
                             const std::string& database,
                             unsigned int port = 3306,
-                            size_t initial_size = 5,
-                            size_t max_size = 20);
+                            size_t initial_size = 1,
+                            size_t max_size = 5);
 
         ~MySQLConnectionPool() {
             shutdown();

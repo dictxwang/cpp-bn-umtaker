@@ -12,6 +12,7 @@
 #include <optional>
 #include "binancecpp/binance_futures.h"
 #include "binancecpp/binance_ws_model.h"
+#include "binancecpp/util/string_helper.h"
 
 using namespace std;
 
