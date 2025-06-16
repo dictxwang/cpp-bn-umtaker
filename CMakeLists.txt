@@ -57,6 +57,11 @@ FILE(GLOB_RECURSE LIB_SHM_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/shm/*")
 add_library(shm ${LIB_SHM_SRC})
 
+# dbsource
+FILE(GLOB_RECURSE LIB_DBSOURCE_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/dbsource/*")
+add_library(dbsource ${LIB_DBSOURCE_SRC})
+
 # receiver
 FILE(GLOB_RECURSE LIB_RECEIVER_SRC RELATIVE ${CMAKE_SOURCE_DIR}
     "src/receiver/*")
@@ -91,6 +96,7 @@ target_link_libraries(actuary
     config
     shm
     tgbot
+    dbsource
 )
 
 # trader

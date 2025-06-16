@@ -54,6 +54,18 @@ namespace actuary {
         this->dynamic_config = make_shared<DynamicConfig>();
 
         this->account_info_channel = make_shared<moodycamel::ConcurrentQueue<string>>();
+
+        this->init_db_source(config);
+        info_log("finish init db source of mysql");
+    }
+
+    void GlobalContext::init_db_source(ActuaryConfig &config) {
+        this->mysql_source = make_shared<db_source::MySQLConnectionPool>(
+            config.db_host,
+            config.db_username,
+            config.db_password,
+            config.db_database
+        );
     }
 
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
@@ -212,5 +224,9 @@ namespace actuary {
 
     bool GlobalContext::dynamic_could_make_order() {
         return !(*(this->dynamic_config)).is_stop_make_order();
+    }
+    
+    shared_ptr<db_source::MySQLConnectionPool> GlobalContext::get_mysql_source() {
+        return this->mysql_source;
     }
 }

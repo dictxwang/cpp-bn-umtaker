@@ -9,6 +9,12 @@ namespace actuary {
 
         // Parse own configuration properties
         this->account_flag = this->doc_["account_flag"].asString();
+        this->db_host = this->doc_["db_host"].asString();
+        this->db_port = this->doc_["db_port"].asUInt();
+        this->db_username = this->doc_["db_username"].asString();
+        this->db_password = this->doc_["db_password"].asString();
+        this->db_database = this->doc_["db_database"].asString();
+
         this->benchmark_inst_config_file = this->doc_["benchmark_inst_config_file"].asString();
         this->follower_inst_config_file = this->doc_["follower_inst_config_file"].asString();
 

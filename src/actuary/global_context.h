@@ -14,6 +14,7 @@
 #include "tgbot/api.h"
 #include "dynamic_config.h"
 #include "market_processor.h"
+#include "dbsource/mysql_source.h"
 #include <unordered_map>
 #include <memory>
 #include <vector>
@@ -53,10 +54,13 @@ namespace actuary {
         tgbot::TgApi tg_bot;
         shared_ptr<DynamicConfig> dynamic_config;
 
+        shared_ptr<db_source::MySQLConnectionPool> mysql_source;
+
     public:
         void init(ActuaryConfig& config);
         void init_shm_mapping(ActuaryConfig& config);
         void init_shm(ActuaryConfig& config);
+        void init_db_source(ActuaryConfig &config);
         InstConfig &get_benchmark_inst_config();
         InstConfig &get_follower_inst_config();
         vector<string>& get_benchmark_inst_ids();
@@ -77,6 +81,7 @@ namespace actuary {
         tgbot::TgApi& get_tg_bot();
         shared_ptr<DynamicConfig> get_dynamic_config();
         bool dynamic_could_make_order();
+        shared_ptr<db_source::MySQLConnectionPool> get_mysql_source();
     };
 }
 #endif

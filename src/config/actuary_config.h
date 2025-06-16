@@ -15,6 +15,12 @@ namespace actuary {
     
     public:
         string account_flag;
+        string db_host;
+        unsigned int db_port;
+        string db_username;
+        string db_password;
+        string db_database;
+
         string benchmark_inst_config_file;
         string follower_inst_config_file;
 
