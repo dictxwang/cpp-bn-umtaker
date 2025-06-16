@@ -6,6 +6,7 @@ sudo apt install pkg-config
 sudo apt install openssl libssl-dev
 sudo apt-get install libcurl4-openssl-dev
 sudo apt-get install -y libabsl-dev
+sudo apt-get install libmysqlclient-dev
 
 ### On MacOS
 brew install pkg-config
