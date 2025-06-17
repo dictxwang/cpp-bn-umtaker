@@ -24,6 +24,8 @@ namespace receiver {
         InstConfig follower_inst_config;
         vector<std::string> benchmark_inst_ids;
         vector<std::string> follower_inst_ids;
+        vector<std::string> all_benchmark_inst_ids;
+        vector<std::string> all_follower_inst_ids;
         set<std::string> inst_ids_set;
         unordered_map<std::string, int> shm_threshold_mapping;
         unordered_map<std::string, int> shm_benchmark_ticker_mapping;

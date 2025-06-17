@@ -35,6 +35,8 @@ namespace actuary {
         InstConfig follower_inst_config;
         vector<string> benchmark_inst_ids;
         vector<string> follower_inst_ids;
+        vector<std::string> all_benchmark_inst_ids;
+        vector<std::string> all_follower_inst_ids;
         set<string> inst_ids_set;
         unordered_map<string, ExchangeInfoLite> exchange_info_map;
         unordered_map<string, int> shm_threshold_mapping;

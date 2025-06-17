@@ -20,6 +20,13 @@ namespace receiver {
             this->inst_ids_set.insert(follower_inst);
         }
 
+        for (string base : config.all_base_assets) {
+            string benchmark_inst = base + config.benchmark_quote_asset;
+            string follower_inst = base + config.follower_quote_asset;
+            this->all_benchmark_inst_ids.push_back(benchmark_inst);
+            this->all_follower_inst_ids.push_back(follower_inst);
+        }
+
         this->benchmark_inst_config.loadInstConfig(config.benchmark_inst_config_file);
         info_log("finiish load benchmark inst config file.");
         this->follower_inst_config.loadInstConfig(config.follower_inst_config_file);
@@ -138,8 +145,8 @@ namespace receiver {
         }
 
         std::vector<string> sorted_benchmark;
-        for (size_t i = 0; i < this->benchmark_inst_ids.size(); ++i) {
-            sorted_benchmark.push_back(this->benchmark_inst_ids[i]);
+        for (size_t i = 0; i < this->all_benchmark_inst_ids.size(); ++i) {
+            sorted_benchmark.push_back(this->all_benchmark_inst_ids[i]);
         }
         std::sort(sorted_benchmark.begin(), sorted_benchmark.end());
         for (int i = 0; i < sorted_benchmark.size(); i++) {
@@ -147,8 +154,8 @@ namespace receiver {
         }
 
         std::vector<string> sorted_follower;
-        for (size_t i = 0; i < this->follower_inst_ids.size(); ++i) {
-            sorted_follower.push_back(this->follower_inst_ids[i]);
+        for (size_t i = 0; i < this->all_follower_inst_ids.size(); ++i) {
+            sorted_follower.push_back(this->all_follower_inst_ids[i]);
         }
         std::sort(sorted_follower.begin(), sorted_follower.end());
         for (int i = 0; i < sorted_follower.size(); i++) {
