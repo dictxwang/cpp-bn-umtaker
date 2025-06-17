@@ -49,7 +49,19 @@
     "share_memory_path_follower_beta": "/home/ubuntu/code/shm_space/shm_umtaker_follower_beta",
     "share_memory_path_order": "/home/ubuntu/code/shm_space/shm_umtaker_order",
 
-    "base_asset_list": [
+    "group_main_node": true,
+    "node_base_assets": [
+        "BTC",
+        "ETH",
+        "BNB",
+        "SOL",
+        "XRP",
+        "DOGE",
+        "SUI",
+        "LINK"
+    ],
+
+    "all_base_assets": [
         "BTC",
         "ETH",
         "BNB",

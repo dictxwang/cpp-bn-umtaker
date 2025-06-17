@@ -4,7 +4,7 @@ namespace actuary {
     
     void GlobalContext::init(ActuaryConfig& config) {
         
-        for (string base : config.base_asset_list) {
+        for (string base : config.node_base_assets) {
             string benchmark_inst = base + config.benchmark_quote_asset;
             string follower_inst = base + config.follower_quote_asset;
             this->benchmark_inst_ids.push_back(benchmark_inst);
@@ -42,7 +42,7 @@ namespace actuary {
         balance_assets.push_back(config.benchmark_quote_asset);
         balance_assets.push_back(config.follower_quote_asset);
         balance_assets.push_back("BNB");
-        for (std::string base : config.base_asset_list) {
+        for (std::string base : config.all_base_assets) {
             balance_assets.push_back(base);
         }
         this->balance_position_composite.init(balance_assets, this->follower_inst_ids);
@@ -71,8 +71,8 @@ namespace actuary {
     void GlobalContext::init_shm_mapping(ActuaryConfig& config) {
 
         std::vector<string> sorted_assets;
-        for (size_t i = 0; i < config.base_asset_list.size(); ++i) {
-            sorted_assets.push_back(config.base_asset_list[i]);
+        for (size_t i = 0; i < config.all_base_assets.size(); ++i) {
+            sorted_assets.push_back(config.all_base_assets[i]);
         }
         std::sort(sorted_assets.begin(), sorted_assets.end());
         for (int i = 0; i < sorted_assets.size(); i++) {
@@ -123,13 +123,23 @@ namespace actuary {
         shm_mng::TickerInfoShm* follower_start = shm_mng::ticker_shm_find_start_address(follower_shm_id);
         info_log("attach follower shm {} start {}", follower_shm_id, int64_t(follower_start));
 
-        int order_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_order.c_str(), config.share_memory_project_id, sizeof(shm_mng::OrderShm), config.base_asset_list.size());
-        shm_mng::OrderShm* order_start = shm_mng::order_shm_find_start_address(order_shm_id);
-        info_log("create order shm {} start {}", order_shm_id, int64_t(order_start));
+        if (config.group_main_node) {
+            int order_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_order.c_str(), config.share_memory_project_id, sizeof(shm_mng::OrderShm), config.all_base_assets.size());
+            shm_mng::OrderShm* order_start = shm_mng::order_shm_find_start_address(order_shm_id);
+            info_log("create order shm {} start {}", order_shm_id, int64_t(order_start));
 
-        for (const auto& [key, value] : this->shm_order_mapping) {
-            shm_mng::order_shm_writer_init(order_start, value, key.c_str());
-            info_log("init order shm for {} at {}", key, value);
+            for (const auto& [key, value] : this->shm_order_mapping) {
+                shm_mng::order_shm_writer_init(order_start, value, key.c_str());
+                info_log("main node init order shm for {} at {}", key, value);
+            }
+            info.order_shm_id = order_shm_id;
+            info.order_start = order_start;
+        } else {
+            int order_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_order.c_str(), config.share_memory_project_id);
+            shm_mng::OrderShm* order_start = shm_mng::order_shm_find_start_address(order_shm_id);
+            info.order_shm_id = order_shm_id;
+            info.order_start = order_start;
+            info_log("secondary node attach order shm {} start {}", order_shm_id, int64_t(order_start));
         }
 
         info.early_run_shm_id = early_run_shm_id;
@@ -142,8 +152,6 @@ namespace actuary {
         info.benchmark_start = benchmark_start;
         info.follower_shm_id = follower_shm_id;
         info.follower_start = follower_start;
-        info.order_shm_id = order_shm_id;
-        info.order_start = order_start;
 
         this->shm_store_info = info;
     }

@@ -7,9 +7,9 @@ namespace actuary {
 
     void start_strategy_processors(ActuaryConfig& config, GlobalContext& context) {
 
-        for (size_t i = 0; i < config.base_asset_list.size(); ++i) {
+        for (size_t i = 0; i < config.node_base_assets.size(); ++i) {
 
-            std::string base_asset = config.base_asset_list[i];
+            std::string base_asset = config.node_base_assets[i];
             std::thread check_task_thread(check_signal_make_order, std::ref(config), std::ref(context), base_asset);
             check_task_thread.detach();
             info_log("start strategy processor for {}", base_asset);

@@ -44,7 +44,10 @@ namespace actuary {
 
         string benchmark_quote_asset;
         string follower_quote_asset;
-        std::vector<string> base_asset_list;
+        
+        bool group_main_node; // only main node should init share memory
+        std::vector<string> node_base_assets;
+        std::vector<string> all_base_assets; // all assets which support taker strategy
         
         bool process_account_settings;
         int initial_leverage;

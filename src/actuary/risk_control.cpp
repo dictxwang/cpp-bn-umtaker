@@ -6,6 +6,11 @@ namespace actuary {
 
     void start_watchdog(ActuaryConfig& config, GlobalContext& context) {
 
+        if (!config.group_main_node) {
+            info_log("only main node need start watchdog");
+            return;
+        }
+
         thread account_meta_thread(watch_account_meta, ref(config), ref(context));
         account_meta_thread.detach();
         info_log("start thread of watching account meata.");
