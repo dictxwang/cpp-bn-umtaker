@@ -106,6 +106,11 @@ namespace receiver {
                         int data_idx = g_data->coin_update_idx[coin_idx] % UDP_COIN_SLOT_COUNT;
                         struct UDPBookTicker *book_ticker = &g_data->data[coin_idx][data_idx];
 
+                        if (context.get_inst_ids_set().find(book_ticker->name) == context.get_inst_ids_set().end()) {
+                            // should ignore ticker
+                            continue;
+                        }
+
                         // std::cout << book_ticker->name <<"," << book_ticker->update_id <<","<< book_ticker->buy_price << "," << book_ticker->buy_num << "," << book_ticker->sell_price << ","  << book_ticker->sell_num << std::endl;
                         if (rand_value < 5) {
                             info_log("read udp shm data: name={} update_id={} bid={} bid_sz={} ask={} ask_sz={}",
@@ -345,8 +350,14 @@ namespace receiver {
             while (true) {
                 try {
                     std::string message = zmq_client.Receive();
+
                     besttick::TickerInfo event;
                     event.ParseFromString(message);
+
+                    if (context.get_inst_ids_set().find(event.instid()) == context.get_inst_ids_set().end()) {
+                        // should ignore ticker
+                        continue;
+                    }
 
                     UmTickerInfo info;
                     info.inst_id = event.instid();

@@ -18,13 +18,12 @@ namespace receiver {
     public:
         string benchmark_inst_config_file;
         string follower_inst_config_file;
-        bool use_best_ticker;
-        std::vector<string> ticker_zmq_ipcs;
-        bool use_normal_ticker;
+
+        string use_ticker_source; // normal/zmq/udp
+
         bool normal_ticker_use_intranet;
         string normal_ticker_local_ip;
-
-        bool use_udp_ticker;
+        std::vector<string> ticker_zmq_ipcs;
         std::vector<UDPTickerIPC> ticker_udp_ipcs;
 
         uint64_t calculate_sma_interval_seconds;
@@ -32,7 +31,10 @@ namespace receiver {
 
         string benchmark_quote_asset;
         string follower_quote_asset;
-        std::vector<string> base_asset_list;
+
+        bool group_main_node; // only main node should init share memory
+        std::vector<string> node_base_assets;
+        std::vector<string> all_base_assets; // all assets which support taker strategy
 
         bool enable_beta_strategy;
         bool enable_early_run_strategy;

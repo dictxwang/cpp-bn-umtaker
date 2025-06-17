@@ -48,7 +48,8 @@ namespace receiver {
     
     public:
         void init(ReceiverConfig& config);
-        void init_shm(ReceiverConfig& config);
+        void init_shm_for_main(ReceiverConfig& config);
+        void init_shm_for_secondary(ReceiverConfig& config);
         void init_shm_mapping(ReceiverConfig& config);
         InstConfig &get_benchmark_inst_config();
         InstConfig &get_follower_inst_config();

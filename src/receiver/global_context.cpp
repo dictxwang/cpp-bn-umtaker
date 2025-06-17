@@ -3,15 +3,15 @@
 namespace receiver {
     
     void GlobalContext::init(ReceiverConfig& config) {
-        this->benchmark_ticker_composite.init(config.benchmark_quote_asset, config.base_asset_list, config.calculate_sma_interval_seconds);
-        this->follower_ticker_composite.init(config.follower_quote_asset, config.base_asset_list, config.calculate_sma_interval_seconds);
+        this->benchmark_ticker_composite.init(config.benchmark_quote_asset, config.node_base_assets, config.calculate_sma_interval_seconds);
+        this->follower_ticker_composite.init(config.follower_quote_asset, config.node_base_assets, config.calculate_sma_interval_seconds);
 
-        this->price_offset_composite.init(config.base_asset_list, config.calculate_sma_interval_seconds);
-        this->early_run_threshold_composite.init(config.base_asset_list);
-        this->benchmark_beta_threshold_composite.init(config.base_asset_list);
-        this->follower_beta_threshold_composite.init(config.base_asset_list);
+        this->price_offset_composite.init(config.node_base_assets, config.calculate_sma_interval_seconds);
+        this->early_run_threshold_composite.init(config.node_base_assets);
+        this->benchmark_beta_threshold_composite.init(config.node_base_assets);
+        this->follower_beta_threshold_composite.init(config.node_base_assets);
 
-        for (string base : config.base_asset_list) {
+        for (string base : config.node_base_assets) {
             string benchmark_inst = base + config.benchmark_quote_asset;
             string follower_inst = base + config.follower_quote_asset;
             this->benchmark_inst_ids.push_back(benchmark_inst);
@@ -26,24 +26,30 @@ namespace receiver {
         info_log("finiish load follower inst config file.");
 
         this->init_shm_mapping(config);
-        this->init_shm(config);
+        if (config.group_main_node) {
+            this->init_shm_for_main(config);
+            info_log("init share memory for main node");
+        } else {
+            this->init_shm_for_secondary(config);
+            info_log("init share memory for secondary node");
+        }
 
         this->benchmark_ticker_channel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
         this->follower_ticker_channel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
     };
 
-    void GlobalContext::init_shm(ReceiverConfig& config) {
+    void GlobalContext::init_shm_for_main(ReceiverConfig& config) {
         ShmStoreInfo info;
 
-        int early_run_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id, sizeof(shm_mng::EarlyRunThresholdShm), config.base_asset_list.size());
+        int early_run_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id, sizeof(shm_mng::EarlyRunThresholdShm), config.all_base_assets.size());
         shm_mng::EarlyRunThresholdShm* early_run_start = shm_mng::early_run_shm_find_start_address(early_run_shm_id);
         info_log("create early run shm {} start {}", early_run_shm_id, int64_t(early_run_start));
 
-        int benchmark_beta_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_benchmark_beta.c_str(), config.share_memory_project_id, sizeof(shm_mng::BetaThresholdShm), config.base_asset_list.size());
+        int benchmark_beta_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_benchmark_beta.c_str(), config.share_memory_project_id, sizeof(shm_mng::BetaThresholdShm), config.all_base_assets.size());
         shm_mng::BetaThresholdShm* benchmark_beta_start = shm_mng::beta_shm_find_start_address(benchmark_beta_shm_id);
         info_log("create benchmark beta shm {} start {}", benchmark_beta_shm_id, int64_t(benchmark_beta_start));
 
-        int follower_beta_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_follower_beta.c_str(), config.share_memory_project_id, sizeof(shm_mng::BetaThresholdShm), config.base_asset_list.size());
+        int follower_beta_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_follower_beta.c_str(), config.share_memory_project_id, sizeof(shm_mng::BetaThresholdShm), config.all_base_assets.size());
         shm_mng::BetaThresholdShm* follower_beta_start = shm_mng::beta_shm_find_start_address(follower_beta_shm_id);
         info_log("create follower beta shm {} start {}", follower_beta_shm_id, int64_t(follower_beta_start));
 
@@ -84,10 +90,62 @@ namespace receiver {
         this->shm_store_info = info;
     }
 
+    void GlobalContext::init_shm_for_secondary(ReceiverConfig& config) {
+        ShmStoreInfo info;
+
+        int early_run_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_early_run.c_str(), config.share_memory_project_id);
+        shm_mng::EarlyRunThresholdShm* early_run_start = shm_mng::early_run_shm_find_start_address(early_run_shm_id);
+        info_log("attach early run shm {} start {}", early_run_shm_id, int64_t(early_run_start));
+
+        int benchmark_beta_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_benchmark_beta.c_str(), config.share_memory_project_id);
+        shm_mng::BetaThresholdShm* benchmark_beta_start = shm_mng::beta_shm_find_start_address(benchmark_beta_shm_id);
+        info_log("attach benchmark beta shm {} start {}", benchmark_beta_shm_id, int64_t(benchmark_beta_start));
+
+        int follower_beta_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_follower_beta.c_str(), config.share_memory_project_id);
+        shm_mng::BetaThresholdShm* follower_beta_start = shm_mng::beta_shm_find_start_address(follower_beta_shm_id);
+        info_log("attach follower beta shm {} start {}", follower_beta_shm_id, int64_t(follower_beta_start));
+
+        for (const auto& [key, value] : this->shm_threshold_mapping) {
+            shm_mng::early_run_shm_writer_init(early_run_start, value, key.c_str());
+            shm_mng::beta_shm_writer_init(benchmark_beta_start, value, key.c_str());
+            shm_mng::beta_shm_writer_init(follower_beta_start, value, key.c_str());
+            info_log("init threshold shm for {} at {}", key, value);
+        }
+
+        int benchmark_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_benchmark_ticker.c_str(), config.share_memory_project_id);
+        shm_mng::TickerInfoShm* benchmark_start = shm_mng::ticker_shm_find_start_address(benchmark_shm_id);
+        info_log("attach benchmark shm {} start {}", benchmark_shm_id, int64_t(benchmark_start));
+        for (const auto& [key, value] : this->shm_benchmark_ticker_mapping) {
+            shm_mng::ticker_shm_writer_init(benchmark_start, value, key.c_str());
+            info_log("init benchmark shm for {} at {}", key, value);
+        }
+
+        int follower_shm_id = shm_mng::reader_common_attach_shm(config.share_memory_path_follower_ticker.c_str(), config.share_memory_project_id);
+        shm_mng::TickerInfoShm* follower_start = shm_mng::ticker_shm_find_start_address(follower_shm_id);
+        info_log("attach follower shm {} start {}", follower_shm_id, int64_t(follower_start));
+        for (const auto& [key, value] : this->shm_follower_ticker_mapping) {
+            shm_mng::ticker_shm_writer_init(follower_start, value, key.c_str());
+            info_log("init follower shm for {} at {}", key, value);
+        }
+
+        info.early_run_shm_id = early_run_shm_id;
+        info.early_run_start = early_run_start;
+        info.benchmark_beta_shm_id = benchmark_beta_shm_id;
+        info.benchmark_beta_start = benchmark_beta_start;
+        info.follower_beta_shm_id = follower_beta_shm_id;
+        info.follower_beta_start = follower_beta_start;
+        info.benchmark_shm_id = benchmark_shm_id;
+        info.benchmark_start = benchmark_start;
+        info.follower_shm_id = follower_shm_id;
+        info.follower_start = follower_start;
+
+        this->shm_store_info = info;
+    }
+
     void GlobalContext::init_shm_mapping(ReceiverConfig& config) {
         std::vector<string> sorted_assets;
-        for (size_t i = 0; i < config.base_asset_list.size(); ++i) {
-            sorted_assets.push_back(config.base_asset_list[i]);
+        for (size_t i = 0; i < config.all_base_assets.size(); ++i) {
+            sorted_assets.push_back(config.all_base_assets[i]);
         }
         std::sort(sorted_assets.begin(), sorted_assets.end());
         for (int i = 0; i < sorted_assets.size(); i++) {

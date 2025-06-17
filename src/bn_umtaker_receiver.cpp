@@ -35,13 +35,13 @@ int main(int argc, char const *argv[]) {
     info_log("start ticker calculate.");
     
     // subscribe ticker message
-    if (config.use_normal_ticker) {
+    if (config.use_ticker_source == receiver::TICKER_SOURCE_NORMAL) {
         receiver::start_subscribe_normal_ticker(config, context);
         info_log("start subscribe normal ticker.");
-    } else if (config.use_best_ticker) {
+    } else if (config.use_ticker_source == receiver::TICKER_SOURCE_ZMQ) {
         receiver::start_subscribe_zmq_best_ticker(config, context);
         info_log("start subscribe best ticker.");
-    } else if (config.use_udp_ticker) {
+    } else if (config.use_ticker_source == receiver::TICKER_SOURCE_UDP) {
         receiver::start_subscribe_udp_ticker(config, context);
         info_log("start subscribe udp ticker.");
     }

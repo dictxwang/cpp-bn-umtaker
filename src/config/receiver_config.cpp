@@ -13,16 +13,15 @@ namespace receiver {
         this->benchmark_inst_config_file = this->doc_["benchmark_inst_config_file"].asString();
         this->follower_inst_config_file = this->doc_["follower_inst_config_file"].asString();
 
+        this->use_ticker_source = this->doc_["use_ticker_source"].asString();
+
+        this->normal_ticker_use_intranet = this->doc_["normal_ticker_use_intranet"].asBool();
+        this->normal_ticker_local_ip = this->doc_["normal_ticker_local_ip"].asString();
+
         for (int i = 0; i < this->doc_["ticker_zmq_ipcs"].size(); i++) {
             this->ticker_zmq_ipcs.push_back(this->doc_["ticker_zmq_ipcs"][i].asString());
         }
 
-        this->use_best_ticker = this->doc_["use_best_ticker"].asBool();
-        this->use_normal_ticker = this->doc_["use_normal_ticker"].asBool();
-        this->normal_ticker_use_intranet = this->doc_["normal_ticker_use_intranet"].asBool();
-        this->normal_ticker_local_ip = this->doc_["normal_ticker_local_ip"].asString();
-
-        this->use_udp_ticker = this->doc_["use_udp_ticker"].asBool();
         Json::Value json_udp_ipcs = this->doc_["ticker_udp_ipcs"];
         for (int i = 0; i < json_udp_ipcs.size(); i++) {
             UDPTickerIPC ipc;
@@ -38,8 +37,12 @@ namespace receiver {
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
 
-        for (int i = 0; i < this->doc_["base_asset_list"].size(); i++) {
-            this->base_asset_list.push_back(this->doc_["base_asset_list"][i].asString());
+        this->group_main_node = this->doc_["group_main_node"].asBool();
+        for (int i = 0; i < this->doc_["node_base_assets"].size(); i++) {
+            this->node_base_assets.push_back(this->doc_["node_base_assets"][i].asString());
+        }
+        for (int i = 0; i < this->doc_["all_base_assets"].size(); i++) {
+            this->all_base_assets.push_back(this->doc_["all_base_assets"][i].asString());
         }
         
         this->share_memory_project_id = this->doc_["share_memory_project_id"].asInt();

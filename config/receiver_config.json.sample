@@ -7,16 +7,15 @@
     "benchmark_inst_config_file": "config/benchmark_inst_config.json.sample",
     "follower_inst_config_file": "config/follower_inst_config.json.sample",
 
-    "use_normal_ticker": true,
+    "use_ticker_source": "normal",
+
     "normal_ticker_use_intranet": false,
     "normal_ticker_local_ip": "",
 
-    "use_best_ticker": false,
     "ticker_zmq_ipcs": [
         "tcp://127.0.0.1:22001"
     ],
-    
-    "use_udp_ticker": false,
+
     "ticker_udp_ipcs": [
         {
             "mmap_file": "/tmp/bn_uperp_mem.dat",
@@ -41,7 +40,19 @@
     "share_memory_path_benchmark_beta": "/home/ubuntu/code/shm_space/shm_umtaker_benchmark_beta",
     "share_memory_path_follower_beta": "/home/ubuntu/code/shm_space/shm_umtaker_follower_beta",
 
-    "base_asset_list": [
+    "group_main_node": true,
+    "node_base_assets": [
+        "BTC",
+        "ETH",
+        "BNB",
+        "SOL",
+        "XRP",
+        "DOGE",
+        "SUI",
+        "LINK"
+    ],
+
+    "all_base_assets": [
         "BTC",
         "ETH",
         "BNB",

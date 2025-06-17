@@ -10,6 +10,10 @@ using namespace std;
 
 namespace receiver {
 
+    const string TICKER_SOURCE_NORMAL = "normal";
+    const string TICKER_SOURCE_ZMQ = "zmq";
+    const string TICKER_SOURCE_UDP = "udp";
+
     struct UmTickerInfo {
         string inst_id;
         double bid_price = 0;
