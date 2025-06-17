@@ -4,12 +4,17 @@ namespace trader {
 
     void GlobalContext::init(TraderConfig& config) {
 
-        for (string base : config.base_asset_list) {
+        for (string base : config.node_base_assets) {
             string benchmark_inst = base + config.benchmark_quote_asset;
             string follower_inst = base + config.follower_quote_asset;
             this->benchmark_inst_ids.push_back(benchmark_inst);
             this->follower_inst_ids.push_back(follower_inst);
             this->follower_inst_id_set.insert(follower_inst);
+        }
+
+        for (string base : config.all_base_assets) {
+            string follower_inst = base + config.follower_quote_asset;
+            this->all_follower_inst_ids.push_back(follower_inst);
         }
 
         this->order_channel = make_shared<moodycamel::ConcurrentQueue<std::string>>();
@@ -41,8 +46,8 @@ namespace trader {
     void GlobalContext::init_shm_mapping(TraderConfig& config) {
 
         std::vector<string> sorted_follower;
-        for (size_t i = 0; i < this->follower_inst_ids.size(); ++i) {
-            sorted_follower.push_back(this->follower_inst_ids[i]);
+        for (size_t i = 0; i < this->all_follower_inst_ids.size(); ++i) {
+            sorted_follower.push_back(this->all_follower_inst_ids[i]);
         }
         std::sort(sorted_follower.begin(), sorted_follower.end());
         for (int i = 0; i < sorted_follower.size(); i++) {

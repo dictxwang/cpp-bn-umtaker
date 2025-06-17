@@ -27,6 +27,7 @@ namespace trader {
         vector<string> benchmark_inst_ids;
         vector<string> follower_inst_ids;
         set<string> follower_inst_id_set;
+        vector<std::string> all_follower_inst_ids;
         
         unordered_map<string, int> shm_order_mapping;
         ShmStoreInfo shm_store_info;

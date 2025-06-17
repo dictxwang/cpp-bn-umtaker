@@ -26,7 +26,18 @@
     "best_path_zmq_ipc": "tcp://127.0.0.1:15555",
     "trading_use_best_path": false,
 
-    "base_asset_list": [
+    "node_base_assets": [
+        "BTC",
+        "ETH",
+        "BNB",
+        "SOL",
+        "XRP",
+        "DOGE",
+        "SUI",
+        "LINK"
+    ],
+
+    "all_base_assets": [
         "BTC",
         "ETH",
         "BNB",

@@ -19,7 +19,7 @@ namespace trader {
             info_log("start thread of starting normal order serice");
         }
 
-        for (std::string base_asset : config.base_asset_list) {
+        for (std::string base_asset : config.node_base_assets) {
             std::thread thread_scan(scan_and_send_order, std::ref(config), std::ref(context), base_asset);
             thread_scan.detach();
             info_log("start thread of scanning and sending order for {}", base_asset);

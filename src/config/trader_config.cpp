@@ -23,9 +23,12 @@ namespace trader {
 
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
-
-        for (int i = 0; i < this->doc_["base_asset_list"].size(); i++) {
-            this->base_asset_list.push_back(this->doc_["base_asset_list"][i].asString());
+        
+        for (int i = 0; i < this->doc_["node_base_assets"].size(); i++) {
+            this->node_base_assets.push_back(this->doc_["node_base_assets"][i].asString());
+        }
+        for (int i = 0; i < this->doc_["all_base_assets"].size(); i++) {
+            this->all_base_assets.push_back(this->doc_["all_base_assets"][i].asString());
         }
 
         this->share_memory_project_id = this->doc_["share_memory_project_id"].asInt();
