@@ -107,8 +107,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 8000000,
-      "order_size": 2000,
-      "max_position": 20000
+      "order_size": 4000,
+      "max_position": 40000
     },
     {
       "asset": "WLD",

@@ -42,3 +42,6 @@ echo "core_%e_%t_%p" > /proc/sys/kernel/core_pattern
 systemctl status apport
 sudo service apport stop
 cat /etc/default/apport
+
+# warning
+the item "all_base_assets" in all configuration files must have same assets, to make sure shared memory index stable
