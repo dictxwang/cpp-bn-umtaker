@@ -132,36 +132,13 @@ namespace actuary {
                     response.data.totalCrossUnPnl
                 );
 
-                // save meta key information into db
-                if (config.group_main_node && ++polling_times == 300/turn_interval) {
-                    // save db per 300 seconds
-                    polling_times = 0;
-                    uint64_t log_ts = binance::get_current_epoch();
-                    string sql = fmt::format("insert ignore into tb_bnum_pnl(account_flag, init_balance, cross_balance, corss_un_pnl, log_ts) values ('{}', {}, {}, {}, {})",
-                        config.account_flag, 0, response.data.totalCrossWalletBalance, response.data.totalCrossUnPnl, log_ts
-                    );
-
-                    info_log("save account meta sql: {}", sql);
-                    MYSQL* my_conn = context.get_mysql_source()->getConnection();
-                    if (my_conn != nullptr) {
-                        try {
-                            if (mysql_query(my_conn, sql.c_str()) != 0) {
-                                int my_no = mysql_errno(my_conn);
-                                string my_err = mysql_error(my_conn);
-                                err_log("fail to insert account meta: {} {}", my_no, my_err);
-                            }
-                        } catch (exception &exp) {
-                            err_log("exception occur while insert account meta: {}", string(exp.what()));
-                        }
-                        context.get_mysql_source()->releaseConnection(my_conn);
-                    } else {
-                        warn_log("no mysql connection created");
-                    }
-                }
-
+                double follower_quote_balance;
                 bool updated = false;
                 if (response.data.assets.size() > 0) {
                     for (size_t i = 0; i < response.data.assets.size(); ++i) {
+                        if (response.data.assets[i].asset == config.follower_quote_asset) {
+                            follower_quote_balance = response.data.assets[i].crossWalletBalance;
+                        }
                         updated = context.get_balance_position_composite().update_exist_balance(response.data.assets[i]);
                         if (updated) {
                             info_log("update account balance: asset={} walletBalance={} crossWalletBalance={} crossUnPnl={}",
@@ -184,6 +161,35 @@ namespace actuary {
                         }
                     }
                 }
+
+                // save meta key information into db
+                if (config.group_main_node && ++polling_times == 300/turn_interval) {
+                    // save db per 300 seconds
+                    
+                    polling_times = 0;
+                    uint64_t log_ts = binance::get_current_epoch();
+                    string sql = fmt::format("insert ignore into tb_bnum_pnl(account_flag, init_balance, usdc_balance, cross_balance, corss_un_pnl, log_ts) values ('{}', {}, {}, {}, {}, {})",
+                        config.account_flag, 0, follower_quote_balance, response.data.totalCrossWalletBalance, response.data.totalCrossUnPnl, log_ts
+                    );
+
+                    info_log("save account meta sql: {}", sql);
+                    MYSQL* my_conn = context.get_mysql_source()->getConnection();
+                    if (my_conn != nullptr) {
+                        try {
+                            if (mysql_query(my_conn, sql.c_str()) != 0) {
+                                int my_no = mysql_errno(my_conn);
+                                string my_err = mysql_error(my_conn);
+                                err_log("fail to insert account meta: {} {}", my_no, my_err);
+                            }
+                        } catch (exception &exp) {
+                            err_log("exception occur while insert account meta: {}", string(exp.what()));
+                        }
+                        context.get_mysql_source()->releaseConnection(my_conn);
+                    } else {
+                        warn_log("no mysql connection created");
+                    }
+                }
+
             }
             std::this_thread::sleep_for(std::chrono::seconds(turn_interval));
         }

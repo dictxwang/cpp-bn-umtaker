@@ -240,11 +240,16 @@ int main(int argc, char const *argv[]) {
     // std::cout << "Response symbols-0.baseAsset: " << response.data.size() << std::endl;
 
     // Example: get_account
-    // binance::CommonRestResponse<binance::SpotAccount> accountResp;
-    // binanceRestSpot.get_account(accountResp);
-    // std::cout << "Response code: " << accountResp.code << std::endl;
-    // std::cout << "Response msg: " << accountResp.msg << std::endl;
-    // std::cout << "Response data: " << accountResp.data.accountType << std::endl;
+    binance::CommonRestResponse<binance::SpotAccount> accountResp;
+    binanceRestSpot.get_account(accountResp);
+    std::cout << "Response code: " << accountResp.code << std::endl;
+    std::cout << "Response msg: " << accountResp.msg << std::endl;
+    std::cout << "Response data: " << accountResp.data.accountType << std::endl;
+    for (binance::BalanceLite bal : accountResp.data.balances) {
+        if (bal.free > 0 || bal.locked > 0) {
+            std::cout << bal.asset << "," << bal.free << std::endl;
+        }
+    }
 
     // Example: subscribe bookticker
     // std::vector<std::string> symbols;

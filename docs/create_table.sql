@@ -17,12 +17,13 @@ CREATE TABLE `tb_bnum_order` (
   KEY `idx_af` (`account_flag`),
   KEY `idx_ct` (`create_time`),
   KEY `idx_afos` (`account_flag`,`order_status`)
-)
+);
 
 CREATE TABLE `tb_bnum_pnl` (
   `tid` bigint NOT NULL AUTO_INCREMENT,
   `account_flag` varchar(32) NOT NULL DEFAULT '',
   `init_balance` float(16,6) NOT NULL DEFAULT '0.000000',
+  `usdc_balance` float(16,6) NOT NULL DEFAULT '0.000000',
   `cross_balance` float(16,6) NOT NULL DEFAULT '0.000000',
   `corss_un_pnl` float(16,6) NOT NULL DEFAULT '0.000000',
   `log_ts` bigint NOT NULL DEFAULT '0',
