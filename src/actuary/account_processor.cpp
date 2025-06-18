@@ -161,7 +161,7 @@ namespace actuary {
 
                 bool updated = false;
                 if (response.data.assets.size() > 0) {
-                    for (size_t i = 0; i <= response.data.assets.size(); ++i) {
+                    for (size_t i = 0; i < response.data.assets.size(); ++i) {
                         updated = context.get_balance_position_composite().update_exist_balance(response.data.assets[i]);
                         if (updated) {
                             info_log("update account balance: asset={} walletBalance={} crossWalletBalance={} crossUnPnl={}",
@@ -172,7 +172,7 @@ namespace actuary {
                     }
                 }
                 if (response.data.positions.size() > 0) {
-                    for (size_t i = 0; i <= response.data.positions.size(); ++i) {
+                    for (size_t i = 0; i < response.data.positions.size(); ++i) {
                         updated = context.get_balance_position_composite().update_exist_position(response.data.positions[i]);
                         if (updated) {
                             info_log("update account position: symbol={} initialMargin={} maintMargin={} unrealizedProfit={} entryPrice={} positionSide={} positionAmt={}",

@@ -28,3 +28,17 @@ https://web.telegram.org/a/#-4958151325
 
 # start udp ticker test processor
 taskset -c 16 ./main_ws ./ws_test.conf > /data/dc/ticker/test.nohup
+
+
+# debug
+# if use apport, the core dump files path is:
+/var/lib/apport/coredump/
+
+# if not use apport, you should do:
+
+# 1 make the core dump file generated in current path
+echo "core_%e_%t_%p" > /proc/sys/kernel/core_pattern
+# 2 stop apport service, avoid it overwrite your custom settings
+systemctl status apport
+sudo service apport stop
+cat /etc/default/apport
