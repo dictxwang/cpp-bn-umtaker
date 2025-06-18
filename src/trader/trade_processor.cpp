@@ -91,7 +91,7 @@ namespace trader {
                 if (!context.get_api_minute_limiter()->get_semaphore(1) || !context.get_api_second_limiter()->get_semaphore(1)) {
                     warn_log("no more semaphore for place order");
                     result.first = false;
-                    result.second = "no semephore";
+                    result.second = "no semaphore";
                 } else {
                     if (config.trading_use_best_path) {
                         optional<shared_ptr<WsClientWrapper>> best_service = context.get_order_service_manager().find_best_service(follower_inst_id);
