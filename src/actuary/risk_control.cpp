@@ -6,11 +6,6 @@ namespace actuary {
 
     void start_watchdog(ActuaryConfig& config, GlobalContext& context) {
 
-        if (!config.group_main_node) {
-            info_log("only main node need start watchdog");
-            return;
-        }
-
         thread account_meta_thread(watch_account_meta, ref(config), ref(context));
         account_meta_thread.detach();
         info_log("start thread of watching account meata.");
@@ -117,6 +112,8 @@ namespace actuary {
     void send_warning_message(ActuaryConfig& config, GlobalContext& context, string message) {
         if (!config.tg_send_message) {
             warn_log("close send tg messag: {}", message);
+        } else if (!config.group_main_node) {
+            info_log("not main node, skip send tg message: {}", message);
         } else {
             message = "[" + config.account_flag + "]" + message;
             pair<int, string> res = context.get_tg_bot().send_message(config.tg_chat_id, message);
