@@ -37,7 +37,7 @@ namespace trader {
     void subscribe_best_path_processor(TraderConfig &config, GlobalContext &context, size_t zmq_ipc_index);
 
     bool is_valid_best_path(GlobalContext &context, const BestPathInfo &info);
-    vector<BestPathInfo> simple_call_best_path(TraderConfig &config);
+    vector<BestPathInfo> simple_call_best_path(string& best_path_url);
 }
 
 #endif
