@@ -247,7 +247,7 @@ int main(int argc, char const *argv[]) {
     std::cout << "Response data: " << accountResp.data.accountType << std::endl;
     for (binance::BalanceLite bal : accountResp.data.balances) {
         if (bal.free > 0 || bal.locked > 0) {
-            std::cout << bal.asset << "," << bal.free << std::endl;
+            std::cout << "spot balance: "<< bal.asset << "," << bal.free << std::endl;
         }
     }
 
@@ -306,11 +306,17 @@ int main(int argc, char const *argv[]) {
     // }
 
     // Example: get_account_v2
-    // binance::CommonRestResponse<binance::FuturesAccount> fururesAcccountResponse;
-    // binanceRestFutures.get_account_v2(fururesAcccountResponse);
-    // std::cout << "Response code: " << fururesAcccountResponse.code << std::endl;
-    // std::cout << "Response account canWithdraw: " << fururesAcccountResponse.data.canWithdraw << std::endl;
-
+    binance::CommonRestResponse<binance::FuturesAccount> fururesAcccountResponse;
+    binanceRestFutures.get_account_v2(fururesAcccountResponse);
+    std::cout << "Response code: " << fururesAcccountResponse.code << std::endl;
+    std::cout << "Response account canWithdraw: " << fururesAcccountResponse.data.canWithdraw << std::endl;
+    std::cout << "Response account totalInitialMargin: " << fururesAcccountResponse.data.totalInitialMargin << std::endl;
+    std::cout << "Response account totalCrossWalletBalance: " << fururesAcccountResponse.data.totalCrossWalletBalance << std::endl;
+    for (binance::FuturesAccountAsset bal : fururesAcccountResponse.data.assets) {
+        if (bal.crossWalletBalance > 0) {
+            std::cout << "futures balance: " << bal.asset << "," << bal.crossWalletBalance << std::endl;
+        }
+    }
     // Example: get_multiAssetMargin
     // binance::CommonRestResponse<bool> futuresMultiAssetResponse;
     // binanceRestFutures.get_multiAssetMargin(futuresMultiAssetResponse);
@@ -409,12 +415,13 @@ int main(int argc, char const *argv[]) {
 
     // Example: spot order by rest
     // binance::SpotNewOrder newOrder;
-    // newOrder.symbol = "ETHUSDC";
-    // newOrder.side = binance::ORDER_SIDE_SELL;
-    // newOrder.type = binance::ORDER_TYPE_LIMIT;
-    // newOrder.timeInForce = binance::TimeInForce_IOC;
-    // newOrder.quantity = 1.5;
-    // newOrder.price = 12605;
+    // newOrder.symbol = "USDCUSDT";
+    // newOrder.side = binance::ORDER_SIDE_BUY;
+    // newOrder.type = "MARKET";
+    // // newOrder.type = binance::ORDER_TYPE_LIMIT;
+    // // newOrder.timeInForce = binance::TimeInForce_IOC;
+    // newOrder.quantity = 5000;
+    // // newOrder.price = 12605;
     // newOrder.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
     // newOrder.newClientOrderId = gen_client_order_id(true);
 
@@ -424,14 +431,14 @@ int main(int argc, char const *argv[]) {
     // std::cout << "order: status=" << newOrderResp.data.status << std::endl;
 
     // Example: univals transfer
-    // binance::WalletUniversalTransfer transfer;
-    // transfer.type = binance::UT_MAIN_UMFUTURE;
-    // transfer.asset = "BNB";
-    // transfer.amount = 0.499126;
-    // binance::CommonRestResponse<uint64_t> transferResponse;
-    // binanceRestWallet.universal_transfer(transfer, transferResponse);
-    // std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;
-    // std::cout << "tranId" << transferResponse.data << std::endl;
+    binance::WalletUniversalTransfer transfer;
+    transfer.type = binance::UT_MAIN_UMFUTURE;
+    transfer.asset = "BNB";
+    transfer.amount = 0.9;
+    binance::CommonRestResponse<uint64_t> transferResponse;
+    binanceRestWallet.universal_transfer(transfer, transferResponse);
+    std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;
+    std::cout << "tranId" << transferResponse.data << std::endl;
 
     while(true) {
         std::cout << "Keep Running..." << std::endl;

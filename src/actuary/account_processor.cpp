@@ -3,7 +3,7 @@
 namespace actuary {
 
     void prepare_account_settings(ActuaryConfig &config, GlobalContext &context) {
-        if (!config.group_main_node || !config.process_account_settings) {
+        if (!config.dt_group_main_node || !config.process_account_settings) {
             info_log("not main node or no need process account settings.");
             return;
         }
@@ -163,9 +163,9 @@ namespace actuary {
                 }
 
                 // save meta key information into db
-                if (config.group_main_node && ++polling_times == 300/turn_interval) {
+                if (config.dt_group_main_node && ++polling_times == 300/turn_interval) {
                     // save db per 300 seconds
-                    
+
                     polling_times = 0;
                     uint64_t log_ts = binance::get_current_epoch();
                     string sql = fmt::format("insert ignore into tb_bnum_pnl(account_flag, init_balance, usdc_balance, cross_balance, corss_un_pnl, log_ts) values ('{}', {}, {}, {}, {}, {})",
@@ -314,7 +314,7 @@ namespace actuary {
                             continue;
                         }
 
-                        if (config.group_main_node) {
+                        if (config.dt_group_main_node) {
                             string sql = fmt::format("insert ignore into tb_bnum_order(account_flag, symbol, order_side, order_id, client_order_id, order_type, order_status, order_size, filled_size, average_price) values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {})",
                                 config.account_flag, event.symbol, event.side, event.id, event.clientOrderId, event.originalOrderType, event.orderStatus, event.volume, event.filledVolume, event.averagePrice
                             );

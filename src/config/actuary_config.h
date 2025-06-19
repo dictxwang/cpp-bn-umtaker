@@ -44,8 +44,9 @@ namespace actuary {
 
         string benchmark_quote_asset;
         string follower_quote_asset;
-        
-        bool group_main_node; // only main node should init share memory
+
+        bool shm_group_main_node; // only main node of group should init share memory
+        bool dt_group_main_node; // only main node of group should do data stat
         std::vector<string> node_base_assets;
         std::vector<string> all_base_assets; // all assets which support taker strategy
         

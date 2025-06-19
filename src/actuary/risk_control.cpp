@@ -112,7 +112,7 @@ namespace actuary {
     void send_warning_message(ActuaryConfig& config, GlobalContext& context, string message) {
         if (!config.tg_send_message) {
             warn_log("close send tg messag: {}", message);
-        } else if (!config.group_main_node) {
+        } else if (!config.dt_group_main_node) {
             info_log("not main node, skip send tg message: {}", message);
         } else {
             message = "[" + config.account_flag + "]" + message;

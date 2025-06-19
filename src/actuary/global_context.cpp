@@ -130,7 +130,7 @@ namespace actuary {
         shm_mng::TickerInfoShm* follower_start = shm_mng::ticker_shm_find_start_address(follower_shm_id);
         info_log("attach follower shm {} start {}", follower_shm_id, int64_t(follower_start));
 
-        if (config.group_main_node) {
+        if (config.shm_group_main_node) {
             int order_shm_id = shm_mng::writer_common_create_shm(config.share_memory_path_order.c_str(), config.share_memory_project_id, sizeof(shm_mng::OrderShm), config.all_base_assets.size());
             shm_mng::OrderShm* order_start = shm_mng::order_shm_find_start_address(order_shm_id);
             info_log("create order shm {} start {}", order_shm_id, int64_t(order_start));

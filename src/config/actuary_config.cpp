@@ -43,7 +43,8 @@ namespace actuary {
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
 
-        this->group_main_node = this->doc_["group_main_node"].asBool();
+        this->shm_group_main_node = this->doc_["shm_group_main_node"].asBool();
+        this->dt_group_main_node = this->doc_["dt_group_main_node"].asBool();
         for (int i = 0; i < this->doc_["node_base_assets"].size(); i++) {
             this->node_base_assets.push_back(this->doc_["node_base_assets"][i].asString());
         }
