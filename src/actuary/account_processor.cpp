@@ -309,6 +309,10 @@ namespace actuary {
                             // ignore testing order
                             continue;
                         }
+                        if (!strHelper::startsWith(event.clientOrderId, "s") && !strHelper::startsWith(event.clientOrderId, "b")) {
+                            // ignore not taker strategy orders
+                            continue;
+                        }
                         if (event.filledVolume == 0) {
                             // ignore no filled order
                             continue;
