@@ -34,7 +34,7 @@ namespace trader {
 
     void service_zookeeper_processor(TraderConfig &config, GlobalContext &context); // interval checking service alive status and clear unused services
     void polling_best_path_processor(TraderConfig &config, GlobalContext &context);
-    void subscribe_best_path_processor(TraderConfig &config, GlobalContext &context);
+    void subscribe_best_path_processor(TraderConfig &config, GlobalContext &context, size_t zmq_ipc_index);
 
     bool is_valid_best_path(GlobalContext &context, const BestPathInfo &info);
     vector<BestPathInfo> simple_call_best_path(TraderConfig &config);

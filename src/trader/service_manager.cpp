@@ -11,9 +11,11 @@ namespace trader {
             polling_thread.detach();
             info_log("start polling best path api thread");
 
-            thread sub_zmq_thread(subscribe_best_path_processor, ref(config), ref(context));
-            sub_zmq_thread.detach();
-            info_log("start subscribe best path zmq thread");
+            for (size_t i = 0; i < config.best_path_zmq_ipcs.size(); ++i) {
+                thread sub_zmq_thread(subscribe_best_path_processor, ref(config), ref(context), i);
+                sub_zmq_thread.detach();
+                info_log("start subscribe best path zmq {} thread", config.best_path_zmq_ipcs[i]);
+            }
 
             thread zookeeper_thread(service_zookeeper_processor, ref(config), ref(context));
             zookeeper_thread.detach();
@@ -68,36 +70,39 @@ namespace trader {
 
         this_thread::sleep_for(chrono::seconds(5));
         while (true) {
-            vector<BestPathInfo> bestpath_list = simple_call_best_path(config);
-            info_log("polling best path result from api, size is {}", bestpath_list.size());
-            uint64_t now = binance::get_current_ms_epoch();
+            for (string best_path_url : config.best_path_rest_urls) {
+                vector<BestPathInfo> bestpath_list = simple_call_best_path(best_path_url);
+                info_log("polling best path result from api {}, size is {}", best_path_url, bestpath_list.size());
+                uint64_t now = binance::get_current_ms_epoch();
 
-            for (BestPathInfo info : bestpath_list) {
-                info_log("polling best path info: {} {} {}->{} {} {}", info.action, info.symbol, info.local_ip, info.remote_ip, info.best_cost, info.update_time_millis);
-                
-                if (!is_valid_best_path(context, info)) {
-                    continue;;
+                for (BestPathInfo info : bestpath_list) {
+                    info_log("polling best path info: {} {} {}->{} {} {}", info.action, info.symbol, info.local_ip, info.remote_ip, info.best_cost, info.update_time_millis);
+                    
+                    if (!is_valid_best_path(context, info)) {
+                        continue;;
+                    }
+
+                    shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
+                    context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "polling");
+                    this_thread::sleep_for(chrono::seconds(1));
                 }
-
-                shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
-                context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "polling");
-                this_thread::sleep_for(chrono::seconds(1));
             }
 
             this_thread::sleep_for(chrono::minutes(5));
         }
     }
     
-    void subscribe_best_path_processor(TraderConfig &config, GlobalContext &context) {
+    void subscribe_best_path_processor(TraderConfig &config, GlobalContext &context, size_t zmq_ipc_index) {
 
         this_thread::sleep_for(chrono::seconds(5));
+        string best_path_zmq_ipc = config.best_path_zmq_ipcs[zmq_ipc_index];
         while (true) {
 
             ZMQClient zmq_client(ZMQ_SUB);
             try {
-                zmq_client.SubscriberConnect(config.best_path_zmq_ipc);
+                zmq_client.SubscriberConnect(best_path_zmq_ipc);
             } catch (std::exception &exp) {
-                err_log("error occur while zmq subscribe connection: {}", std::string(exp.what()));
+                err_log("error occur while zmq subscribe connection to {}: {}", best_path_zmq_ipc, std::string(exp.what()));
             }
 
             while (true) {
@@ -162,12 +167,12 @@ namespace trader {
         return true;
     }
 
-    vector<BestPathInfo> simple_call_best_path(TraderConfig &config) {
+    vector<BestPathInfo> simple_call_best_path(string& best_path_rest_url) {
         CURL* curl = curl_easy_init();
         CURLcode call_code;
 
         string call_result;
-        curl_easy_setopt(curl, CURLOPT_URL, config.best_path_rest_url.c_str());
+        curl_easy_setopt(curl, CURLOPT_URL, best_path_rest_url.c_str());
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curl_write_callback);
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, &call_result );
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);

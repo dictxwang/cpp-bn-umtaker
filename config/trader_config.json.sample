@@ -22,8 +22,12 @@
     "share_memory_project_id": 65,
     "share_memory_path_order": "/home/ubuntu/code/shm_space/shm_umtaker_order",
 
-    "best_path_rest_url": "",
-    "best_path_zmq_ipc": "tcp://127.0.0.1:15555",
+    "best_path_rest_urls": [
+        ""
+    ],
+    "best_path_zmq_ipcs": [
+        "tcp://127.0.0.1:15555"
+    ],
     "trading_use_best_path": false,
 
     "node_base_assets": [

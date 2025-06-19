@@ -30,7 +30,7 @@ namespace trader {
 
         string benchmark_quote_asset;
         string follower_quote_asset;
-        
+
         std::vector<string> node_base_assets;
         std::vector<string> all_base_assets; // all assets which support taker strategy
 
@@ -38,8 +38,8 @@ namespace trader {
         int share_memory_project_id; // a single character or integer for the project identifier.
         string share_memory_path_order; // make sure the path is exists, and accessiable
 
-        string best_path_rest_url;
-        string best_path_zmq_ipc;
+        std::vector<string> best_path_rest_urls;
+        std::vector<string> best_path_zmq_ipcs;
         bool trading_use_best_path;
     };
 }
