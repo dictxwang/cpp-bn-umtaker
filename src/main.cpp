@@ -431,14 +431,14 @@ int main(int argc, char const *argv[]) {
     // std::cout << "order: status=" << newOrderResp.data.status << std::endl;
 
     // Example: univals transfer
-    binance::WalletUniversalTransfer transfer;
-    transfer.type = binance::UT_MAIN_UMFUTURE;
-    transfer.asset = "BNB";
-    transfer.amount = 0.9;
-    binance::CommonRestResponse<uint64_t> transferResponse;
-    binanceRestWallet.universal_transfer(transfer, transferResponse);
-    std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;
-    std::cout << "tranId" << transferResponse.data << std::endl;
+    // binance::WalletUniversalTransfer transfer;
+    // transfer.type = binance::UT_MAIN_UMFUTURE;
+    // transfer.asset = "BNB";
+    // transfer.amount = 0.9;
+    // binance::CommonRestResponse<uint64_t> transferResponse;
+    // binanceRestWallet.universal_transfer(transfer, transferResponse);
+    // std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;
+    // std::cout << "tranId" << transferResponse.data << std::endl;
 
     while(true) {
         std::cout << "Keep Running..." << std::endl;
