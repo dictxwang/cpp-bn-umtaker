@@ -26,7 +26,7 @@ namespace actuary {
         double totalUnrealizedProfit = 0;
         double totalCrossWalletBalance = 0;
         double totalCrossUnPnl = 0;
-        uint64_t updateTimeMills = 0;
+        uint64_t updateTimeMillis = 0;
     };
 
     struct AccountBalanceInfo {
@@ -34,7 +34,7 @@ namespace actuary {
         double walletBalance = 0;
         double crossWalletBalance = 0;
         double crossUnPnl = 0;
-        uint64_t updateTimeMills = 0;
+        uint64_t updateTimeMillis = 0;
     };
     
     struct AccountPositionInfo {
@@ -45,7 +45,14 @@ namespace actuary {
         double entryPrice = 0;
         string positionSide;
         double positionAmt = 0;
-        uint64_t updateTimeMills = 0;
+        uint64_t updateTimeMillis = 0;
+    };
+
+    struct PositionThresholdInfo {
+        string symbol;
+        double position_reduce_ratio = 0;
+        double total_notional = 0;
+        uint64_t updateTimeMillis = 0;
     };
 
     struct AccountBalanceInfoWrapper {
@@ -58,6 +65,11 @@ namespace actuary {
         shared_mutex rw_lock;
     };
 
+    struct PositionThresholdInfoWrapper {
+        unordered_map<string, PositionThresholdInfo> threshold_map;
+        shared_mutex rw_lock;
+    };
+
     class AccountBalancePositionComposite {
     public:
         AccountBalancePositionComposite() {}
@@ -67,6 +79,7 @@ namespace actuary {
         AccountMetaInfo meta;
         AccountBalanceInfoWrapper balanceWrapper;
         AccountPositionInfoWrapper positionWrapper;
+        PositionThresholdInfoWrapper positionThresholdWrapper;
         shared_mutex rw_lock;
     
     public:
@@ -74,11 +87,14 @@ namespace actuary {
         bool update_meta(binance::FuturesAccount& meta);
         bool update_exist_balance(binance::FuturesAccountAsset& balance);
         bool update_exist_position(binance::FuturesAccountPosition& position);
+        bool update_exist_position_threshold(PositionThresholdInfo& position);
         bool update_exist_balance_event(binance::WsFuturesAccountUpdateBalanceEvent& event);
         bool update_exist_position_event(binance::WsFuturesAccountUpdatePositionEvent& position);
+        bool update_exist_position_threshold_event(PositionThresholdInfo& position);
         AccountMetaInfo copy_meta();
         optional<AccountBalanceInfo> copy_balance(string asset);
         optional<AccountPositionInfo> copy_position(string inst_id);
+        optional<PositionThresholdInfo> copy_position_threshold(string inst_id);
     };
 }
 

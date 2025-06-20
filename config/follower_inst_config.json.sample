@@ -8,6 +8,8 @@
       "beta": 0.000075,
       "min_ticker_size": 0.001,
       "max_ticker_size": 800,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 0.002,
       "max_position": 0.02
     },
@@ -19,6 +21,8 @@
       "beta": 0.000075,
       "min_ticker_size": 0.001,
       "max_ticker_size": 8000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 0.05,
       "max_position": 0.5
     },
@@ -30,6 +34,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.01,
       "max_ticker_size": 80000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 0.15,
       "max_position": 1.5
     },
@@ -41,6 +47,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.01,
       "max_ticker_size": 800000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 0.5,
       "max_position": 5
     },
@@ -52,6 +60,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 8000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 25,
       "max_position": 250
     },
@@ -63,6 +73,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 500000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 200,
       "max_position": 2000
     },
@@ -74,6 +86,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 100000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 15,
       "max_position": 150
     },
@@ -85,6 +99,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.01,
       "max_ticker_size": 100000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 3,
       "max_position": 30
     },
@@ -96,6 +112,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 100000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 5,
       "max_position": 50
     },
@@ -107,6 +125,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 8000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 4000,
       "max_position": 40000
     },
@@ -118,6 +138,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 35,
       "max_position": 350
     },
@@ -129,6 +151,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.01,
       "max_ticker_size": 100000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 2,
       "max_position": 20
     },
@@ -140,6 +164,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 8000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 2500,
       "max_position": 25000
     },
@@ -151,6 +177,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 40,
       "max_position": 450
     },
@@ -162,6 +190,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.001,
       "max_ticker_size": 10000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 0.1,
       "max_position": 1
     },
@@ -173,6 +203,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.001,
       "max_ticker_size": 10000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 0.5,
       "max_position": 5
     },
@@ -184,6 +216,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 10000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 20,
       "max_position": 200
     },
@@ -195,6 +229,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 100,
       "max_position": 1000
     },
@@ -206,6 +242,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.001,
       "max_ticker_size": 100000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 5,
       "max_position": 6
     },
@@ -217,6 +255,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 10000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 15,
       "max_position": 150
     },
@@ -228,6 +268,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 15,
       "max_position": 150
     },
@@ -239,6 +281,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 20000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 20000,
       "max_position": 200000
     },
@@ -250,6 +294,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 100,
       "max_position": 1000
     },
@@ -261,6 +307,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 35,
       "max_position": 350
     },
@@ -272,6 +320,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 10000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 2000,
       "max_position": 20000
     },
@@ -283,6 +333,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 3000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 50,
       "max_position": 500
     },
@@ -294,6 +346,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 500000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 20,
       "max_position": 200
     },
@@ -305,6 +359,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 200000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 10,
       "max_position": 100
     },
@@ -316,6 +372,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.01,
       "max_ticker_size": 70000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 3.5,
       "max_position": 35
     },
@@ -327,6 +385,8 @@
       "beta": 0.0003,
       "min_ticker_size": 0.1,
       "max_ticker_size": 1000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 50,
       "max_position": 500
     },
@@ -338,6 +398,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 5000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 150,
       "max_position": 1500
     },
@@ -349,6 +411,8 @@
       "beta": 0.0003,
       "min_ticker_size": 1,
       "max_ticker_size": 4000000,
+      "position_adjust_step_ratio": 0.01,
+      "position_adjust_step_notional": 1000,
       "order_size": 200,
       "max_position": 2000
     }

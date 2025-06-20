@@ -19,6 +19,8 @@ bool InstConfig::loadInstConfig(std::string& inputfile) {
             item.max_ticker_size = binance::str_to_dobule(info_list[i]["max_ticker_size"]);
             item.order_size = binance::str_to_dobule(info_list[i]["order_size"]);
             item.max_position = binance::str_to_dobule(info_list[i]["max_position"]);
+            item.position_adjust_step_ratio = info_list[i]["position_adjust_step_ratio"].asDouble();
+            item.position_adjust_step_notional = info_list[i]["position_adjust_step_notional"].asDouble();
             
             this->inst_map[item.asset] = item;
         }

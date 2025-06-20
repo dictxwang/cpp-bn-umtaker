@@ -12,6 +12,11 @@ namespace actuary {
             AccountPositionInfo position;
             this->positionWrapper.position_map.insert({inst_id, position});
         }
+
+        for (string inst_id : inst_ids) {
+            PositionThresholdInfo threshold;
+            this->positionThresholdWrapper.threshold_map.insert({inst_id, threshold});
+        }
     }
 
     bool AccountBalancePositionComposite::update_meta(binance::FuturesAccount& meta) {
@@ -23,7 +28,7 @@ namespace actuary {
         this->meta.totalUnrealizedProfit = meta.totalUnrealizedProfit;
         this->meta.totalCrossWalletBalance = meta.totalCrossWalletBalance;
         this->meta.totalCrossUnPnl = meta.totalCrossUnPnl;
-        this->meta.updateTimeMills = binance::get_current_ms_epoch();
+        this->meta.updateTimeMillis = binance::get_current_ms_epoch();
         w_lock.unlock();
         return true;
     }
@@ -40,7 +45,7 @@ namespace actuary {
             item.walletBalance = balance.walletBalance;
             item.crossWalletBalance = balance.crossWalletBalance;
             item.crossUnPnl = balance.crossUnPnl;
-            item.updateTimeMills = binance::get_current_ms_epoch();
+            item.updateTimeMillis = binance::get_current_ms_epoch();
 
             std::unique_lock<std::shared_mutex> w_lock(this->balanceWrapper.rw_lock);
             this->balanceWrapper.balance_map[item.asset] = item;
@@ -75,7 +80,7 @@ namespace actuary {
                 }
             }
             item.positionAmt = std::abs(position.positionAmt);
-            item.updateTimeMills = position.updateTime;
+            item.updateTimeMillis = position.updateTime;
 
             std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
             this->positionWrapper.position_map[item.symbol] = item;
@@ -85,6 +90,11 @@ namespace actuary {
         } else {
             return false;
         }
+    }
+
+    bool AccountBalancePositionComposite::update_exist_position_threshold(PositionThresholdInfo& position) {
+        // TODO
+        return false;
     }
 
     bool AccountBalancePositionComposite::update_exist_balance_event(binance::WsFuturesAccountUpdateBalanceEvent& event) {
@@ -98,7 +108,7 @@ namespace actuary {
             item.asset = event.asset;
             item.walletBalance = event.walletBalance;
             item.crossWalletBalance = event.crossWalletBalance;
-            item.updateTimeMills = binance::get_current_ms_epoch();
+            item.updateTimeMillis = binance::get_current_ms_epoch();
 
             std::unique_lock<std::shared_mutex> w_lock(this->balanceWrapper.rw_lock);
             this->balanceWrapper.balance_map[item.asset] = item;
@@ -130,7 +140,7 @@ namespace actuary {
                 }
             }
             item.positionAmt = std::abs(event.positionAmout);
-            item.updateTimeMills = binance::get_current_ms_epoch();
+            item.updateTimeMillis = binance::get_current_ms_epoch();
 
             std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
             this->positionWrapper.position_map[item.symbol] = item;
@@ -140,6 +150,11 @@ namespace actuary {
         } else {
             return false;
         }
+    }
+
+    bool AccountBalancePositionComposite::update_exist_position_threshold_event(PositionThresholdInfo& position) {
+        // TODO
+        return false;
     }
 
     AccountMetaInfo AccountBalancePositionComposite::copy_meta() {
@@ -152,7 +167,7 @@ namespace actuary {
         info.totalUnrealizedProfit = this->meta.totalUnrealizedProfit;
         info.totalCrossWalletBalance = this->meta.totalCrossWalletBalance;
         info.totalCrossUnPnl = this->meta.totalCrossUnPnl;
-        info.updateTimeMills = this->meta.updateTimeMills;
+        info.updateTimeMillis = this->meta.updateTimeMillis;
         return info;
     }
 
@@ -165,7 +180,7 @@ namespace actuary {
             info.walletBalance = (*item).second.walletBalance;
             info.crossWalletBalance = (*item).second.crossWalletBalance;
             info.crossUnPnl = (*item).second.crossUnPnl;
-            info.updateTimeMills = (*item).second.updateTimeMills;
+            info.updateTimeMillis = (*item).second.updateTimeMillis;
             return info;
         } else {
             return nullopt;
@@ -184,10 +199,15 @@ namespace actuary {
             info.entryPrice = (*item).second.entryPrice;
             info.positionSide = (*item).second.positionSide;
             info.positionAmt = (*item).second.positionAmt;
-            info.updateTimeMills = (*item).second.updateTimeMills;
+            info.updateTimeMillis = (*item).second.updateTimeMillis;
             return info;
         } else {
             return nullopt;
         }
+    }
+
+    optional<PositionThresholdInfo> AccountBalancePositionComposite::copy_position_threshold(string inst_id) {
+        // TODO
+        return nullopt;
     }
 }

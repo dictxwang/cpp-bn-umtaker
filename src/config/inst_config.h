@@ -15,6 +15,8 @@ struct InstConfigItem {
     double max_ticker_size = 0;
     double order_size = 0;
     double max_position = 0;
+    double position_adjust_step_ratio = 0;
+    double position_adjust_step_notional = 0;
 };
 
 class InstConfig : public BaseConfig
