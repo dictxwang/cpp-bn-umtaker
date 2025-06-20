@@ -23,24 +23,43 @@ namespace trader {
         this->init_shm(config);
         info_log("finish init share memory settings");
 
-        // init trading service
-        this->init_order_service(config);
-        info_log("finish init order service");
+        // init order service and limiter
+        if (config.trading_use_best_path) {
 
-        // init auto reset counter
-        this->counter_boss.init(10, 1);
-        this->api_second_limiter = this->counter_boss.create_new_counter(config.order_limit_per_10seconds, 10*1000).value();
-        this->api_minute_limiter = this->counter_boss.create_new_counter(config.order_limit_per_minute, 60*1000).value();
-        this->counter_boss.start();
+            this->init_normal_order_service(config);
+            info_log("finish init normal order service");
+            this->init_normal_order_limiter(config);
+            info_log("finish init normal order limiter");
+
+        } else {
+            this->init_best_path_order_limiter(config);
+            info_log("finish init best path order limiter");
+        }
     }
 
-    void GlobalContext::init_order_service(TraderConfig& config) {
+    void GlobalContext::init_normal_order_limiter(TraderConfig& config) {
+
+        this->order_normal_limiter.init(10, 1);
+        this->order_normal_second_limiter = this->order_normal_limiter.create_new_counter(config.order_account_limit_per_10seconds, 10*1000).value();
+        this->order_normal_minute_limiter = this->order_normal_limiter.create_new_counter(config.order_account_limit_per_minute, 60*1000).value();
+        
+        this->order_normal_limiter.start();
+
+    }
+
+    void GlobalContext::init_best_path_order_limiter(TraderConfig& config) {
+        this->order_best_path_limiter.init(64, 1, config.order_account_limit_per_10seconds, 10, config.order_account_limit_per_minute, 1);
+        this->order_best_path_limiter.start();
+
+    }
+
+    void GlobalContext::init_normal_order_service(TraderConfig& config) {
 
         if (config.trade_local_ip.size() > 0) {
-            this->order_service.setLocalIP(config.trade_local_ip);
+            this->normal_order_service.setLocalIP(config.trade_local_ip);
         }
-        this->order_service.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, config.trade_use_intranet);
-        this->order_service.setMessageChannel(this->get_order_channel());
+        this->normal_order_service.initOrderService(config.api_key_ed25519, config.secret_key_ed25519, config.trade_use_intranet);
+        this->normal_order_service.setMessageChannel(this->get_order_channel());
     }
 
     void GlobalContext::init_shm_mapping(TraderConfig& config) {
@@ -84,20 +103,23 @@ namespace trader {
     unordered_map<string, int>& GlobalContext::get_shm_order_mapping() {
         return this->shm_order_mapping;
     }
-    OrderServiceManager& GlobalContext::get_order_service_manager() {
-        return this->order_service_manager;
+    OrderServiceManager& GlobalContext::get_best_order_service_manager() {
+        return this->best_order_service_manager;
     }
 
-    binance::BinanceFuturesWsClient& GlobalContext::get_order_service() {
-        return this->order_service;
+    binance::BinanceFuturesWsClient& GlobalContext::get_normal_order_service() {
+        return this->normal_order_service;
     }
     shared_ptr<moodycamel::ConcurrentQueue<std::string>> GlobalContext::get_order_channel() {
         return this->order_channel;
     }
-    shared_ptr<AutoResetCounter> GlobalContext::get_api_second_limiter() {
-        return this->api_second_limiter;
+    shared_ptr<AutoResetCounter> GlobalContext::get_order_normal_second_limiter() {
+        return this->order_normal_second_limiter;
     }
-    shared_ptr<AutoResetCounter> GlobalContext::get_api_minute_limiter() {
-        return this->api_minute_limiter;
+    shared_ptr<AutoResetCounter> GlobalContext::get_order_normal_minute_limiter() {
+        return this->order_normal_minute_limiter;
+    }
+    AutoResetOrderLimiterBoss& GlobalContext::get_order_best_path_limiter() {
+        return this->order_best_path_limiter;
     }
 }

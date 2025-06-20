@@ -8,6 +8,7 @@
 #include "service_container.h"
 #include "logger/logger.h"
 #include "common/auto_reset_counter.h"
+#include "order_limiter.h"
 #include "shm/order_shm.h"
 #include <unordered_map>
 #include <vector>
@@ -32,30 +33,36 @@ namespace trader {
         unordered_map<string, int> shm_order_mapping;
         ShmStoreInfo shm_store_info;
 
-        OrderServiceManager order_service_manager;
+        OrderServiceManager best_order_service_manager;
 
-        binance::BinanceFuturesWsClient order_service;
+        binance::BinanceFuturesWsClient normal_order_service;
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> order_channel;
 
-        AutoResetCounterBoss counter_boss;
-        shared_ptr<AutoResetCounter> api_second_limiter;
-        shared_ptr<AutoResetCounter> api_minute_limiter;
+        AutoResetCounterBoss order_normal_limiter;
+        shared_ptr<AutoResetCounter> order_normal_second_limiter;
+        shared_ptr<AutoResetCounter> order_normal_minute_limiter;
+
+        AutoResetOrderLimiterBoss order_best_path_limiter;
     
     public:
         void init(TraderConfig& config);
         void init_shm_mapping(TraderConfig& config);
         void init_shm(TraderConfig& config);
-        void init_order_service(TraderConfig& config);
+        void init_normal_order_limiter(TraderConfig& config);
+        void init_best_path_order_limiter(TraderConfig& config);
+        void init_normal_order_service(TraderConfig& config);
         vector<string>& get_benchmark_inst_ids();
         vector<string>& get_follower_inst_ids();
         set<string>& get_follower_inst_id_set();
         ShmStoreInfo& get_shm_store_info();
         unordered_map<string, int>& get_shm_order_mapping();
-        OrderServiceManager &get_order_service_manager();
-        binance::BinanceFuturesWsClient& get_order_service();
+        OrderServiceManager &get_best_order_service_manager();
+        binance::BinanceFuturesWsClient& get_normal_order_service();
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_channel();
-        shared_ptr<AutoResetCounter> get_api_second_limiter();
-        shared_ptr<AutoResetCounter> get_api_minute_limiter();
+        shared_ptr<AutoResetCounter> get_order_normal_second_limiter();
+        shared_ptr<AutoResetCounter> get_order_normal_minute_limiter();
+        AutoResetOrderLimiterBoss &get_order_best_path_limiter();
+
     };
 }
 #endif

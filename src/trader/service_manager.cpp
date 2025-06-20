@@ -30,8 +30,8 @@ namespace trader {
         while (true) {
             this_thread::sleep_for(chrono::seconds(120));
             info_log("zookeeper start work");
-            vector<string> all_ip_pairs = context.get_order_service_manager().get_all_service_ip_pairs();
-            unordered_map<string, string> symbol_ip_mapping = context.get_order_service_manager().get_inuse_symol_ip_mapping();
+            vector<string> all_ip_pairs = context.get_best_order_service_manager().get_all_service_ip_pairs();
+            unordered_map<string, string> symbol_ip_mapping = context.get_best_order_service_manager().get_inuse_symol_ip_mapping();
             set<string> inuse_ip_pairs;
 
             for (auto [symbol, ip_piar] : symbol_ip_mapping) {
@@ -53,14 +53,14 @@ namespace trader {
 
             info_log("zookeeper find unused service keys {}", strHelper::joinStrings(unused_ip_pairs, ","));
             for (string ip_pair : unused_ip_pairs) {
-                context.get_order_service_manager().stop_and_remove_service(ip_pair);
+                context.get_best_order_service_manager().stop_and_remove_service(ip_pair);
                 info_log("zookeeper stop unused service which key is {}", ip_pair);
             }
 
-            vector<string> expired_ip_pairs = context.get_order_service_manager().find_update_expired_service(5400*1000);
+            vector<string> expired_ip_pairs = context.get_best_order_service_manager().find_update_expired_service(5400*1000);
             info_log("zookeeper find update expired service keys {}", strHelper::joinStrings(expired_ip_pairs, ","));
             for (string ip_pair : expired_ip_pairs) {
-                context.get_order_service_manager().stop_and_remove_service(ip_pair);
+                context.get_best_order_service_manager().stop_and_remove_service(ip_pair);
                 info_log("zookeeper stop update expired service which key is {}", ip_pair);
             }
         }
@@ -83,7 +83,14 @@ namespace trader {
                     }
 
                     shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
-                    context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "polling");
+                    bool new_service = context.get_best_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "polling");
+                    if (new_service) {
+                        // should create limter with local ip
+                        context.get_order_best_path_limiter().create_ip_limiter(info.local_ip,
+                            config.order_ip_limit_per_10seconds, 10,
+                            config.order_ip_limit_per_minute, 1
+                        );
+                    }
                     this_thread::sleep_for(chrono::seconds(1));
                 }
             }
@@ -128,8 +135,14 @@ namespace trader {
                     }
                     
                     shared_ptr<WsClientWrapper> new_wrapper = make_shared<WsClientWrapper>();
-                    context.get_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "zmq");
-                    
+                    bool new_service = context.get_best_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "zmq");
+                    if (new_service) {
+                        // should create limter with local ip
+                        context.get_order_best_path_limiter().create_ip_limiter(info.local_ip,
+                            config.order_ip_limit_per_10seconds, 10,
+                            config.order_ip_limit_per_minute, 1
+                        );
+                    }
                 } catch (exception &exp) {
                     err_log("error occur while parse zmq message");
                     break;

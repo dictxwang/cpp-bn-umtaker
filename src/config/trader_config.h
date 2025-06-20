@@ -25,8 +25,10 @@ namespace trader {
         uint64_t order_valid_millis;
         long loop_pause_time_millis;
 
-        int order_limit_per_minute;
-        int order_limit_per_10seconds;
+        int order_account_limit_per_minute;
+        int order_account_limit_per_10seconds;
+        int order_ip_limit_per_minute;
+        int order_ip_limit_per_10seconds;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

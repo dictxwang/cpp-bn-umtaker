@@ -88,23 +88,29 @@ namespace trader {
 
             pair<bool, string> result;
             if (config.open_place_order) {
-                if (!context.get_api_minute_limiter()->get_semaphore(1) || !context.get_api_second_limiter()->get_semaphore(1)) {
-                    warn_log("no more semaphore for place order");
-                    result.first = false;
-                    result.second = "no semaphore";
-                } else {
-                    if (config.trading_use_best_path) {
-                        optional<shared_ptr<WsClientWrapper>> best_service = context.get_order_service_manager().find_best_service(follower_inst_id);
-                        if (!best_service.has_value()) {
-                            // no available order service
-                            warn_log("not found available order service for {}", follower_inst_id);
+                if (config.trading_use_best_path) {
+                    optional<shared_ptr<WsClientWrapper>> best_service = context.get_best_order_service_manager().find_best_service(follower_inst_id);
+                    if (!best_service.has_value()) {
+                        // no available order service
+                        warn_log("not found available order service for {}", follower_inst_id);
+                        result.first = false;
+                        result.second = "no best service";
+                    } else {
+                        if (!context.get_order_best_path_limiter().get_order_semaphore(best_service.value()->get_local_ip(), 1)) {
+                            warn_log("no more semaphore for place order with best ip: {}", best_service.value()->get_local_ip());
                             result.first = false;
-                            result.second = "no best service";
+                            result.second = "no semaphore";
                         } else {
                             result = best_service.value()->place_order(order);
                         }
+                    }
+                } else {
+                    if (!context.get_order_normal_minute_limiter()->get_semaphore(1) || !context.get_order_normal_second_limiter()->get_semaphore(1)) {
+                        warn_log("no more semaphore for place order");
+                        result.first = false;
+                        result.second = "no semaphore";
                     } else {
-                        result = context.get_order_service().placeOrder(order);
+                        result = context.get_normal_order_service().placeOrder(order);
                     }
                 }
             } else {
@@ -120,7 +126,7 @@ namespace trader {
     void start_order_service(TraderConfig& config, GlobalContext& context) {
         while (true) {
             try {
-                pair<bool, string> result = context.get_order_service().startOrderService();
+                pair<bool, string> result = context.get_normal_order_service().startOrderService();
             } catch (std::exception &e) {
                 err_log("fail to start order service: {}", std::string(e.what()));
             }

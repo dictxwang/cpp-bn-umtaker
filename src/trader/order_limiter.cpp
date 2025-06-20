@@ -61,7 +61,7 @@ namespace trader {
         if (this->minute_semaphore_remain_count + return_num <= this->minute_semaphore_init_count) {
             this->minute_semaphore_remain_count += return_num;
         } else {
-            // also should do nothing
+            // do nothing
         }
     }
 
@@ -137,6 +137,12 @@ namespace trader {
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
         this->ip_limiter_map[local_ip] = ip_limiter;
         w_lock.unlock();
+
+        info_log("create new order limiter for {} with thresholds {} {} {} {}",
+            local_ip,
+            second_semaphre_count, duration_second*1000,
+            minute_semaphore_count, duration_minute*60*1000
+        );
         
         return true;
     }

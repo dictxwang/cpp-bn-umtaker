@@ -11,6 +11,7 @@ namespace trader {
         this->ws_client->setRemoteIP(remote_ip);
         this->ws_client->initOrderService(config.api_key_ed25519, config.secret_key_ed25519, config.trade_use_intranet);
         this->ws_client->setMessageChannel(order_channel);
+        this->local_ip = local_ip;
     }
 
     void WsClientWrapper::start() {
@@ -44,6 +45,10 @@ namespace trader {
         info_log("order service {} processor thread stopped", service_id);
     }
 
+    string& WsClientWrapper::get_local_ip() {
+        return this->local_ip;
+    }
+
     void WsClientWrapper::stop() {
         (*this->is_stopped) = true;
         this->ws_client->stop();
@@ -64,12 +69,13 @@ namespace trader {
         }
     }
 
-    void OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string method) {
+    bool OrderServiceManager::update_best_service(TraderConfig& config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string method) {
         
         std::unique_lock<std::shared_mutex> w_lock(rw_lock);
 
         string ip_pair = local_ip + "_" + remote_ip;
         auto original = this->ippair_service_map.find(ip_pair);
+        bool new_service = false;
 
         uint64_t now = binance::get_current_ms_epoch();
         if (original == this->ippair_service_map.end()) {
@@ -78,6 +84,7 @@ namespace trader {
             new_wrapper->update_time_millis = now;
             new_wrapper->start();
             this->ippair_service_map[ip_pair] = new_wrapper;
+            new_service = true;
 
             info_log("put new order service {} wrapper for {}", new_wrapper->id, ip_pair);
         } else {
@@ -87,6 +94,8 @@ namespace trader {
 
         this->symbol_best_ippair_map[symbol] = ip_pair;
         info_log("update symbol order service mapping {} => {} by {}", symbol, ip_pair, method);
+
+        return new_service;
     }
 
     optional<shared_ptr<WsClientWrapper>> OrderServiceManager::find_best_service(string &symbol) {

@@ -35,6 +35,7 @@ namespace trader {
     
     private:
         string id;
+        string local_ip;
         shared_ptr<binance::BinanceFuturesWsClient> ws_client;
         bool has_init_started;
         shared_ptr<bool> is_stopped;
@@ -50,6 +51,7 @@ namespace trader {
     
     public:
         pair<bool, string> place_order(binance::FuturesNewOrder &order);
+        string& get_local_ip();
     };
 
     class OrderServiceManager {
@@ -66,7 +68,7 @@ namespace trader {
         shared_mutex rw_lock;
 
     public:
-        void update_best_service(TraderConfig &config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string method);
+        bool update_best_service(TraderConfig &config, string &symbol, string &local_ip, string &remote_ip, shared_ptr<WsClientWrapper> new_wrapper, shared_ptr<moodycamel::ConcurrentQueue<string>> order_channel, string method);
         optional<shared_ptr<WsClientWrapper>> find_best_service(string &symbol);
 
         vector<string> get_all_service_ip_pairs();
