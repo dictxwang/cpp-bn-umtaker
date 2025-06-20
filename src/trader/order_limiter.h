@@ -57,7 +57,7 @@ namespace trader {
         int max_capacity;
         uint64_t refresh_duration_millis;
         bool is_started;
-        unique_ptr<AutoResetOrderLimiter> default_limiter;
+        unique_ptr<AutoResetOrderLimiter> account_limiter;
         unordered_map<string, shared_ptr<AutoResetOrderLimiter>> ip_limiter_map;
         shared_mutex rw_lock;
 
@@ -69,7 +69,7 @@ namespace trader {
         void start();
         void stop();
         bool create_ip_limiter(string &local_ip, int second_semaphre_count, int duration_second, int minute_semaphore_count, int duration_minute);
-        bool get_order_semaphore(string &local_ip, int require_num);
+        pair<bool, bool> get_order_semaphore(string &local_ip, int require_num);
     };
 }
 

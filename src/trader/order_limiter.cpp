@@ -76,8 +76,8 @@ namespace trader {
         }
 
         // init default limiter
-        this->default_limiter = make_unique<AutoResetOrderLimiter>();
-        this->default_limiter->init(second_semaphre_count, duration_second*1000, minute_semaphore_count, duration_minute*60*1000);
+        this->account_limiter = make_unique<AutoResetOrderLimiter>();
+        this->account_limiter->init(second_semaphre_count, duration_second*1000, minute_semaphore_count, duration_minute*60*1000);
     }
 
     void AutoResetOrderLimiterBoss::refresh_all_limiters() {
@@ -87,7 +87,7 @@ namespace trader {
             uint64_t now = binance::get_current_ms_epoch();
             std::unique_lock<std::shared_mutex> lock(rw_lock);
 
-            this->default_limiter->reset_if_cycle_end(now);
+            this->account_limiter->reset_if_cycle_end(now);
             for (auto item = this->ip_limiter_map.begin(); item != this->ip_limiter_map.end(); ++item) {
                 item->second->reset_if_cycle_end(now);
             }
@@ -148,28 +148,30 @@ namespace trader {
         return true;
     }
 
-    bool AutoResetOrderLimiterBoss::get_order_semaphore(string &local_ip, int require_num) {
+    pair<bool, bool> AutoResetOrderLimiterBoss::get_order_semaphore(string &local_ip, int require_num) {
         
+        bool has_account_semaphore, has_ip_semaphore = false;
+
         std::shared_lock<std::shared_mutex> r_lock(rw_lock);
-        bool has_default_semaphore = this->default_limiter->get_order_semaphore(require_num);
-        if (!has_default_semaphore) {
-            return false;
+        has_account_semaphore = this->account_limiter->get_order_semaphore(require_num);
+        if (!has_account_semaphore) {
+            return pair<bool, bool>(has_account_semaphore, has_ip_semaphore);
         }
 
         auto ip_limiter = this->ip_limiter_map.find(local_ip);
         if (ip_limiter == this->ip_limiter_map.end()) {
             // not ip limiter
-            this->default_limiter->return_order_semaphore(require_num);
-            return false;
+            this->account_limiter->return_order_semaphore(require_num);
+            return pair<bool, bool>(has_account_semaphore, has_ip_semaphore);
         }
 
-        bool has_ip_semaphore = ip_limiter->second->get_order_semaphore(require_num);
+        has_ip_semaphore = ip_limiter->second->get_order_semaphore(require_num);
         if (!has_ip_semaphore) {
             // no ip semaphore, should return default semaphore
-            this->default_limiter->return_order_semaphore(require_num);
-            return false;
+            this->account_limiter->return_order_semaphore(require_num);
+            return pair<bool, bool>(has_account_semaphore, has_ip_semaphore);
         }
 
-        return true;
+        return pair<bool, bool>(has_account_semaphore, has_ip_semaphore);
     }
 }
