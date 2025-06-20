@@ -48,6 +48,7 @@ namespace trader {
     }
 
     void GlobalContext::init_best_path_order_limiter(TraderConfig& config) {
+        this->order_best_path_limiter = make_shared<AutoResetOrderLimiterBoss>();
         this->order_best_path_limiter->init(64, 1, config.order_account_limit_per_10seconds, 10, config.order_account_limit_per_minute, 1);
         this->order_best_path_limiter->start();
 
