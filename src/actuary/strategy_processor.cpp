@@ -234,7 +234,7 @@ namespace actuary {
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_SHORT) {
-                    // reduce_only is not available in trader, so donot change order_size
+                    // reduce_only is not available in trader, so don't change order_size
                     // if (order_size > (*position).positionAmt) {
                     //     order_size = (*position).positionAmt;
                     // }
