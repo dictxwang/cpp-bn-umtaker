@@ -122,12 +122,13 @@ namespace trader {
         }
         r_lock.unlock();
 
-        if (ip_limiter_count >= this->max_capacity) {
-            warn_log("cannot create more order limiter in this boos");
-            return false;
-        }
         if (ip_limiter_exists) {
             info_log("ip limiter has existed fo {}", local_ip);
+            return false;
+        }
+
+        if (ip_limiter_count >= this->max_capacity) {
+            warn_log("cannot create more order limiter in this boos");
             return false;
         }
 
