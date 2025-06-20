@@ -42,7 +42,7 @@ namespace trader {
         shared_ptr<AutoResetCounter> order_normal_second_limiter;
         shared_ptr<AutoResetCounter> order_normal_minute_limiter;
 
-        AutoResetOrderLimiterBoss order_best_path_limiter;
+        shared_ptr<AutoResetOrderLimiterBoss> order_best_path_limiter;
     
     public:
         void init(TraderConfig& config);
@@ -61,7 +61,7 @@ namespace trader {
         shared_ptr<moodycamel::ConcurrentQueue<std::string>> get_order_channel();
         shared_ptr<AutoResetCounter> get_order_normal_second_limiter();
         shared_ptr<AutoResetCounter> get_order_normal_minute_limiter();
-        AutoResetOrderLimiterBoss &get_order_best_path_limiter();
+        shared_ptr<AutoResetOrderLimiterBoss> get_order_best_path_limiter();
 
     };
 }

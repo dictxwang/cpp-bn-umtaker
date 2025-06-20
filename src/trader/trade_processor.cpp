@@ -96,7 +96,7 @@ namespace trader {
                         result.first = false;
                         result.second = "no best service";
                     } else {
-                        pair<bool, bool> has_semaphore = context.get_order_best_path_limiter().get_order_semaphore(best_service.value()->get_local_ip(), 1);
+                        pair<bool, bool> has_semaphore = context.get_order_best_path_limiter()->get_order_semaphore(best_service.value()->get_local_ip(), 1);
                         if (!has_semaphore.first || !has_semaphore.second) {
                             warn_log("no more semaphore for place order with best ip {} account={}:ip={}",
                                 best_service.value()->get_local_ip(),

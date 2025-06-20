@@ -86,7 +86,7 @@ namespace trader {
                     bool new_service = context.get_best_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "polling");
                     if (new_service) {
                         // should create limter with local ip
-                        context.get_order_best_path_limiter().create_ip_limiter(info.local_ip,
+                        context.get_order_best_path_limiter()->create_ip_limiter(info.local_ip,
                             config.order_ip_limit_per_10seconds, 10,
                             config.order_ip_limit_per_minute, 1
                         );
@@ -138,7 +138,7 @@ namespace trader {
                     bool new_service = context.get_best_order_service_manager().update_best_service(config, info.symbol, info.local_ip, info.remote_ip, new_wrapper, context.get_order_channel(), "zmq");
                     if (new_service) {
                         // should create limter with local ip
-                        context.get_order_best_path_limiter().create_ip_limiter(info.local_ip,
+                        context.get_order_best_path_limiter()->create_ip_limiter(info.local_ip,
                             config.order_ip_limit_per_10seconds, 10,
                             config.order_ip_limit_per_minute, 1
                         );
