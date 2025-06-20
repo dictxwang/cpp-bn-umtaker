@@ -205,6 +205,12 @@ namespace actuary {
                 continue;
             }
 
+            double position_reduce_ratio = 0;
+            optional<PositionThresholdInfo> position_threshold = context.get_balance_position_composite().copy_position_threshold(follower_inst_id);
+            if (position_threshold.has_value()) {
+                position_reduce_ratio = position_threshold.value().positionReduceRatio;
+            }
+
             // dynamic adjust threshold with position amount
             bool stop_buy, stop_sell = false;
             if ((*position).positionAmt >= inst_config.max_position * config.max_position_zoom) {
@@ -221,8 +227,8 @@ namespace actuary {
 				bnTicker.BidVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.AskVolume < instConfig.MaxTickerSize
             */
             
-            if ((benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold)) 
-                >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold))
+            if ((benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold * (1 + position_reduce_ratio))) 
+                >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold * (1 + position_reduce_ratio)))
                 && (*benchmark_ticker).bid_size > inst_config.min_ticker_size
                 && (*follower_ticker).ask_size < inst_config.max_ticker_size
             ) {
@@ -279,8 +285,8 @@ namespace actuary {
 				(okxTicker.BidPrice+earlyRunThreshold.BnAskOkxBidPriceDiffMedian)/(1+instdBetaThreshold.BidBetaThreshold*(1-positionReduceRatio))) &&
 				bnTicker.AskVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.BidVolume < instConfig.MaxTickerSize
             */
-            if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold)) 
-                <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold))
+            if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio))) 
+                <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold * (1 - position_reduce_ratio)))
                 && benchmark_ticker->ask_size > inst_config.min_ticker_size
                 && follower_ticker->bid_size < inst_config.max_ticker_size
             ) {

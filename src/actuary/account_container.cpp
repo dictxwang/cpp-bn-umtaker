@@ -207,7 +207,17 @@ namespace actuary {
     }
 
     optional<PositionThresholdInfo> AccountBalancePositionComposite::copy_position_threshold(string inst_id) {
-        // TODO
-        return nullopt;
+        std::shared_lock<std::shared_mutex> lock(this->positionThresholdWrapper.rw_lock);
+        auto item = this->positionThresholdWrapper.threshold_map.find(inst_id);
+        if (item != this->positionThresholdWrapper.threshold_map.end()) {
+            PositionThresholdInfo info;
+            info.symbol = item->second.symbol;
+            info.positionReduceRatio = item->second.positionReduceRatio;
+            info.totalNotional = item->second.totalNotional;
+            info.updateTimeMillis = item->second.updateTimeMillis;
+            return info;
+        } else {
+            return nullopt;
+        }
     }
 }

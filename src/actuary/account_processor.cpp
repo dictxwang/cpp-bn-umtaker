@@ -158,6 +158,8 @@ namespace actuary {
                                 response.data.positions[i].entryPrice, response.data.positions[i].positionSide,
                                 response.data.positions[i].positionAmt
                             );
+
+                            // TODO update position threshold
                         }
                     }
                 }
@@ -300,7 +302,11 @@ namespace actuary {
                         if (event.positions.size() > 0) {
                             for (size_t i = 0; i < event.positions.size(); ++i) {
                                 bool updated = context.get_balance_position_composite().update_exist_position_event(event.positions[i]);
-                                info_log("update position by event for {} {} {} {}", event.positions[i].symbol, event.positions[i].positionSide, event.positions[i].positionAmout, updated);
+                                if (updated) {
+                                    info_log("update position by event for {} {} {} {}", event.positions[i].symbol, event.positions[i].positionSide, event.positions[i].positionAmout, updated);
+
+                                    // TODO update position threshold
+                                }
                             }
                         }
                     } else if (json_result["e"] == binance::FuturesUserDataOrderTradeUpdate) {
