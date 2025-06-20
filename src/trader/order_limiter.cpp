@@ -23,7 +23,7 @@ namespace trader {
 
     void AutoResetOrderLimiter::reset_if_cycle_end(uint64_t now) {
 
-        std::unique_lock<std::shared_mutex> lock(rw_lock);
+        std::unique_lock<std::shared_mutex> lock(this->rw_lock);
         if (this->second_latest_reset_millis + this->second_reset_duration_millis <= now) {
             // has expired
             this->second_semaphore_remain_count = this->second_semaphore_init_count;
@@ -39,7 +39,7 @@ namespace trader {
 
     bool AutoResetOrderLimiter::get_order_semaphore(int require_num) {
 
-        std::unique_lock<std::shared_mutex> lock(rw_lock);
+        std::unique_lock<std::shared_mutex> lock(this->rw_lock);
         if (this->second_semaphore_remain_count >= require_num && this->minute_semaphore_remain_count >= require_num) {
             this->second_semaphore_remain_count -= require_num;
             this->minute_semaphore_remain_count -= require_num;
@@ -51,7 +51,7 @@ namespace trader {
 
     void AutoResetOrderLimiter::return_order_semaphore(int return_num) {
 
-        std::unique_lock<std::shared_mutex> lock(rw_lock);
+        std::unique_lock<std::shared_mutex> lock(this->rw_lock);
         if (this->second_semaphore_remain_count + return_num <= this->second_semaphore_init_count) {
             this->second_semaphore_remain_count += return_num;
         } else {
@@ -85,7 +85,7 @@ namespace trader {
         while (this->is_started) {
             std::this_thread::sleep_for(std::chrono::milliseconds(this->refresh_duration_millis));
             uint64_t now = binance::get_current_ms_epoch();
-            std::unique_lock<std::shared_mutex> lock(rw_lock);
+            std::unique_lock<std::shared_mutex> lock(this->rw_lock);
 
             this->account_limiter->reset_if_cycle_end(now);
             for (auto item = this->ip_limiter_map.begin(); item != this->ip_limiter_map.end(); ++item) {
@@ -95,7 +95,7 @@ namespace trader {
     }
 
     void AutoResetOrderLimiterBoss::start() {
-        std::unique_lock<std::shared_mutex> lock(rw_lock);
+        std::unique_lock<std::shared_mutex> lock(this->rw_lock);
         if (!this->is_started) {
             this->is_started = true;
             thread refresh_thread(&AutoResetOrderLimiterBoss::refresh_all_limiters, this);
@@ -105,7 +105,7 @@ namespace trader {
     }
 
     void AutoResetOrderLimiterBoss::stop() {
-        std::unique_lock<std::shared_mutex> lock(rw_lock);
+        std::unique_lock<std::shared_mutex> lock(this->rw_lock);
         this->is_started = false;
     }
     
@@ -114,7 +114,7 @@ namespace trader {
         int ip_limiter_count = 0;
         bool ip_limiter_exists = false;
 
-        std::shared_lock<std::shared_mutex> r_lock(rw_lock);
+        std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
         ip_limiter_count = this->ip_limiter_map.size();
         auto exists = this->ip_limiter_map.find(local_ip);
         if (exists != this->ip_limiter_map.end()) {
@@ -135,7 +135,7 @@ namespace trader {
         shared_ptr<AutoResetOrderLimiter> ip_limiter = make_shared<AutoResetOrderLimiter>();
         ip_limiter->init(second_semaphre_count, duration_second*1000, minute_semaphore_count, duration_minute*60*1000);
        
-        std::unique_lock<std::shared_mutex> w_lock(rw_lock);
+        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
         this->ip_limiter_map[local_ip] = ip_limiter;
         w_lock.unlock();
 
@@ -152,7 +152,7 @@ namespace trader {
         
         bool has_account_semaphore, has_ip_semaphore = false;
 
-        std::shared_lock<std::shared_mutex> r_lock(rw_lock);
+        std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
         has_account_semaphore = this->account_limiter->get_order_semaphore(require_num);
         if (!has_account_semaphore) {
             return pair<bool, bool>(has_account_semaphore, has_ip_semaphore);

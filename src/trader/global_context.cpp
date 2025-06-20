@@ -25,15 +25,13 @@ namespace trader {
 
         // init order service and limiter
         if (config.trading_use_best_path) {
-
+            this->init_best_path_order_limiter(config);
+            info_log("finish init best path order limiter");
+        } else {
             this->init_normal_order_service(config);
             info_log("finish init normal order service");
             this->init_normal_order_limiter(config);
             info_log("finish init normal order limiter");
-
-        } else {
-            this->init_best_path_order_limiter(config);
-            info_log("finish init best path order limiter");
         }
     }
 
