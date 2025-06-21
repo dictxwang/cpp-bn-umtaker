@@ -210,7 +210,7 @@ namespace actuary {
             }
 
             double position_reduce_ratio = 0;
-            if (config.use_position_threshold) {
+            if (config.enable_position_threshold) {
                 optional<PositionThresholdInfo> position_threshold = context.get_balance_position_composite().copy_position_threshold(follower_inst_id);
                 if (position_threshold.has_value()) {
                     position_reduce_ratio = position_threshold.value().positionReduceRatio;
