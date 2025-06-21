@@ -4,6 +4,7 @@
 #include <deque>
 #include <vector>
 #include <cstdint>
+#include <limits>
 #include <mutex>
 #include <shared_mutex>
 #include <unordered_map>
@@ -16,19 +17,45 @@ using namespace std;
 
 namespace receiver {
 
+    struct TickerMinMaxResult {
+        double min_bid_price = std::numeric_limits<double>::max();
+        double max_bid_price = std::numeric_limits<double>::min();
+        double min_ask_price = std::numeric_limits<double>::max();
+        double max_ask_price = std::numeric_limits<double>::min();
+        double min_avg_price = std::numeric_limits<double>::max();
+        double max_avg_price = std::numeric_limits<double>::min();
+        size_t ticker_length = 0;
+        bool validity_min_max = false;
+    };
+
     class TickerWrapper {
 
     public:
-        TickerWrapper() {}
+        TickerWrapper() {
+            this->clear_min_max();
+        }
         ~TickerWrapper() {}
 
         void update_ticker(UmTickerInfo ticker, uint64_t remain_senconds);
         optional<UmTickerInfo> get_lastest_ticker();
         deque<UmTickerInfo>& get_ticker_list();
         vector<UmTickerInfo> copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after);
+        TickerMinMaxResult get_min_max_result();
+        void set_min_max_result(TickerMinMaxResult& result);
     private:
         deque<UmTickerInfo> ticker_list;
+
+        double min_bid_price;
+        double max_bid_price;
+        double min_ask_price;
+        double max_ask_price;
+        double min_avg_price;
+        double max_avg_price;
+        bool validity_min_max;
+
         shared_mutex rw_lock;
+    private:
+        void clear_min_max();
     };
 
     class TickerComposite {
@@ -46,6 +73,9 @@ namespace receiver {
         void update_ticker(UmTickerInfo &ticker);
         optional<UmTickerInfo> get_lastest_ticker(string &inst_id);
         vector<UmTickerInfo> copy_ticker_list_after(string &inst_id, uint64_t remain_ts_after);
+        
+        optional<TickerMinMaxResult> get_min_max_result(string &inst_id);
+        void set_min_max_result(string &inst_id, TickerMinMaxResult& result);
     private:
         void init_wrapper(string inst_id);
     };

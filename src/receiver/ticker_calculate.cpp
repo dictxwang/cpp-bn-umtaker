@@ -31,33 +31,52 @@ namespace receiver {
                 base_asset = inst_id.substr(0, inst_id.size() - config.follower_quote_asset.size());
             }
 
-            std::vector<PriceOffset> offset_list = context.get_price_offset_composite().get_price_offset_list(base_asset);
-            if (offset_list.size() < config.calculate_sma_interval_seconds) {
-                continue;
-            }
-
-            std::vector<double> avg_price_diff_list;
-            std::vector<double> bid_ask_price_diff_list;
-            std::vector<double> ask_bid_price_diff_list;
-
-            for (size_t i = 0; i < offset_list.size(); ++i) {
-                avg_price_diff_list.push_back(offset_list[i].avg_price_diff);
-                bid_ask_price_diff_list.push_back(offset_list[i].bid_ask_price_diff);
-                ask_bid_price_diff_list.push_back(offset_list[i].ask_bid_price_diff);
-            }
-
-            std::sort(avg_price_diff_list.begin(), avg_price_diff_list.end());
-            std::sort(bid_ask_price_diff_list.begin(), bid_ask_price_diff_list.end());
-            std::sort(ask_bid_price_diff_list.begin(), ask_bid_price_diff_list.end());
-
-            size_t median_index = offset_list.size() / 2;
-
             EarlyRunThreshold threshold;
-            threshold.avg_price_diff_median = avg_price_diff_list[median_index];
-            threshold.bid_ask_price_diff_median = bid_ask_price_diff_list[median_index];
-            threshold.ask_bid_price_diff_median = ask_bid_price_diff_list[median_index];
-            threshold.price_offset_length = offset_list.size();
-            threshold.current_time_mills = binance::get_current_ms_epoch();
+            if (config.early_run_calculation_type == Early_Run_Calculation_Type_Median) {
+
+                // calculate early run threshold by price offset median
+                std::vector<PriceOffset> offset_list = context.get_price_offset_composite().get_price_offset_list(base_asset);
+                if (offset_list.size() < config.calculate_sma_interval_seconds) {
+                    continue;
+                }
+
+                std::vector<double> avg_price_diff_list;
+                std::vector<double> bid_ask_price_diff_list;
+                std::vector<double> ask_bid_price_diff_list;
+
+                for (size_t i = 0; i < offset_list.size(); ++i) {
+                    avg_price_diff_list.push_back(offset_list[i].avg_price_diff);
+                    bid_ask_price_diff_list.push_back(offset_list[i].bid_ask_price_diff);
+                    ask_bid_price_diff_list.push_back(offset_list[i].ask_bid_price_diff);
+                }
+
+                std::sort(avg_price_diff_list.begin(), avg_price_diff_list.end());
+                std::sort(bid_ask_price_diff_list.begin(), bid_ask_price_diff_list.end());
+                std::sort(ask_bid_price_diff_list.begin(), ask_bid_price_diff_list.end());
+
+                size_t median_index = offset_list.size() / 2;
+
+                threshold.avg_price_diff_median = avg_price_diff_list[median_index];
+                threshold.bid_ask_price_diff_median = bid_ask_price_diff_list[median_index];
+                threshold.ask_bid_price_diff_median = ask_bid_price_diff_list[median_index];
+                threshold.price_offset_length = offset_list.size();
+                threshold.current_time_mills = binance::get_current_ms_epoch();
+            } else {
+
+                // calculate early run threshold by average
+                auto avg_result = context.get_price_offset_composite().get_price_avg_result(base_asset);
+                if (!avg_result.has_value()) {
+                    continue;
+                }
+                if (avg_result->price_offset_length < config.calculate_sma_interval_seconds) {
+                    continue;
+                }
+                threshold.avg_price_diff_median = avg_result->avg_avg_price_diff;
+                threshold.bid_ask_price_diff_median = avg_result->avg_bid_ask_price_diff;
+                threshold.ask_bid_price_diff_median = avg_result->avg_ask_bid_price_diff;
+                threshold.price_offset_length = avg_result->price_offset_length;
+                threshold.current_time_mills = binance::get_current_ms_epoch();
+            }
 
             context.get_early_run_threshold_composite().update(base_asset, threshold);
 
@@ -74,8 +93,8 @@ namespace receiver {
             }
 
             if (rand.randInt() < 20) {
-                info_log("process early-run threshold: inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={} update_shm={}",
-                    inst_id, base_asset, threshold.avg_price_diff_median, threshold.bid_ask_price_diff_median,
+                info_log("process early-run threshold: type={} inst_id={} base={} avg_price_diff_median={} bid_ask_price_diff_median={} ask_bid_price_diff_median={} price_offset_length={} current_time_mills={} update_shm={}",
+                    config.early_run_calculation_type, inst_id, base_asset, threshold.avg_price_diff_median, threshold.bid_ask_price_diff_median,
                     threshold.ask_bid_price_diff_median, threshold.price_offset_length, threshold.current_time_mills, update_shm);
             }
         }
@@ -95,81 +114,114 @@ namespace receiver {
             uint64_t now = binance::get_current_ms_epoch();
             TickerRole role;
             std::string base_asset;
-            std::vector<UmTickerInfo> ticker_list;
+            InstConfigItem inst_config;
+            TickerMinMaxResult min_max_result;
+            bool runtime = false;
+
             if (str_ends_with(inst_id, config.benchmark_quote_asset)) {
                 base_asset = inst_id.substr(0, inst_id.size() - config.benchmark_quote_asset.size());
-                ticker_list = context.get_benchmark_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
                 role = TickerRole::Benchmark;
-            } else {
-                base_asset = inst_id.substr(0, inst_id.size() - config.follower_quote_asset.size());
-                ticker_list = context.get_follower_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
-                role = TickerRole::Follower;
-            }
-
-            if (ticker_list.size() < config.calculate_sma_interval_seconds) {
-                if (rand_value < 10) {
-                    warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
-                }
-                continue;
-            }
-
-            InstConfigItem inst_config;
-            if (role == TickerRole::Benchmark) {
                 auto inst_config_auto = context.get_benchmark_inst_config().inst_map.find(base_asset);
                 if (inst_config_auto == context.get_benchmark_inst_config().inst_map.end()) {
                     warn_log("not found benchmark inst config for {}/{}", base_asset, inst_id);
                     continue;
                 }
                 inst_config = inst_config_auto->second;
+                
+                auto min_max_result_auto = context.get_benchmark_ticker_composite().get_min_max_result(inst_id);
+                if (min_max_result_auto.has_value()) {
+                    min_max_result = min_max_result_auto.value();
+                }
             } else {
+                base_asset = inst_id.substr(0, inst_id.size() - config.follower_quote_asset.size());
+                role = TickerRole::Follower;
                 auto inst_config_auto = context.get_follower_inst_config().inst_map.find(base_asset);
                 if (inst_config_auto == context.get_follower_inst_config().inst_map.end()) {
                     warn_log("not found follower inst config for {}/{}", base_asset, inst_id);
                     continue;
                 }
                 inst_config = inst_config_auto->second;
-            }
 
-            // double volatility_a = (*inst_config).second.volatility_a;
-            // double volatility_b = (*inst_config).second.volatility_b;
-            // double volatility_c = (*inst_config).second.volatility_c;
-            // double beta = (*inst_config).second.beta;
-
-            double max_bid = std::numeric_limits<double>::min();
-            double min_bid = std::numeric_limits<double>::max();
-
-            double max_ask = std::numeric_limits<double>::min();
-            double min_ask = std::numeric_limits<double>::max();
-
-            double max_avg = std::numeric_limits<double>::min();
-            double min_avg = std::numeric_limits<double>::max();
-
-            for (size_t i = 0; i < ticker_list.size(); i++) {
-                if (ticker_list[i].bid_price > max_bid) {
-                    max_bid = ticker_list[i].bid_price;
-                }
-                if (ticker_list[i].bid_price < min_bid) {
-                    min_bid = ticker_list[i].bid_price;
-                }
-                if (ticker_list[i].ask_price > max_ask) {
-                    max_ask = ticker_list[i].ask_price;
-                }
-                if (ticker_list[i].ask_price < min_ask) {
-                    min_ask = ticker_list[i].ask_price;
-                }
-                if (ticker_list[i].avg_price > max_avg) {
-                    max_avg = ticker_list[i].avg_price;
-                }
-                if (ticker_list[i].avg_price < min_avg) {
-                    min_avg = ticker_list[i].avg_price;
+                auto min_max_result_auto = context.get_follower_ticker_composite().get_min_max_result(inst_id);
+                if (min_max_result_auto.has_value()) {
+                    min_max_result = min_max_result_auto.value();
                 }
             }
 
-            double bid_volatility = (max_bid - min_bid) / min_bid;
+            if (!min_max_result.validity_min_max 
+                || min_max_result.ticker_length < config.calculate_sma_interval_seconds) {
+                
+                runtime = true;
+                // require try to calculate min max
+                std::vector<UmTickerInfo> ticker_list;
+                if (role == TickerRole::Benchmark) {
+                    ticker_list = context.get_benchmark_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
+                } else {
+                    ticker_list = context.get_follower_ticker_composite().copy_ticker_list_after(inst_id, (now - config.calculate_sma_interval_seconds*1000));
+                }
+
+                if (ticker_list.size() < config.calculate_sma_interval_seconds) {
+                    if (rand_value < 10) {
+                        warn_log("no enough tickers for beta calculation: {}", ticker_list.size());
+                    }
+                    continue;
+                }
+
+                // double volatility_a = (*inst_config).second.volatility_a;
+                // double volatility_b = (*inst_config).second.volatility_b;
+                // double volatility_c = (*inst_config).second.volatility_c;
+                // double beta = (*inst_config).second.beta;
+
+                double max_bid = std::numeric_limits<double>::min();
+                double min_bid = std::numeric_limits<double>::max();
+
+                double max_ask = std::numeric_limits<double>::min();
+                double min_ask = std::numeric_limits<double>::max();
+
+                double max_avg = std::numeric_limits<double>::min();
+                double min_avg = std::numeric_limits<double>::max();
+
+
+                for (size_t i = 0; i < ticker_list.size(); i++) {
+                    if (ticker_list[i].bid_price > max_bid) {
+                        max_bid = ticker_list[i].bid_price;
+                    }
+                    if (ticker_list[i].bid_price < min_bid) {
+                        min_bid = ticker_list[i].bid_price;
+                    }
+                    if (ticker_list[i].ask_price > max_ask) {
+                        max_ask = ticker_list[i].ask_price;
+                    }
+                    if (ticker_list[i].ask_price < min_ask) {
+                        min_ask = ticker_list[i].ask_price;
+                    }
+                    if (ticker_list[i].avg_price > max_avg) {
+                        max_avg = ticker_list[i].avg_price;
+                    }
+                    if (ticker_list[i].avg_price < min_avg) {
+                        min_avg = ticker_list[i].avg_price;
+                    }
+                }
+
+                min_max_result.min_bid_price = min_bid;
+                min_max_result.max_bid_price = max_bid;
+                min_max_result.min_ask_price = min_ask;
+                min_max_result.max_ask_price = max_ask;
+                min_max_result.min_avg_price = min_avg;
+                min_max_result.max_avg_price = max_avg;
+                min_max_result.validity_min_max = true;
+            }
+
+            if (min_max_result.min_bid_price <= 0 || min_max_result.min_ask_price <= 0 || min_max_result.min_avg_price) {
+                warn_log("invalid ticker min max price: {} {} {}", min_max_result.min_bid_price, min_max_result.min_ask_price, min_max_result.min_avg_price);
+                continue;
+            }
+
+            double bid_volatility = (min_max_result.max_bid_price - min_max_result.min_bid_price) / min_max_result.min_bid_price;
             double bid_volatility_multiplier = calculate_volatility_multiplier(bid_volatility, inst_config);
-            double ask_volatility = (max_ask - min_ask) / min_ask;
+            double ask_volatility = (min_max_result.max_ask_price - min_max_result.min_ask_price) / min_max_result.min_ask_price;
             double ask_volatility_multiplier = calculate_volatility_multiplier(ask_volatility, inst_config);
-            double avg_volatility = (max_avg - min_avg) / min_avg;
+            double avg_volatility = (min_max_result.max_avg_price - min_max_result.min_avg_price) / min_max_result.min_avg_price;
             double avg_volatility_multiplier = calculate_volatility_multiplier(avg_volatility, inst_config);
 
             double bid_beta_threshold = calculate_beta_threshold(bid_volatility, inst_config);

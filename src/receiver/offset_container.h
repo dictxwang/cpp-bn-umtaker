@@ -26,13 +26,30 @@ namespace receiver {
         void copy_self(PriceOffset &other);
     };
 
+    struct PriceOffsetAvgResult {
+        size_t price_offset_length = 0;
+
+        double sum_avg_price_diff = 0;
+        double sum_bid_ask_price_diff = 0;
+        double sum_ask_bid_price_diff = 0;
+
+        double avg_avg_price_diff = 0;
+        double avg_bid_ask_price_diff = 0;
+        double avg_ask_bid_price_diff = 0;
+    };
+
     struct PriceOffsetWrapper {
         deque<PriceOffset> offset_list = {};
+        double sum_avg_price_diff = 0;
+        double sum_bid_ask_price_diff = 0;
+        double sum_ask_bid_price_diff = 0;
+
         shared_mutex rw_lock;
 
         void update_price_offset(UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick, uint64_t remain_senconds);
         optional<PriceOffset> get_latest_price_offset();
         vector<PriceOffset> copy_price_offset_list();
+        PriceOffsetAvgResult calculate_avg_result();
     };
 
     class PriceOffsetComposite {
@@ -49,6 +66,7 @@ namespace receiver {
         void update_price_offset(std::string& base_asset, UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick);
         optional<PriceOffset> get_latest_price_offset(string &base_asset);
         vector<PriceOffset> get_price_offset_list(string &base_asset);
+        optional<PriceOffsetAvgResult> get_price_avg_result(string &base_asset);
     private:
         void init_wrapper(string base_asset);
     };

@@ -45,6 +45,10 @@ namespace receiver {
             this->all_base_assets.push_back(this->doc_["all_base_assets"][i].asString());
         }
         
+        this->enable_beta_strategy = this->doc_["enable_beta_strategy"].asBool();
+        this->enable_early_run_strategy = this->doc_["enable_early_run_strategy"].asBool();
+        this->early_run_calculation_type = this->doc_["early_run_calculation_type"].asString();
+
         this->share_memory_project_id = this->doc_["share_memory_project_id"].asInt();
         this->share_memory_path_benchmark_ticker = this->doc_["share_memory_path_benchmark_ticker"].asString();
         this->share_memory_path_follower_ticker = this->doc_["share_memory_path_follower_ticker"].asString();

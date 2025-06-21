@@ -30,6 +30,8 @@
     "enable_beta_strategy": true,
     "enable_early_run_strategy": true,
 
+    "early_run_calculation_type": "average",
+
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",
 

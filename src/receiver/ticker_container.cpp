@@ -4,16 +4,55 @@
 
 namespace receiver {
 
+    void TickerWrapper::clear_min_max() {
+        this->min_bid_price = std::numeric_limits<double>::max();
+        this->max_bid_price = std::numeric_limits<double>::min();
+        this->min_ask_price = std::numeric_limits<double>::max();
+        this->max_ask_price = std::numeric_limits<double>::min();
+        this->min_avg_price = std::numeric_limits<double>::max();
+        this->max_avg_price = std::numeric_limits<double>::min();
+        this->validity_min_max = false;
+    }
+
     void TickerWrapper::update_ticker(UmTickerInfo ticker, uint64_t remain_senconds) {
         
         std::unique_lock<std::shared_mutex> lock(rw_lock);
         // Also could directly lock
         // this->rw_lock.lock();
         ticker_list.push_back(ticker);
+
+        // change min max if need
+        if (ticker.bid_price > this->max_bid_price) {
+            this->max_bid_price = ticker.bid_price;
+        }
+        if (ticker.bid_price < this->min_bid_price) {
+            this->min_bid_price = ticker.bid_price;
+        }
+        if (ticker.ask_price > this->max_ask_price) {
+            this->max_ask_price = ticker.ask_price;
+        }
+        if (ticker.ask_price < this->min_ask_price) {
+            this->min_ask_price = ticker.ask_price;
+        }
+        if (ticker.avg_price > this->max_avg_price) {
+            this->max_avg_price = ticker.avg_price;
+        }
+        if (ticker.avg_price < this->min_avg_price) {
+            this->min_avg_price = ticker.avg_price;
+        }
         
         uint64_t now = binance::get_current_ms_epoch();
         while (!ticker_list.empty()) {
             if (now > ticker_list.front().update_time_millis + remain_senconds * 1000) {
+                
+                // check if the min or max value is relation with the list 'front' item
+                if (ticker_list.front().bid_price >= this->max_bid_price || ticker_list.front().bid_price <= this->min_bid_price
+                    || ticker_list.front().ask_price >= this->max_ask_price || ticker_list.front().ask_price <= this->min_ask_price
+                    || ticker_list.front().avg_price >= this->max_avg_price || ticker_list.front().avg_price <= this->min_avg_price) {
+                    // clear min max value not validity, make ticker calculator work
+                    this->clear_min_max();
+                }
+
                 // remove expired ticker
                 ticker_list.pop_front();
             } else {
@@ -53,6 +92,34 @@ namespace receiver {
             }
         }
         return result;
+    }
+
+    TickerMinMaxResult TickerWrapper::get_min_max_result() {
+        
+        TickerMinMaxResult result;
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        result.min_bid_price = this->min_bid_price;
+        result.max_bid_price = this->max_bid_price;
+        result.min_ask_price = this->min_ask_price;
+        result.max_ask_price = this->max_ask_price;
+        result.min_avg_price = this->min_avg_price;
+        result.max_avg_price = this->max_avg_price;
+        result.ticker_length = this->ticker_list.size();
+        result.validity_min_max = this->validity_min_max;
+
+        return result;
+    }
+
+    void TickerWrapper::set_min_max_result(TickerMinMaxResult& result) {
+
+        std::unique_lock<std::shared_mutex> lock(rw_lock);
+        this->min_bid_price = result.min_bid_price;
+        this->max_bid_price = result.max_bid_price;
+        this->min_ask_price = result.min_ask_price;
+        this->max_ask_price = result.max_ask_price;
+        this->min_avg_price = result.min_avg_price;
+        this->max_avg_price = result.max_avg_price;
+        this->validity_min_max = result.validity_min_max;
     }
 
     void TickerComposite::init(string& quote_asset, vector<string>& base_assets, uint64_t remain_seconds) {
@@ -114,5 +181,25 @@ namespace receiver {
             result = (*wrapper->second).copy_ticker_list_after(inst_id, remain_ts_after);
         }
         return result;
+    }
+
+    optional<TickerMinMaxResult> TickerComposite::get_min_max_result(string &inst_id) {
+
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        auto wrapper = this->wrapper_map.find(inst_id);
+        if (wrapper != this->wrapper_map.end()) {
+            return wrapper->second->get_min_max_result();
+        } else {
+            return nullopt;
+        }
+    }
+
+    void TickerComposite::set_min_max_result(string &inst_id, TickerMinMaxResult& result) {
+
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        auto wrapper = this->wrapper_map.find(inst_id);
+        if (wrapper != this->wrapper_map.end()) {
+            wrapper->second->set_min_max_result(result);
+        }
     }
 }

@@ -39,6 +39,8 @@ namespace receiver {
         bool enable_beta_strategy;
         bool enable_early_run_strategy;
 
+        string early_run_calculation_type;
+
         int share_memory_project_id; // a single character or integer for the project identifier.
         string share_memory_path_benchmark_ticker; // make sure the path is exists, and accessiable
         string share_memory_path_follower_ticker;

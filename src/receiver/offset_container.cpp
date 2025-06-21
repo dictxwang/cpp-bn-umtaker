@@ -27,8 +27,20 @@ namespace receiver {
 
         std::unique_lock<std::shared_mutex> lock(rw_lock);
         this->offset_list.push_back(offset);
+
+        // overlay the price diff
+        this->sum_avg_price_diff += offset.avg_price_diff;
+        this->sum_bid_ask_price_diff += offset.bid_ask_price_diff;
+        this->sum_ask_bid_price_diff += offset.ask_bid_price_diff;
+
         while (!offset_list.empty()) {
             if (now - offset_list.front().update_time_millis > remain_senconds * 1000) {
+
+                // minus front price diff
+                this->sum_avg_price_diff -= offset_list.front().avg_price_diff;
+                this->sum_bid_ask_price_diff -= offset_list.front().bid_ask_price_diff;
+                this->sum_ask_bid_price_diff -= offset_list.front().ask_bid_price_diff;
+
                 // remove expired ticker
                 offset_list.pop_front();
             } else {
@@ -56,6 +68,26 @@ namespace receiver {
             this->offset_list[i].copy_self(other);
             result.push_back(other);
         }
+        return result;
+    }
+
+    PriceOffsetAvgResult PriceOffsetWrapper::calculate_avg_result() {
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        PriceOffsetAvgResult result;
+        if (this->offset_list.size() == 0) {
+            return result;
+        }
+
+        result.price_offset_length = this->offset_list.size();
+        
+        result.sum_avg_price_diff = this->sum_avg_price_diff;
+        result.sum_bid_ask_price_diff = this->sum_bid_ask_price_diff;
+        result.sum_ask_bid_price_diff = this->sum_ask_bid_price_diff;
+
+        result.avg_avg_price_diff = this->sum_avg_price_diff / result.price_offset_length;
+        result.avg_bid_ask_price_diff = this->sum_bid_ask_price_diff / result.price_offset_length;
+        result.avg_ask_bid_price_diff = this->sum_ask_bid_price_diff / result.price_offset_length;
+
         return result;
     }
 
@@ -115,6 +147,18 @@ namespace receiver {
         } else {
             vector<PriceOffset> result;
             return result;
+        }
+    }
+
+    optional<PriceOffsetAvgResult> PriceOffsetComposite::get_price_avg_result(string &base_asset) {
+
+        std::shared_lock<std::shared_mutex> lock(rw_lock);
+        auto wrapper = this->wrapper_map.find(base_asset);
+        lock.unlock();
+        if (wrapper != this->wrapper_map.end()) {
+            return wrapper->second->calculate_avg_result();
+        } else {
+            return nullopt;
         }
     }
 }
