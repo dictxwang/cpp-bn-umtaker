@@ -67,7 +67,7 @@ namespace trader {
             order_version = (*shm_order).version_number;
 
             uint64_t now = binance::get_current_ms_epoch();
-            if (now > (*shm_order).update_time + config.order_valid_millis) {
+            if (now > (*shm_order).update_time + config.order_validity_millis) {
                 if (rnd_number < 10) {
                     warn_log("order is expired for {}", base_asset);
                 }
