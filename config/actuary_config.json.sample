@@ -28,7 +28,7 @@
     "rest_use_intranet": false,
     "rest_local_ip": "",
 
-    "ticker_valididy_millis": 1000,
+    "ticker_validity_millis": 1000,
     "threshold_validity_millis": 2000,
     "loop_pause_time_millis": 5,
     "order_price_margin": 0.00002,
