@@ -36,7 +36,8 @@ namespace actuary {
         this->rest_use_intranet = this->doc_["rest_use_intranet"].asBool();
         this->rest_local_ip = this->doc_["rest_local_ip"].asString();
 
-        this->ticker_valid_millis = this->doc_["ticker_valid_millis"].asUInt64();
+        this->ticker_validity_millis = this->doc_["ticker_validity_millis"].asUInt64();
+        this->threshold_validity_millis = this->doc_["threshold_validity_millis"].asUInt64();
         this->loop_pause_time_millis = this->doc_["loop_pause_time_millis"].asInt64();
         this->order_price_margin = this->doc_["order_price_margin"].asDouble();
 

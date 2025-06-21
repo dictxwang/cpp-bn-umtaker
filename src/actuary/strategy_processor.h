@@ -10,7 +10,7 @@
 namespace actuary {
 
     void start_strategy_processors(ActuaryConfig& config, GlobalContext& context);
-    void check_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string base_asset);
+    void calculate_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string base_asset);
 
 }
 #endif

@@ -10,13 +10,13 @@ namespace actuary {
         for (size_t i = 0; i < config.node_base_assets.size(); ++i) {
 
             std::string base_asset = config.node_base_assets[i];
-            std::thread check_task_thread(check_signal_make_order, std::ref(config), std::ref(context), base_asset);
+            std::thread check_task_thread(calculate_signal_make_order, std::ref(config), std::ref(context), base_asset);
             check_task_thread.detach();
             info_log("start strategy processor for {}", base_asset);
         }
     }
 
-    void check_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string base_asset) {
+    void calculate_signal_make_order(ActuaryConfig& config, GlobalContext& context, std::string base_asset) {
 
         std::string benchmark_inst_id = base_asset + config.benchmark_quote_asset;
         std::string follower_inst_id = base_asset + config.follower_quote_asset;
@@ -71,7 +71,7 @@ namespace actuary {
         }
 
         RandomIntGen rand;
-        rand.init(0, 100000);
+        rand.init(0, 500000);
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
         while (true) {
@@ -99,6 +99,7 @@ namespace actuary {
 
             if ((*benchmark_ticker).version_number == benchmark_ticker_version && (*follower_ticker).version_number == follower_ticker_version ||
                 (*benchmark_ticker).version_number < benchmark_ticker_version || (*follower_ticker).version_number < follower_ticker_version) {
+                
                 if ((*benchmark_ticker).version_number > benchmark_ticker_version) {
                     benchmark_ticker_version = (*benchmark_ticker).version_number;
                 }
@@ -137,12 +138,10 @@ namespace actuary {
                 continue;
             }
 
-            if (benchmark_beta_threshold->version_number == benchmark_beta_version
-                && follower_beta_threshold->version_number == follower_beta_version
-                && early_run_threshold->version_number == early_run_version
-                || benchmark_beta_threshold->version_number < benchmark_beta_version
+            if (benchmark_beta_threshold->version_number < benchmark_beta_version
                 || follower_beta_threshold->version_number < follower_beta_version
                 || early_run_threshold->version_number < early_run_version) {
+
                 if (benchmark_beta_threshold->version_number > benchmark_beta_version) {
                     benchmark_beta_version = benchmark_beta_threshold->version_number;
                 }
@@ -162,13 +161,18 @@ namespace actuary {
             follower_beta_version = follower_beta_threshold->version_number;
             early_run_version = (*early_run_threshold).version_number;
 
-            if (now > (*benchmark_ticker).update_time + config.ticker_valid_millis ||
-                now > (*follower_ticker).update_time + config.ticker_valid_millis ||
-                now > (*benchmark_beta_threshold).time_mills + config.ticker_valid_millis ||
-                now > (*follower_beta_threshold).time_mills + config.ticker_valid_millis ||
-                now > (*early_run_threshold).time_mills + config.ticker_valid_millis) {
+            if (now > (*benchmark_ticker).update_time + config.ticker_validity_millis ||
+                now > (*follower_ticker).update_time + config.ticker_validity_millis) {
                 if (rnd_number < 10) {
-                    warn_log("ticker or threshold timestamp expired for {}", base_asset);
+                    warn_log("ticker timestamp expired for {}", base_asset);
+                }
+                continue;
+            }
+            if (now > (*benchmark_beta_threshold).time_mills + config.threshold_validity_millis ||
+                now > (*follower_beta_threshold).time_mills + config.threshold_validity_millis ||
+                now > (*early_run_threshold).time_mills + config.threshold_validity_millis) {
+                if (rnd_number < 10) {
+                    warn_log("threshold timestamp expired for {}", base_asset);
                 }
                 continue;
             }
