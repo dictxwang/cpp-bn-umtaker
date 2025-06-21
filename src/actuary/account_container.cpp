@@ -92,9 +92,27 @@ namespace actuary {
         }
     }
 
-    bool AccountBalancePositionComposite::update_exist_position_threshold(PositionThresholdInfo& position) {
-        // TODO
-        return false;
+    bool AccountBalancePositionComposite::update_exist_position_threshold(PositionThresholdInfo& threshold) {
+        
+        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        auto original = this->positionThresholdWrapper.threshold_map.find(threshold.symbol);
+        r_lock.unlock();
+
+        if (original != this->positionThresholdWrapper.threshold_map.end()) {
+            PositionThresholdInfo item;
+            item.symbol = threshold.symbol;
+            item.positionReduceRatio = threshold.positionReduceRatio;
+            item.totalNotional = threshold.totalNotional;
+            item.updateTimeMillis = threshold.updateTimeMillis;
+
+            std::unique_lock<std::shared_mutex> w_lock(this->positionThresholdWrapper.rw_lock);
+            this->positionThresholdWrapper.threshold_map[item.symbol] = item;
+            w_lock.unlock();
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     bool AccountBalancePositionComposite::update_exist_balance_event(binance::WsFuturesAccountUpdateBalanceEvent& event) {
@@ -150,11 +168,6 @@ namespace actuary {
         } else {
             return false;
         }
-    }
-
-    bool AccountBalancePositionComposite::update_exist_position_threshold_event(PositionThresholdInfo& position) {
-        // TODO
-        return false;
     }
 
     AccountMetaInfo AccountBalancePositionComposite::copy_meta() {

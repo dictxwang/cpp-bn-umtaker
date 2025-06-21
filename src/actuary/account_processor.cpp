@@ -159,7 +159,13 @@ namespace actuary {
                                 response.data.positions[i].positionAmt
                             );
 
-                            // TODO update position threshold
+                            auto threshold = calculcate_position_threshold(config, context, response.data.positions[i].symbol);
+                            if (threshold != nullopt) {
+                                updated = context.get_balance_position_composite().update_exist_position_threshold(threshold.value());
+                                info_log("update position threshold: symbol={} positionReduceRatio={} totalNotional={} updateTimeMillis={} updated={}",
+                                    threshold->symbol, threshold->positionReduceRatio, threshold->totalNotional, threshold->updateTimeMillis, updated
+                                );
+                            }
                         }
                     }
                 }
@@ -305,7 +311,13 @@ namespace actuary {
                                 if (updated) {
                                     info_log("update position by event for {} {} {} {}", event.positions[i].symbol, event.positions[i].positionSide, event.positions[i].positionAmout, updated);
 
-                                    // TODO update position threshold
+                                    auto threshold = calculcate_position_threshold(config, context, event.positions[i].symbol);
+                                    if (threshold != nullopt) {
+                                        updated = context.get_balance_position_composite().update_exist_position_threshold(threshold.value());
+                                        info_log("update position threshold by event: symbol={} positionReduceRatio={} totalNotional={} updateTimeMillis={} updated={}",
+                                            threshold->symbol, threshold->positionReduceRatio, threshold->totalNotional, threshold->updateTimeMillis, updated
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -357,5 +369,40 @@ namespace actuary {
                 err_log("fail to process user data stream message: {}", std::string( exp.what()));
             }
         }
+    }
+
+    optional<PositionThresholdInfo> calculcate_position_threshold(ActuaryConfig &config, GlobalContext &context, string &follower_symbol) {
+        auto follower_shm = context.get_shm_follower_ticker_mapping().find(follower_symbol);
+        if (follower_shm == context.get_shm_follower_ticker_mapping().end()) {
+            warn_log("follower ticker shm index not found for position threshold calculation of {}", follower_symbol);
+            return nullopt;
+        }
+        std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm->second);
+        if (follower_ticker == nullptr) {
+            warn_log("follower ticker not found from shm for position threshold calculation of {}", follower_symbol);
+            return nullopt;
+        }
+        
+        auto position = context.get_balance_position_composite().copy_position(follower_symbol);
+        if (!position.has_value()) {
+            warn_log("follower not found for threshold calculation of {}", follower_symbol);
+            return nullopt;
+        }
+        
+        string base_asset = follower_symbol.substr(0, follower_symbol.size() - config.follower_quote_asset.size());
+        auto inst_config = context.get_follower_inst_config().inst_map.find(base_asset);
+        if (inst_config == context.get_follower_inst_config().inst_map.end()) {
+            warn_log("follower inst config not found for threshold calculation of {} {}", follower_symbol, base_asset);
+            return nullopt;
+        }
+
+        double totalNotional = position.value().positionAmt * ((follower_ticker->ask_price + follower_ticker->bid_price) / 2);
+        PositionThresholdInfo threshold;
+        threshold.symbol = follower_symbol;
+        threshold.totalNotional = totalNotional;
+        threshold.positionReduceRatio = (totalNotional / inst_config->second.position_adjust_step_notional) * inst_config->second.position_adjust_step_ratio;
+        threshold.updateTimeMillis = binance::get_current_ms_epoch();
+
+        return threshold;
     }
 }

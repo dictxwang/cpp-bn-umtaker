@@ -42,6 +42,7 @@ namespace actuary {
         uint64_t threshold_validity_millis;
         long loop_pause_time_millis;
         double order_price_margin;
+        bool use_position_threshold;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

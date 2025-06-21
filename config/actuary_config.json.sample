@@ -32,6 +32,7 @@
     "threshold_validity_millis": 2000,
     "loop_pause_time_millis": 5,
     "order_price_margin": 0.00002,
+    "use_position_threshold": true,
 
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",

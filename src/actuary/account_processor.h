@@ -23,6 +23,8 @@ namespace actuary {
     void refresh_listen_key(ActuaryConfig &config, GlobalContext &context);
     void subscribe_balance_position(ActuaryConfig &config, GlobalContext &context);
     void process_balance_position(ActuaryConfig &config, GlobalContext &context);
+
+    optional<PositionThresholdInfo> calculcate_position_threshold(ActuaryConfig &config, GlobalContext &context, string &follower_symbol);
 }
 
 #endif
