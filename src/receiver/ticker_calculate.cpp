@@ -152,6 +152,7 @@ namespace receiver {
                 || min_max_result.ticker_length < config.calculate_sma_interval_seconds) {
                 
                 runtime = true;
+                
                 // require try to calculate min max
                 std::vector<UmTickerInfo> ticker_list;
                 if (role == TickerRole::Benchmark) {
@@ -212,7 +213,7 @@ namespace receiver {
                 min_max_result.validity_min_max = true;
             }
 
-            if (min_max_result.min_bid_price <= 0 || min_max_result.min_ask_price <= 0 || min_max_result.min_avg_price) {
+            if (min_max_result.min_bid_price <= 0 || min_max_result.min_ask_price <= 0 || min_max_result.min_avg_price <= 0) {
                 warn_log("invalid ticker min max price: {} {} {}", min_max_result.min_bid_price, min_max_result.min_ask_price, min_max_result.min_avg_price);
                 continue;
             }
@@ -279,8 +280,8 @@ namespace receiver {
             if (rand_value < 20) {
                 // shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(shm_start, (*address).second);
                 // std::cout << "shm asset: " << (*shared_shm).asset << "," << (*shared_shm).bid_beta_threshold << "," << (*shared_shm).time_mills << std::endl;
-                info_log("process beta threshold: role={} inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
-                    strHelper::toString(role), inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier,
+                info_log("process beta threshold: runtime={} role={} inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
+                    runtime, strHelper::toString(role), inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier,
                     threshold.bid_beta_threshold, threshold.ask_volatility, threshold.ask_volatility_multiplier,
                     threshold.ask_beta_threshold, threshold.volatility, threshold.volatility_multiplier,
                     threshold.beta_threshold, update_shm);
