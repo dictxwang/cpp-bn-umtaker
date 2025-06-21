@@ -31,7 +31,7 @@ namespace receiver {
         shared_mutex rw_lock;
 
         void update_price_offset(UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick, uint64_t remain_senconds);
-        optional<PriceOffset> get_lastest_price_offset();
+        optional<PriceOffset> get_latest_price_offset();
         vector<PriceOffset> copy_price_offset_list();
     };
 
@@ -47,7 +47,7 @@ namespace receiver {
     public:
         void init(vector<string>& base_assets, uint64_t remain_senconds);
         void update_price_offset(std::string& base_asset, UmTickerInfo &benchmark_tick, UmTickerInfo &follower_tick);
-        optional<PriceOffset> get_lastest_price_offset(string &base_asset);
+        optional<PriceOffset> get_latest_price_offset(string &base_asset);
         vector<PriceOffset> get_price_offset_list(string &base_asset);
     private:
         void init_wrapper(string base_asset);

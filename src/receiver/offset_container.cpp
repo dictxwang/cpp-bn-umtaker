@@ -39,7 +39,7 @@ namespace receiver {
         lock.unlock();
     }
 
-    optional<PriceOffset> PriceOffsetWrapper::get_lastest_price_offset() {
+    optional<PriceOffset> PriceOffsetWrapper::get_latest_price_offset() {
         std::shared_lock<std::shared_mutex> lock(rw_lock);
         if (!offset_list.empty()) {
             return offset_list.back();
@@ -92,13 +92,13 @@ namespace receiver {
         w_lock.unlock();
     }
 
-    optional<PriceOffset> PriceOffsetComposite::get_lastest_price_offset(string &base_asset) {
+    optional<PriceOffset> PriceOffsetComposite::get_latest_price_offset(string &base_asset) {
         std::shared_lock<std::shared_mutex> lock(rw_lock);
         auto wrapper = this->wrapper_map.find(base_asset);
         lock.unlock();
 
         if (wrapper != this->wrapper_map.end()) {
-            return (*(wrapper->second)).get_lastest_price_offset();
+            return (*(wrapper->second)).get_latest_price_offset();
         } else {
             return nullopt;
         }
