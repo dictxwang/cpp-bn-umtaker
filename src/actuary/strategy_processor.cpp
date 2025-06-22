@@ -277,7 +277,7 @@ namespace actuary {
                 bool make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
                 if (!stop_buy && make_order) {
-                    should_write_log = true;
+                    should_write_log = rnd_number < 10;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 } else {
                     should_write_log = rnd_number < 100;
@@ -340,7 +340,7 @@ namespace actuary {
                 bool make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
                 if (!stop_sell && make_order) {
-                    should_write_log = true;
+                    should_write_log = rnd_number < 10;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 } else {
                     // reduce log frequency

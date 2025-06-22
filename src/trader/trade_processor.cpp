@@ -88,6 +88,7 @@ namespace trader {
 
             bool has_interval_semaphore = context.get_order_interval_boss()->has_more_semaphore(follower_inst_id);
             pair<bool, string> result;
+            bool real_place_order = false;
             if (config.open_place_order && has_interval_semaphore) {
 
                 if (config.trading_use_best_path) {
@@ -100,23 +101,29 @@ namespace trader {
                     } else {
                         pair<bool, bool> has_semaphore = context.get_order_best_path_limiter()->get_order_semaphore(best_service.value()->get_local_ip(), 1);
                         if (!has_semaphore.first || !has_semaphore.second) {
-                            warn_log("no more semaphore for place order with best ip {} account={}:ip={}",
-                                best_service.value()->get_local_ip(),
-                                has_semaphore.first, has_semaphore.second
-                            );
+                            if (rnd_number < 100) {
+                                warn_log("no more semaphore for place order with best ip {} account={}:ip={}",
+                                    best_service.value()->get_local_ip(),
+                                    has_semaphore.first, has_semaphore.second
+                                );
+                            }
                             result.first = false;
                             result.second = "no semaphore";
                         } else {
                             result = best_service.value()->place_order(order);
+                            real_place_order = true;
                         }
                     }
                 } else {
                     if (!context.get_order_normal_minute_limiter()->get_semaphore(1) || !context.get_order_normal_second_limiter()->get_semaphore(1)) {
-                        warn_log("no more semaphore for place order");
+                        if (rnd_number < 100) {
+                            warn_log("no more semaphore for place order");
+                        }
                         result.first = false;
                         result.second = "no semaphore";
                     } else {
                         result = context.get_normal_order_service().placeOrder(order);
+                        real_place_order = true;
                     }
                 }
             } else {
@@ -124,8 +131,11 @@ namespace trader {
                 result.second = "config-stop/no-interval";
             }
             
-            info_log("place order: result={} msg={} has_interval_semaphore={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
-                result.first, result.second, has_interval_semaphore, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
+            // reduce log frequency
+            if (real_place_order || rnd_number < 100) {
+                info_log("place order: result={} msg={} has_interval_semaphore={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
+                    result.first, result.second, has_interval_semaphore, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
+            }
         }
     }
 
