@@ -8,6 +8,7 @@
 #include <shared_mutex>
 #include <cstdint>
 #include <memory>
+#include "common/auto_reset_counter.h"
 #include "binancecpp/util/binance_tool.h"
 #include "logger/logger.h"
 
@@ -70,6 +71,26 @@ namespace trader {
         void stop();
         bool create_ip_limiter(string &local_ip, int second_semaphre_count, int duration_second, int minute_semaphore_count, int duration_minute);
         pair<bool, bool> get_order_semaphore(string &local_ip, int require_num);
+    };
+
+    class AutoResetOrderIntervalBoss {
+    public:
+        AutoResetOrderIntervalBoss() {}
+        ~AutoResetOrderIntervalBoss() {
+            this->is_started = false;
+            this->interval_map.clear();
+        }
+    private:
+        bool is_started;
+        shared_ptr<AutoResetCounterBoss> interval_boss;
+        unordered_map<string, shared_ptr<AutoResetCounter>> interval_map;
+        shared_mutex rw_lock;
+    
+    public:
+        void init(vector<string> &symbols, int order_limit_count, uint64_t order_interval_millis);
+        void start();
+        bool has_more_semaphore(string symbol);
+        bool burn_semaphore(string symbol);
     };
 }
 

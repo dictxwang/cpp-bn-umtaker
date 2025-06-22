@@ -86,8 +86,10 @@ namespace trader {
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
             // order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
 
+            bool has_interval_semaphore = context.get_order_interval_boss()->has_more_semaphore(follower_inst_id);
             pair<bool, string> result;
-            if (config.open_place_order) {
+            if (config.open_place_order && has_interval_semaphore) {
+
                 if (config.trading_use_best_path) {
                     optional<shared_ptr<WsClientWrapper>> best_service = context.get_best_order_service_manager().find_best_service(follower_inst_id);
                     if (!best_service.has_value()) {
@@ -119,11 +121,11 @@ namespace trader {
                 }
             } else {
                 result.first = false;
-                result.second = "config stop";
+                result.second = "config-stop/no-interval";
             }
             
-            info_log("place order: result={} msg={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
-                result.first, result.second, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
+            info_log("place order: result={} msg={} has_interval_semaphore={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
+                result.first, result.second, has_interval_semaphore, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
         }
     }
 
@@ -164,10 +166,17 @@ namespace trader {
 
                 binance::WsFuturesOrderCallbackEvent event = binance::convertJsonToWsFuturesOrderCallbackEvent(json_result);
                 if (event.status == binance::WsCallbackStatusOK) {
-                    info_log("receive order event: inst_id={} client_id={} status={} side={} position_side={} orig_qty={} executed_qty={} price={}",
+
+                    bool burn_interval_semaphore = false;
+                    if (event.result.status == binance::ORDER_STATUS_FILLED || event.result.status == binance::ORDER_STATUS_PARTIALLY_FILLED) {
+                        // burn a semaphore of place order interval, to pause palce order with the same symbol for a while
+                        burn_interval_semaphore = context.get_order_interval_boss()->burn_semaphore(event.result.symbol);
+                    }
+
+                    info_log("receive order event: inst_id={} client_id={} status={} side={} position_side={} orig_qty={} executed_qty={} price={} burn_interval_semaphore={}",
                         event.result.symbol, event.result.clientOrderId, event.result.status,
                         event.result.side, event.result.positionSide, event.result.origQty,
-                        event.result.executedQty, event.result.price
+                        event.result.executedQty, event.result.price, burn_interval_semaphore
                     );
                 } else {
                     err_log("error occur receive order event: id={} code={} msg={}", event.id, event.error.code, event.error.msg);

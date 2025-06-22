@@ -39,6 +39,7 @@ private:
 
 public:
     bool get_semaphore(int require_count);
+    int peek_remain_semaphore_count();
 };
 
 class AutoResetCounterBoss {

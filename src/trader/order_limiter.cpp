@@ -174,4 +174,50 @@ namespace trader {
 
         return pair<bool, bool>(has_account_semaphore, has_ip_semaphore);
     }
+
+    void AutoResetOrderIntervalBoss::init(vector<string> &symbols, int order_limit_count, uint64_t order_interval_millis) {
+
+        this->interval_boss = make_shared<AutoResetCounterBoss>();
+        this->interval_boss->init(symbols.size(), 1);
+
+        for (string symbol : symbols) {
+            optional<shared_ptr<AutoResetCounter>> couter = this->interval_boss->create_new_counter(order_limit_count, order_interval_millis);
+            if (couter.has_value()) {
+                this->interval_map.insert({symbol, couter.value()});
+                info_log("create auto reset counter for order interval for {}", symbol);
+            }
+        }
+    }
+
+    void AutoResetOrderIntervalBoss::start() {
+        std::unique_lock<std::shared_mutex> r_lock(this->rw_lock);
+        if (this->is_started) {
+            return;
+        }
+        this->interval_boss->start();
+        this->is_started = true;
+    }
+    
+    bool AutoResetOrderIntervalBoss::has_more_semaphore(string symbol) {
+
+        std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
+        auto interval = this->interval_map.find(symbol);
+        if (interval == this->interval_map.end()) {
+            return false;
+        }
+
+        int remain = interval->second->peek_remain_semaphore_count();
+        return remain > 0;
+    }
+
+    bool AutoResetOrderIntervalBoss::burn_semaphore(string symbol) {
+
+        std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
+        auto interval = this->interval_map.find(symbol);
+        if (interval == this->interval_map.end()) {
+            return false;
+        }
+
+        return interval->second->get_semaphore(1);
+    }
 }

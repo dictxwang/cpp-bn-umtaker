@@ -24,6 +24,7 @@ namespace trader {
         bool open_place_order;
         uint64_t order_validity_millis;
         long loop_pause_time_millis;
+        uint64_t place_order_interval_millis;
 
         int order_account_limit_per_minute;
         int order_account_limit_per_10seconds;

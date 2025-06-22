@@ -17,6 +17,7 @@ namespace trader {
         this->open_place_order = this->doc_["open_place_order"].asBool();
         this->order_validity_millis = this->doc_["order_validity_millis"].asUInt64();
         this->loop_pause_time_millis = this->doc_["loop_pause_time_millis"].asInt64();
+        this->place_order_interval_millis = this->doc_["place_order_interval_millis"].asInt64();
 
         this->order_account_limit_per_minute = this->doc_["order_account_limit_per_minute"].asInt();
         this->order_account_limit_per_10seconds = this->doc_["order_account_limit_per_10seconds"].asInt();

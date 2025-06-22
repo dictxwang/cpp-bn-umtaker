@@ -43,6 +43,8 @@ namespace trader {
         shared_ptr<AutoResetCounter> order_normal_minute_limiter;
 
         shared_ptr<AutoResetOrderLimiterBoss> order_best_path_limiter;
+
+        shared_ptr<AutoResetOrderIntervalBoss> order_interval_boss;
     
     public:
         void init(TraderConfig& config);
@@ -51,6 +53,7 @@ namespace trader {
         void init_normal_order_limiter(TraderConfig& config);
         void init_best_path_order_limiter(TraderConfig& config);
         void init_normal_order_service(TraderConfig& config);
+        void init_order_interval_boss(TraderConfig& config);
         vector<string>& get_benchmark_inst_ids();
         vector<string>& get_follower_inst_ids();
         set<string>& get_follower_inst_id_set();
@@ -62,7 +65,7 @@ namespace trader {
         shared_ptr<AutoResetCounter> get_order_normal_second_limiter();
         shared_ptr<AutoResetCounter> get_order_normal_minute_limiter();
         shared_ptr<AutoResetOrderLimiterBoss> get_order_best_path_limiter();
-
+        shared_ptr<AutoResetOrderIntervalBoss> get_order_interval_boss();
     };
 }
 #endif

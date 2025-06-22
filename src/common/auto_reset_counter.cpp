@@ -24,6 +24,11 @@ bool AutoResetCounter::get_semaphore(int require_count) {
     }
 }
 
+int AutoResetCounter::peek_remain_semaphore_count() {
+    std::shared_lock<std::shared_mutex> lock(rw_lock);
+    return this->semaphore_remain_count;
+}
+
 void AutoResetCounterBoss::init(int max_capacity, uint64_t refresh_duration_millis=1) {
 
     this->is_started = false;

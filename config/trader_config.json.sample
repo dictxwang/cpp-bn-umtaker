@@ -12,6 +12,7 @@
     "open_place_order": false,
     "order_validity_millis": 8000,
     "loop_pause_time_millis": 5000,
+    "place_order_interval_millis": 2000,
 
     "order_account_limit_per_minute": 1200,
     "order_account_limit_per_10seconds": 300,

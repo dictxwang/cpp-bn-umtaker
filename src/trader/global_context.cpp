@@ -33,6 +33,9 @@ namespace trader {
             this->init_normal_order_limiter(config);
             info_log("finish init normal order limiter");
         }
+
+        this->init_order_interval_boss(config);
+        info_log("finish init order interval boss");
     }
 
     void GlobalContext::init_normal_order_limiter(TraderConfig& config) {
@@ -50,6 +53,12 @@ namespace trader {
         this->order_best_path_limiter->init(64, 1, config.order_account_limit_per_10seconds, 10, config.order_account_limit_per_minute, 1);
         this->order_best_path_limiter->start();
 
+    }
+
+    void GlobalContext::init_order_interval_boss(TraderConfig& config) {
+        this->order_interval_boss = make_shared<AutoResetOrderIntervalBoss>();
+        this->order_interval_boss->init(this->follower_inst_ids, 1, config.place_order_interval_millis);
+        this->order_interval_boss->start();
     }
 
     void GlobalContext::init_normal_order_service(TraderConfig& config) {
@@ -120,5 +129,8 @@ namespace trader {
     }
     shared_ptr<AutoResetOrderLimiterBoss> GlobalContext::get_order_best_path_limiter() {
         return this->order_best_path_limiter;
+    }
+    shared_ptr<AutoResetOrderIntervalBoss> GlobalContext::get_order_interval_boss() {
+        return this->order_interval_boss;
     }
 }
