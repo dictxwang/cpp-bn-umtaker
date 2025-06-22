@@ -211,6 +211,16 @@ namespace receiver {
                 min_max_result.min_avg_price = min_avg;
                 min_max_result.max_avg_price = max_avg;
                 min_max_result.validity_min_max = true;
+                
+                // update min-max values in wrapper
+                if (role == TickerRole::Benchmark) {
+                    context.get_benchmark_ticker_composite().set_min_max_result(inst_id, min_max_result);
+                } else {
+                    context.get_follower_ticker_composite().set_min_max_result(inst_id, min_max_result);
+                }
+                info_log("calculate ticker min-max values by calculator: inst_id={} min_bid={} max_bid={} min_ask={} max_ask={} min_avg={} max_avg={}",
+                    inst_id, min_bid, max_bid, min_ask, max_ask, min_avg, max_avg
+                );
             }
 
             if (min_max_result.min_bid_price <= 0 || min_max_result.min_ask_price <= 0 || min_max_result.min_avg_price <= 0) {

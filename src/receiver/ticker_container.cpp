@@ -21,24 +21,27 @@ namespace receiver {
         // this->rw_lock.lock();
         ticker_list.push_back(ticker);
 
-        // change min max if need
-        if (ticker.bid_price > this->max_bid_price) {
-            this->max_bid_price = ticker.bid_price;
-        }
-        if (ticker.bid_price < this->min_bid_price) {
-            this->min_bid_price = ticker.bid_price;
-        }
-        if (ticker.ask_price > this->max_ask_price) {
-            this->max_ask_price = ticker.ask_price;
-        }
-        if (ticker.ask_price < this->min_ask_price) {
-            this->min_ask_price = ticker.ask_price;
-        }
-        if (ticker.avg_price > this->max_avg_price) {
-            this->max_avg_price = ticker.avg_price;
-        }
-        if (ticker.avg_price < this->min_avg_price) {
-            this->min_avg_price = ticker.avg_price;
+        // change min max when which values are validity
+        // so when the values are not validity, must wait the ticker calculator make the values validity
+        if (this->validity_min_max) {
+            if (ticker.bid_price > this->max_bid_price) {
+                this->max_bid_price = ticker.bid_price;
+            }
+            if (ticker.bid_price < this->min_bid_price) {
+                this->min_bid_price = ticker.bid_price;
+            }
+            if (ticker.ask_price > this->max_ask_price) {
+                this->max_ask_price = ticker.ask_price;
+            }
+            if (ticker.ask_price < this->min_ask_price) {
+                this->min_ask_price = ticker.ask_price;
+            }
+            if (ticker.avg_price > this->max_avg_price) {
+                this->max_avg_price = ticker.avg_price;
+            }
+            if (ticker.avg_price < this->min_avg_price) {
+                this->min_avg_price = ticker.avg_price;
+            }
         }
         
         uint64_t now = binance::get_current_ms_epoch();
