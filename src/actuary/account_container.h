@@ -52,6 +52,7 @@ namespace actuary {
         string symbol;
         double positionReduceRatio = 0;
         double totalNotional = 0;
+        bool reachMaxPosition = false;
         uint64_t updateTimeMillis = 0;
     };
 

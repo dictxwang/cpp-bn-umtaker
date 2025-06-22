@@ -162,8 +162,8 @@ namespace actuary {
                             auto threshold = calculcate_position_threshold(config, context, response.data.positions[i].symbol);
                             if (threshold != nullopt) {
                                 updated = context.get_balance_position_composite().update_exist_position_threshold(threshold.value());
-                                info_log("update position threshold: symbol={} positionReduceRatio={} totalNotional={} updateTimeMillis={} updated={}",
-                                    threshold->symbol, threshold->positionReduceRatio, threshold->totalNotional, threshold->updateTimeMillis, updated
+                                info_log("update position threshold: symbol={} positionReduceRatio={} totalNotional={} reachMaxPosition={} updateTimeMillis={} updated={}",
+                                    threshold->symbol, threshold->positionReduceRatio, threshold->totalNotional, threshold->reachMaxPosition, threshold->updateTimeMillis, updated
                                 );
                             }
                         }
@@ -314,8 +314,8 @@ namespace actuary {
                                     auto threshold = calculcate_position_threshold(config, context, event.positions[i].symbol);
                                     if (threshold != nullopt) {
                                         updated = context.get_balance_position_composite().update_exist_position_threshold(threshold.value());
-                                        info_log("update position threshold by event: symbol={} positionReduceRatio={} totalNotional={} updateTimeMillis={} updated={}",
-                                            threshold->symbol, threshold->positionReduceRatio, threshold->totalNotional, threshold->updateTimeMillis, updated
+                                        info_log("update position threshold by event: symbol={} positionReduceRatio={} totalNotional={} reachMaxPosition={} updateTimeMillis={} updated={}",
+                                            threshold->symbol, threshold->positionReduceRatio, threshold->totalNotional, threshold->reachMaxPosition, threshold->updateTimeMillis, updated
                                         );
                                     }
                                 }
@@ -401,6 +401,7 @@ namespace actuary {
         threshold.symbol = follower_symbol;
         threshold.totalNotional = totalNotional;
         threshold.positionReduceRatio = (totalNotional / inst_config->second.position_adjust_step_notional) * inst_config->second.position_adjust_step_ratio;
+        threshold.reachMaxPosition = position.value().positionAmt >= inst_config->second.max_position;
         threshold.updateTimeMillis = binance::get_current_ms_epoch();
 
         return threshold;

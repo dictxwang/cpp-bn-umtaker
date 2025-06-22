@@ -275,14 +275,20 @@ namespace actuary {
 
                 int updated = 0;
                 bool make_order = context.dynamic_could_make_order();
+                bool should_write_log = false;
                 if (!stop_buy && make_order) {
+                    should_write_log = true;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
+                } else {
+                    should_write_log = rnd_number < 100;
                 }
 
-                // TODO reduce too many logs
-                info_log("update buy order: make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                    make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
-                    benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                if (should_write_log) {
+                    // reduce log frequency
+                    info_log("update buy order: make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
+                        benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                }
             
             }
 
@@ -332,14 +338,20 @@ namespace actuary {
                 
                 int updated = 0;
                 bool make_order = context.dynamic_could_make_order();
+                bool should_write_log = false;
                 if (!stop_sell && make_order) {
+                    should_write_log = true;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
+                } else {
+                    // reduce log frequency
+                    should_write_log = rnd_number < 100;
                 }
 
-                // TODO reduce too many logs
-                info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                    make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
-                    benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                if (should_write_log) {
+                    info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
+                        benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                }
             }
         }
     }
