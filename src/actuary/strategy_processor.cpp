@@ -74,8 +74,6 @@ namespace actuary {
         uint64_t latest_buy_order_millis = 0;
         double latest_sell_order_price = 0;
         uint64_t latest_sell_order_millis = 0;
-        RandomIntGen rand_order;
-        rand_order.init(0, 1000);
 
         RandomIntGen rand_log;
         rand_log.init(0, 500000);
@@ -90,8 +88,6 @@ namespace actuary {
             }
             int rand_log_number = rand_log.randInt();
             uint64_t now = binance::get_current_ms_epoch();
-
-            int rand_order_number = rand_order.randInt();
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
             std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm_index);
@@ -282,13 +278,11 @@ namespace actuary {
                 order_buy.update_time = now;
 
                 bool same_make_order = false;
-                if (buy_price == latest_buy_order_price && latest_buy_order_millis + 2 > now) {
+                if (buy_price == latest_buy_order_price && latest_buy_order_millis + config.same_price_pause_time_millis > now) {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        same_make_order = rand_order_number < 100;
-                    } else {
-                        same_make_order = rand_log_number < 10;
+                        same_make_order = latest_buy_order_millis + 2 <= now;
                     }
                 } else {
                     same_make_order = true;
@@ -360,13 +354,11 @@ namespace actuary {
                 order_sell.update_time = now;
                 
                 bool same_make_order = false;
-                if (sell_price == latest_sell_order_price && latest_sell_order_millis + 2 > now) {
+                if (sell_price == latest_sell_order_price && latest_sell_order_millis + config.same_price_pause_time_millis > now) {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        same_make_order = rand_order_number < 100;
-                    } else {
-                        same_make_order = rand_log_number < 10;
+                        same_make_order = latest_sell_order_millis + 2 <= now;
                     }
                 } else {
                     same_make_order = true;

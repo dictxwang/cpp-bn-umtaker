@@ -41,6 +41,7 @@ namespace actuary {
         this->loop_pause_time_millis = this->doc_["loop_pause_time_millis"].asInt64();
         this->order_price_margin = this->doc_["order_price_margin"].asDouble();
         this->enable_position_threshold = this->doc_["enable_position_threshold"].asBool();
+        this->same_price_pause_time_millis = this->doc_["same_price_pause_time_millis"].asInt64();
 
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
