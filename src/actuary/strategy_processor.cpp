@@ -71,7 +71,9 @@ namespace actuary {
         }
 
         double latest_buy_order_price = 0;
+        uint64_t latest_buy_order_millis = 0;
         double latest_sell_order_price = 0;
+        uint64_t latest_sell_order_millis = 0;
         RandomIntGen rand_order;
         rand_order.init(0, 1000);
 
@@ -280,17 +282,21 @@ namespace actuary {
                 order_buy.update_time = now;
 
                 bool same_make_order = false;
-                if (buy_price == latest_buy_order_price) {
+                if (buy_price == latest_buy_order_price && latest_buy_order_millis + 2 > now) {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        same_make_order = rand_order_number < 200;
+                        same_make_order = rand_order_number < 100;
                     } else {
-                        same_make_order = rand_log_number < 100;
+                        same_make_order = rand_log_number < 10;
                     }
                 } else {
-                    latest_buy_order_price = buy_price;
                     same_make_order = true;
+                }
+
+                if (same_make_order) {
+                    latest_buy_order_price = buy_price;
+                    latest_buy_order_millis = now;
                 }
 
                 int updated = 0;
@@ -354,17 +360,21 @@ namespace actuary {
                 order_sell.update_time = now;
                 
                 bool same_make_order = false;
-                if (sell_price == latest_sell_order_price) {
+                if (sell_price == latest_sell_order_price && latest_sell_order_millis + 2 > now) {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        same_make_order = rand_order_number < 200;
+                        same_make_order = rand_order_number < 100;
                     } else {
-                        same_make_order = rand_log_number < 100;
+                        same_make_order = rand_log_number < 10;
                     }
                 } else {
-                    latest_sell_order_price = sell_price;
                     same_make_order = true;
+                }
+
+                if (same_make_order) {
+                    latest_sell_order_price = sell_price;
+                    latest_sell_order_millis = now;
                 }
 
                 int updated = 0;
