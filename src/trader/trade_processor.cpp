@@ -77,7 +77,7 @@ namespace trader {
             binance::FuturesNewOrder order;
             order.symbol = follower_inst_id;
             order.side = std::string((*shm_order).side);
-            // order.positionSide = std::string((*shm_order).pos_side);
+            order.positionSide = std::string((*shm_order).pos_side);
             order.quantity = (*shm_order).volume;
             order.price = (*shm_order).price;
             order.type = std::string((*shm_order).type);

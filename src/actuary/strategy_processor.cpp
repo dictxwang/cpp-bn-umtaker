@@ -265,6 +265,7 @@ namespace actuary {
                 strcpy(order_buy.type, binance::ORDER_TYPE_LIMIT.c_str());
                 strcpy(order_buy.side, binance::ORDER_SIDE_BUY.c_str());
                 // strcpy(order_buy.pos_side, binance::PositionSide_LONG.c_str());
+                strcpy(order_buy.pos_side, binance::PositionSide_BOTH.c_str());
                 strcpy(order_buy.time_in_force, binance::TimeInForce_IOC.c_str());
                 order_buy.price = buy_price;
                 order_buy.volume = order_size;
@@ -328,6 +329,7 @@ namespace actuary {
                 strcpy(order_sell.type, binance::ORDER_TYPE_LIMIT.c_str());
                 strcpy(order_sell.side, binance::ORDER_SIDE_SELL.c_str());
                 // strcpy(order_buy.pos_side, binance::PositionSide_SHORT.c_str());
+                strcpy(order_sell.pos_side, binance::PositionSide_BOTH.c_str());
                 strcpy(order_sell.time_in_force, binance::TimeInForce_IOC.c_str());
                 order_sell.price = sell_price;
                 order_sell.volume = order_size;
