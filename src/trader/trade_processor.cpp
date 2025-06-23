@@ -84,6 +84,7 @@ namespace trader {
             order.timeInForce = std::string((*shm_order).time_in_force);
             order.newClientOrderId = std::string((*shm_order).client_order_id);
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
+            // there no need to send reduceOnly, because if oversold occurs, it means that the current market has revered.
             // order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
 
             bool has_interval_semaphore = context.get_order_interval_boss()->has_more_semaphore(follower_inst_id);

@@ -70,28 +70,37 @@ namespace actuary {
             exit(-1);
         }
 
-        RandomIntGen rand;
-        rand.init(0, 500000);
+        double latest_buy_order_price = 0;
+        double latest_sell_order_price = 0;
+        RandomIntGen rand_order;
+        rand_order.init(0, 1000);
+
+        RandomIntGen rand_log;
+        rand_log.init(0, 500000);
+
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
+        
         while (true) {
 
             if (config.loop_pause_time_millis > 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
             }
-            int rnd_number = rand.randInt();
+            int rand_log_number = rand_log.randInt();
             uint64_t now = binance::get_current_ms_epoch();
+
+            int rand_order_number = rand_order.randInt();
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
             std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm_index);
             if (benchmark_ticker == nullptr || follower_ticker == nullptr) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("ticker in share memory not found for {}", base_asset);
                 }
                 continue;
             }
             if ((*benchmark_ticker).version_number == 0 || (*follower_ticker).version_number == 0) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("ticker version in share memory are zero {}", base_asset);
                 }
                 continue;
@@ -106,7 +115,7 @@ namespace actuary {
                 if ((*follower_ticker).version_number > follower_ticker_version) {
                     follower_ticker_version = (*follower_ticker).version_number;
                 }
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("ticker version is old in share memory for {}", base_asset);
                 }
                 continue;
@@ -120,19 +129,19 @@ namespace actuary {
             std::shared_ptr<shm_mng::BetaThresholdShm> follower_beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().follower_beta_start, threshold_shm_index);
             
             if (early_run_threshold == nullptr || (*early_run_threshold).version_number == 0) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("threshold early run in share memory not found or version is zero for {}", base_asset);
                 }
                 continue;
             }
             if (benchmark_beta_threshold == nullptr || benchmark_beta_threshold->version_number == 0) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("benchmark threshold beta in share memory not found or version is zero for {}", base_asset);
                 }
                 continue;
             }
             if (follower_beta_threshold == nullptr || follower_beta_threshold->version_number == 0) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("follower threshold beta in share memory not found or version is zero for {}", base_asset);
                 }
                 continue;
@@ -151,7 +160,7 @@ namespace actuary {
                 if ((*early_run_threshold).version_number > early_run_version) {
                     early_run_version = (*early_run_threshold).version_number;
                 }
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("threshold version is old in share memory for {}", base_asset);
                 }
                 continue;
@@ -163,7 +172,7 @@ namespace actuary {
 
             if (now > (*benchmark_ticker).update_time + config.ticker_validity_millis ||
                 now > (*follower_ticker).update_time + config.ticker_validity_millis) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("ticker timestamp expired for {}", base_asset);
                 }
                 continue;
@@ -171,7 +180,7 @@ namespace actuary {
             if (now > (*benchmark_beta_threshold).time_mills + config.threshold_validity_millis ||
                 now > (*follower_beta_threshold).time_mills + config.threshold_validity_millis ||
                 now > (*early_run_threshold).time_mills + config.threshold_validity_millis) {
-                if (rnd_number < 10) {
+                if (rand_log_number < 10) {
                     warn_log("threshold timestamp expired for {}", base_asset);
                 }
                 continue;
@@ -238,10 +247,6 @@ namespace actuary {
                 && (*benchmark_ticker).bid_size > inst_config.min_ticker_size
                 && (*follower_ticker).ask_size < inst_config.max_ticker_size
             ) {
-
-            // if ((*benchmark_ticker).bid_price > ((*follower_ticker).ask_price + (*early_run_threshold).bid_ask_median) * (1 + (*beta_threshold).volatility_multiplier * inst_config.beta)
-            //     && (*benchmark_ticker).bid_size > inst_config.min_ticker_size
-            //     && (*follower_ticker).ask_size < inst_config.max_ticker_size) {
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
@@ -274,20 +279,34 @@ namespace actuary {
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
                 order_buy.update_time = now;
 
+                bool same_make_order = false;
+                if (buy_price == latest_buy_order_price) {
+                    // price is same with latest, should reduce order making ratio
+                    if (reduce_only == 1) {
+                        // close position
+                        same_make_order = rand_order_number < 200;
+                    } else {
+                        same_make_order = rand_log_number < 100;
+                    }
+                } else {
+                    latest_buy_order_price = buy_price;
+                    same_make_order = true;
+                }
+
                 int updated = 0;
-                bool make_order = context.dynamic_could_make_order();
+                bool config_make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
-                if (!stop_buy && make_order) {
-                    should_write_log = rnd_number < 10;
+                if (!stop_buy && config_make_order && same_make_order) {
+                    should_write_log = rand_log_number < 10;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 } else {
-                    should_write_log = rnd_number < 100;
+                    should_write_log = rand_log_number < 100;
                 }
 
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
+                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
                         benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             
@@ -303,10 +322,6 @@ namespace actuary {
                 && benchmark_ticker->ask_size > inst_config.min_ticker_size
                 && follower_ticker->bid_size < inst_config.max_ticker_size
             ) {
-
-            // if ((*benchmark_ticker).ask_price < ((*follower_ticker).bid_price + (*early_run_threshold).ask_bid_median) / (1 + (*beta_threshold).volatility_multiplier * inst_config.beta)
-            //     && (*benchmark_ticker).ask_size > inst_config.min_ticker_size
-            //     && (*follower_ticker).bid_size < inst_config.max_ticker_size) {
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 int reduce_only = 0;
@@ -338,20 +353,34 @@ namespace actuary {
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 order_sell.update_time = now;
                 
+                bool same_make_order = false;
+                if (sell_price == latest_sell_order_price) {
+                    // price is same with latest, should reduce order making ratio
+                    if (reduce_only == 1) {
+                        // close position
+                        same_make_order = rand_order_number < 200;
+                    } else {
+                        same_make_order = rand_log_number < 100;
+                    }
+                } else {
+                    latest_sell_order_price = sell_price;
+                    same_make_order = true;
+                }
+
                 int updated = 0;
-                bool make_order = context.dynamic_could_make_order();
+                bool config_make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
-                if (!stop_sell && make_order) {
-                    should_write_log = rnd_number < 10;
+                if (!stop_sell && config_make_order && same_make_order) {
+                    should_write_log = rand_log_number < 10;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 } else {
                     // reduce log frequency
-                    should_write_log = rnd_number < 100;
+                    should_write_log = rand_log_number < 100;
                 }
 
                 if (should_write_log) {
-                    info_log("update sell order: make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
+                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
                         benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
