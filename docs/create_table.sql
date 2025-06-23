@@ -24,6 +24,7 @@ CREATE TABLE `tb_bnum_pnl` (
   `account_flag` varchar(32) NOT NULL DEFAULT '',
   `init_balance` float(16,6) NOT NULL DEFAULT '0.000000',
   `usdc_balance` float(16,6) NOT NULL DEFAULT '0.000000',
+  `usdc_cross_balance` float(16,6) NOT NULL DEFAULT '0.000000',
   `cross_balance` float(16,6) NOT NULL DEFAULT '0.000000',
   `corss_un_pnl` float(16,6) NOT NULL DEFAULT '0.000000',
   `log_ts` bigint NOT NULL DEFAULT '0',

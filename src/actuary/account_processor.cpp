@@ -132,18 +132,20 @@ namespace actuary {
                     response.data.totalCrossUnPnl
                 );
 
-                double follower_quote_balance;
+                double follower_quote_margin_balance;
+                double follower_quote_cross_balance;
                 bool updated = false;
                 if (response.data.assets.size() > 0) {
                     for (size_t i = 0; i < response.data.assets.size(); ++i) {
                         if (response.data.assets[i].asset == config.follower_quote_asset) {
-                            follower_quote_balance = response.data.assets[i].crossWalletBalance;
+                            follower_quote_margin_balance = response.data.assets[i].marginBalance;
+                            follower_quote_cross_balance = response.data.assets[i].crossWalletBalance;
                         }
                         updated = context.get_balance_position_composite().update_exist_balance(response.data.assets[i]);
                         if (updated) {
-                            info_log("update account balance: asset={} walletBalance={} crossWalletBalance={} crossUnPnl={}",
-                                response.data.assets[i].asset, response.data.assets[i].walletBalance,
-                                response.data.assets[i].crossWalletBalance, response.data.assets[i].crossUnPnl
+                            info_log("update account balance: asset={} marginBalance={} walletBalance={} crossWalletBalance={} crossUnPnl={}",
+                                response.data.assets[i].asset, response.data.assets[i].marginBalance,
+                                response.data.assets[i].walletBalance, response.data.assets[i].crossWalletBalance, response.data.assets[i].crossUnPnl
                             );
                         }
                     }
@@ -176,8 +178,8 @@ namespace actuary {
 
                     polling_times = 0;
                     uint64_t log_ts = binance::get_current_epoch();
-                    string sql = fmt::format("insert ignore into tb_bnum_pnl(account_flag, init_balance, usdc_balance, cross_balance, corss_un_pnl, log_ts) values ('{}', {}, {}, {}, {}, {})",
-                        config.account_flag, 0, follower_quote_balance, response.data.totalCrossWalletBalance, response.data.totalCrossUnPnl, log_ts
+                    string sql = fmt::format("insert ignore into tb_bnum_pnl(account_flag, init_balance, usdc_balance, usdc_cross_balance, cross_balance, corss_un_pnl, log_ts) values ('{}', {}, {}, {}, {}, {}, {})",
+                        config.account_flag, 0, follower_quote_margin_balance, follower_quote_cross_balance, response.data.totalCrossWalletBalance, response.data.totalCrossUnPnl, log_ts
                     );
 
                     info_log("save account meta sql: {}", sql);
@@ -302,7 +304,7 @@ namespace actuary {
                         if (event.balances.size() > 0) {
                             for (size_t i = 0; i < event.balances.size(); ++i) {
                                 bool updated = context.get_balance_position_composite().update_exist_balance_event(event.balances[i]);
-                                info_log("update balance by event for {} {} {}", event.balances[i].asset, event.balances[i].crossWalletBalance, updated);
+                                info_log("update balance by event for {} {} {} {}", event.balances[i].asset, event.balances[i].crossWalletBalance, updated);
                             }
                         }
                         if (event.positions.size() > 0) {
