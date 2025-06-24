@@ -43,6 +43,7 @@ namespace actuary {
         long loop_pause_time_millis;
         double order_price_margin;
         bool enable_position_threshold;
+        bool enable_order_reduce_only;
         long same_price_pause_time_millis;
 
         string benchmark_quote_asset;

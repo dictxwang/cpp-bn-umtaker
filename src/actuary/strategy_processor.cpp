@@ -251,13 +251,15 @@ namespace actuary {
             ) {
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
+                bool position_close = false;
                 int reduce_only = 0;
-                if ((*position).positionSide == binance::PositionSide_SHORT) {
-                    // reduce_only is not available in trader, so don't change order_size
-                    // if (order_size > (*position).positionAmt) {
-                    //     order_size = (*position).positionAmt;
-                    // }
-                    reduce_only = 1;
+                if ((*position).positionSide == binance::PositionSide_SHORT
+                    && order_size > (*position).positionAmt) {
+                    position_close = true;
+                    if (config.enable_order_reduce_only) {
+                        reduce_only = 1;
+                        order_size = (*position).positionAmt;
+                    }
                 }
 
                 double buy_price = follower_ticker->ask_price * (1 + config.order_price_margin);
@@ -286,7 +288,7 @@ namespace actuary {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 2), 10);
+                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis * 90 / 100), 50);
                         same_make_order = latest_buy_order_millis + small_pause_time_millis <= now;
                     }
                 } else {
@@ -298,20 +300,20 @@ namespace actuary {
                     latest_buy_order_millis = now;
                 }
 
-                int updated = 0;
+                int shm_updated = 0;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
                 if (!stop_buy && config_make_order && same_make_order) {
-                    should_write_log = rand_order_log_number < 100;
-                    updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
+                    should_write_log = true;
+                    shm_updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 } else {
-                    should_write_log = rand_order_log_number < 100;
+                    should_write_log = rand_order_log_number < 1;
                 }
 
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} reduce_only={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id, order_buy.reduce_only,
+                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_buy, shm_updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id, position_close,
                         benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
@@ -328,12 +330,15 @@ namespace actuary {
             ) {
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
+                bool position_close = false;
                 int reduce_only = 0;
-                if ((*position).positionSide == binance::PositionSide_LONG) {
-                    // if (order_size > (*position).positionAmt) {
-                    //     order_size = (*position).positionAmt;
-                    // }
-                    reduce_only = 1;
+                if ((*position).positionSide == binance::PositionSide_LONG
+                    && order_size > (*position).positionAmt) {
+                    position_close = true;
+                    if (config.enable_order_reduce_only) {
+                        order_size = (*position).positionAmt;
+                        reduce_only = 1;
+                    }
                 }
 
                 double sell_price = follower_ticker->bid_price * (1 - config.order_price_margin);
@@ -362,7 +367,7 @@ namespace actuary {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 2), 10);
+                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis * 90 / 100), 50);
                         same_make_order = latest_sell_order_millis + small_pause_time_millis <= now;
                     }
                 } else {
@@ -374,20 +379,20 @@ namespace actuary {
                     latest_sell_order_millis = now;
                 }
 
-                int updated = 0;
+                int shm_updated = 0;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
                 if (!stop_sell && config_make_order && same_make_order) {
-                    should_write_log = rand_order_log_number < 100;
-                    updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
+                    should_write_log = true;
+                    shm_updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 } else {
                     // reduce log frequency
-                    should_write_log = rand_order_log_number < 100;
+                    should_write_log = rand_order_log_number < 1;
                 }
 
                 if (should_write_log) {
-                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} reduce_only={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id, reduce_only,
+                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_sell, shm_updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id, position_close,
                         benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }

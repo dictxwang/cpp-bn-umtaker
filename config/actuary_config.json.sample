@@ -33,6 +33,7 @@
     "loop_pause_time_millis": 5,
     "order_price_margin": 0.00002,
     "enable_position_threshold": true,
+    "enable_order_reduce_only": false,
     "same_price_pause_time_millis": 500,
 
     "benchmark_quote_asset": "USDT",
