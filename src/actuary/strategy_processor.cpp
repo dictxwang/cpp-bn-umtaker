@@ -78,6 +78,8 @@ namespace actuary {
 
         RandomIntGen rand_log;
         rand_log.init(0, 500000);
+        RandomIntGen rand_order_log;
+        rand_order_log.init(0, 100);
 
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
@@ -88,6 +90,7 @@ namespace actuary {
                 std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
             }
             int rand_log_number = rand_log.randInt();
+            int rand_order_log_number = rand_order_log.randInt();
             uint64_t now = binance::get_current_ms_epoch();
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
@@ -283,7 +286,7 @@ namespace actuary {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 10), 10);
+                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 2), 10);
                         same_make_order = latest_buy_order_millis + small_pause_time_millis <= now;
                     }
                 } else {
@@ -299,10 +302,10 @@ namespace actuary {
                 bool config_make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
                 if (!stop_buy && config_make_order && same_make_order) {
-                    should_write_log = rand_log_number < 10;
+                    should_write_log = rand_order_log_number < 100;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                 } else {
-                    should_write_log = rand_log_number < 100;
+                    should_write_log = rand_order_log_number < 100;
                 }
 
                 if (should_write_log) {
@@ -359,7 +362,7 @@ namespace actuary {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 10), 10);
+                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 2), 10);
                         same_make_order = latest_sell_order_millis + small_pause_time_millis <= now;
                     }
                 } else {
@@ -375,11 +378,11 @@ namespace actuary {
                 bool config_make_order = context.dynamic_could_make_order();
                 bool should_write_log = false;
                 if (!stop_sell && config_make_order && same_make_order) {
-                    should_write_log = rand_log_number < 10;
+                    should_write_log = rand_order_log_number < 100;
                     updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                 } else {
                     // reduce log frequency
-                    should_write_log = rand_log_number < 100;
+                    should_write_log = rand_order_log_number < 100;
                 }
 
                 if (should_write_log) {
