@@ -92,6 +92,7 @@ namespace actuary {
             int rand_log_number = rand_log.randInt();
             int rand_order_log_number = rand_order_log.randInt();
             uint64_t now = binance::get_current_ms_epoch();
+            int ticker_delay_millis = 0;
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
             std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm_index);
@@ -172,13 +173,17 @@ namespace actuary {
             follower_beta_version = follower_beta_threshold->version_number;
             early_run_version = (*early_run_threshold).version_number;
 
-            if (now > (*benchmark_ticker).update_time + config.ticker_validity_millis ||
-                now > (*follower_ticker).update_time + config.ticker_validity_millis) {
+            if (now > (*benchmark_ticker).update_time + config.benchmark_ticker_validity_millis ||
+                now > (*follower_ticker).update_time + config.follower_ticker_validity_millis) {
                 if (rand_log_number < 10) {
                     warn_log("ticker timestamp expired for {}", base_asset);
                 }
                 continue;
             }
+            if (now >= follower_ticker->update_time) {
+                ticker_delay_millis = int(now - follower_ticker->update_time);
+            }
+
             if (now > (*benchmark_beta_threshold).time_mills + config.threshold_validity_millis ||
                 now > (*follower_beta_threshold).time_mills + config.threshold_validity_millis ||
                 now > (*early_run_threshold).time_mills + config.threshold_validity_millis) {
@@ -252,6 +257,7 @@ namespace actuary {
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 bool position_close = false;
+                bool adjusted_price = false;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_SHORT
                     && order_size > (*position).positionAmt) {
@@ -266,6 +272,7 @@ namespace actuary {
 				// make sure buy price not higher than the threshold
                 if (buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
 					buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
+                    adjusted_price = true;
 				}
                 buy_price = decimal_process(buy_price, follower_exchange_info.pricePrecision);
 
@@ -279,7 +286,7 @@ namespace actuary {
                 order_buy.price = buy_price;
                 order_buy.volume = order_size;
                 order_buy.reduce_only = reduce_only;
-                std::string client_order_id = gen_client_order_id(true);
+                std::string client_order_id = gen_client_order_id(true, adjusted_price, ticker_delay_millis);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
                 order_buy.update_time = now;
 
@@ -331,6 +338,7 @@ namespace actuary {
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 bool position_close = false;
+                bool adjusted_price = false;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_LONG
                     && order_size > (*position).positionAmt) {
@@ -345,6 +353,7 @@ namespace actuary {
 				// make sure sell price not lower than the threshold
                 if (sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
 					sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
+                    adjusted_price = true;
 				}
                 sell_price = decimal_process(sell_price, follower_exchange_info.pricePrecision);
 
@@ -358,7 +367,7 @@ namespace actuary {
                 order_sell.price = sell_price;
                 order_sell.volume = order_size;
                 order_sell.reduce_only = reduce_only;
-                std::string client_order_id = gen_client_order_id(false);
+                std::string client_order_id = gen_client_order_id(false, adjusted_price, ticker_delay_millis);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 order_sell.update_time = now;
                 

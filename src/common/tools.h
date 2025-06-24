@@ -9,7 +9,7 @@
 
 bool str_ends_with(const std::string& str, const std::string& suffix);
 
-std::string gen_client_order_id(bool is_buy_size);
+std::string gen_client_order_id(bool is_buy_side, bool adjusted_price, int ticker_delay_millis);
 
 double decimal_process(double value, int precision);
 
