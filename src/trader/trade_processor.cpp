@@ -39,8 +39,8 @@ namespace trader {
         }
 
         long order_version = 0;
-        RandomIntGen rand;
-        rand.init(0, 100000);
+        RandomIntGen log_rand;
+        log_rand.init(0, 100000);
 
         while (true) {
 
@@ -48,18 +48,18 @@ namespace trader {
                 std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
             }
 
-            int rnd_number = rand.randInt();
+            int log_rand_number = log_rand.randInt();
 
             shared_ptr<shm_mng::OrderShm> shm_order = shm_mng::order_shm_reader_get(context.get_shm_store_info().order_start, shm_mapping_index);
             if (shm_order == nullptr) {
-                if (rnd_number < 10) {
+                if (log_rand_number < 10) {
                     warn_log("order in share memory not found for {}", base_asset);
                 }
                 continue;
             }
 
             if ((*shm_order).version_number <= order_version) {
-                if (rnd_number < 10) {
+                if (log_rand_number < 10) {
                     warn_log("order version in share memory is old for {} {} {} {}:{}", base_asset, shm_mapping_index, (*shm_order).inst_id, (*shm_order).version_number, order_version);
                 }
                 continue;
@@ -67,12 +67,18 @@ namespace trader {
             order_version = (*shm_order).version_number;
 
             uint64_t now = binance::get_current_ms_epoch();
+            int order_delay_millis = 0;
+
             if (now > (*shm_order).update_time + config.order_validity_millis) {
-                if (rnd_number < 10) {
-                    warn_log("order is expired for {}", base_asset);
-                }
+                warn_log("order is expired for {} {}", base_asset, shm_order->client_order_id);
                 continue;
+            } else {
+                if (now > shm_order->update_time) {
+                    order_delay_millis = int(now - shm_order->update_time);
+                }
             }
+
+            string client_order_id = std::string(shm_order->client_order_id) + "_" + std::to_string(order_delay_millis);
 
             binance::FuturesNewOrder order;
             order.symbol = follower_inst_id;
@@ -82,14 +88,14 @@ namespace trader {
             order.price = (*shm_order).price;
             order.type = std::string((*shm_order).type);
             order.timeInForce = std::string((*shm_order).time_in_force);
-            order.newClientOrderId = std::string((*shm_order).client_order_id);
+            order.newClientOrderId = client_order_id;
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
             // there no need to send reduceOnly, because if oversold occurs, it means that the current market has revered.
             // order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
 
             bool has_interval_semaphore = context.get_order_interval_boss()->has_more_semaphore(follower_inst_id);
             pair<bool, string> result;
-            bool real_place_order = false;
+
             if (config.open_place_order && has_interval_semaphore) {
 
                 if (config.trading_use_best_path) {
@@ -102,41 +108,32 @@ namespace trader {
                     } else {
                         pair<bool, bool> has_semaphore = context.get_order_best_path_limiter()->get_order_semaphore(best_service.value()->get_local_ip(), 1);
                         if (!has_semaphore.first || !has_semaphore.second) {
-                            if (rnd_number < 100) {
-                                warn_log("no more semaphore for place order with best ip {} account={}:ip={}",
-                                    best_service.value()->get_local_ip(),
-                                    has_semaphore.first, has_semaphore.second
-                                );
-                            }
+                            warn_log("no more semaphore for place order with best ip {} account={}:ip={}",
+                                best_service.value()->get_local_ip(),
+                                has_semaphore.first, has_semaphore.second
+                            );
                             result.first = false;
                             result.second = "no semaphore";
                         } else {
                             result = best_service.value()->place_order(order);
-                            real_place_order = true;
                         }
                     }
                 } else {
                     if (!context.get_order_normal_minute_limiter()->get_semaphore(1) || !context.get_order_normal_second_limiter()->get_semaphore(1)) {
-                        if (rnd_number < 100) {
-                            warn_log("no more semaphore for place order");
-                        }
+                        warn_log("no more semaphore for place order");
                         result.first = false;
                         result.second = "no semaphore";
                     } else {
                         result = context.get_normal_order_service().placeOrder(order);
-                        real_place_order = true;
                     }
                 }
             } else {
                 result.first = false;
                 result.second = "config-stop/no-interval";
             }
-            
-            // reduce log frequency
-            if (real_place_order || rnd_number < 100) {
-                info_log("place order: result={} msg={} has_interval_semaphore={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
-                    result.first, result.second, has_interval_semaphore, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
-            }
+        
+            info_log("place order: result={} msg={} has_interval_semaphore={} order(inst_id={} side={} pos_side={} price={} volume={} client_id={} reduce_only={})",
+                result.first, result.second, has_interval_semaphore, order.symbol, order.side, order.positionSide, order.price, order.quantity, order.newClientOrderId, order.reduceOnly);
         }
     }
 
