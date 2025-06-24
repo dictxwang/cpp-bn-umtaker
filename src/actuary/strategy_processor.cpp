@@ -2,6 +2,7 @@
 
 #include <cstdlib> // For exit()
 #include <thread>
+#include <algorithm>
 
 namespace actuary {
 
@@ -282,7 +283,8 @@ namespace actuary {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        same_make_order = latest_buy_order_millis + 2 <= now;
+                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 10), 10);
+                        same_make_order = latest_buy_order_millis + small_pause_time_millis <= now;
                     }
                 } else {
                     same_make_order = true;
@@ -305,11 +307,10 @@ namespace actuary {
 
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id,
+                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} updated={} inst_id={} price={} size={} client_id={} reduce_only={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_buy, updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id, order_buy.reduce_only,
                         benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
-            
             }
 
             /*
@@ -358,7 +359,8 @@ namespace actuary {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
-                        same_make_order = latest_sell_order_millis + 2 <= now;
+                        long small_pause_time_millis = std::max(int(config.same_price_pause_time_millis / 10), 10);
+                        same_make_order = latest_sell_order_millis + small_pause_time_millis <= now;
                     }
                 } else {
                     same_make_order = true;
@@ -381,8 +383,8 @@ namespace actuary {
                 }
 
                 if (should_write_log) {
-                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id,
+                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} updated={} inst_id={} price={} size={} client_id={} reduce_only={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_sell, updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id, reduce_only,
                         benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
