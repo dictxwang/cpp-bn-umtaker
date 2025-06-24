@@ -70,7 +70,7 @@ namespace trader {
             int order_delay_millis = 0;
 
             if (now > (*shm_order).update_time + config.order_validity_millis) {
-                warn_log("order is expired for {} {}", base_asset, shm_order->client_order_id);
+                warn_log("order is expired for {} {} {}", base_asset, shm_order->client_order_id, now - shm_order->update_time);
                 continue;
             } else {
                 if (now > shm_order->update_time) {
