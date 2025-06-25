@@ -257,7 +257,7 @@ namespace actuary {
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 bool position_close = false;
-                bool adjusted_price = false;
+                bool price_is_adjusted = false;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_SHORT
                     && order_size > (*position).positionAmt) {
@@ -268,13 +268,14 @@ namespace actuary {
                     }
                 }
 
-                double buy_price = follower_ticker->ask_price * (1 + config.order_price_margin);
-				// make sure buy price not higher than the threshold
-                if (buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
-					buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
-                    adjusted_price = true;
+                double original_buy_price = follower_ticker->ask_price * (1 + config.order_price_margin);
+				double adjusted_buy_price = original_buy_price;
+                // make sure buy price not higher than the threshold
+                if (original_buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
+					adjusted_buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
+                    adjusted_buy_price = decimal_process(adjusted_buy_price, follower_exchange_info.pricePrecision);
+                    price_is_adjusted = true;
 				}
-                buy_price = decimal_process(buy_price, follower_exchange_info.pricePrecision);
 
                 shm_mng::OrderShm order_buy;
                 strcpy(order_buy.inst_id, follower_inst_id.c_str());
@@ -283,15 +284,15 @@ namespace actuary {
                 // strcpy(order_buy.pos_side, binance::PositionSide_LONG.c_str());
                 strcpy(order_buy.pos_side, binance::PositionSide_BOTH.c_str());
                 strcpy(order_buy.time_in_force, binance::TimeInForce_IOC.c_str());
-                order_buy.price = buy_price;
+                order_buy.price = adjusted_buy_price;
                 order_buy.volume = order_size;
                 order_buy.reduce_only = reduce_only;
-                std::string client_order_id = gen_client_order_id(true, adjusted_price, ticker_delay_millis);
+                std::string client_order_id = gen_client_order_id(true, price_is_adjusted, ticker_delay_millis);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
                 order_buy.update_time = now;
 
                 bool same_make_order = false;
-                if (buy_price == latest_buy_order_price && latest_buy_order_millis + config.same_price_pause_time_millis > now) {
+                if (adjusted_buy_price == latest_buy_order_price && latest_buy_order_millis + config.same_price_pause_time_millis > now) {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
@@ -303,7 +304,7 @@ namespace actuary {
                 }
 
                 if (same_make_order) {
-                    latest_buy_order_price = buy_price;
+                    latest_buy_order_price = adjusted_buy_price;
                     latest_buy_order_millis = now;
                 }
 
@@ -319,9 +320,9 @@ namespace actuary {
 
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_buy, shm_updated, follower_inst_id, order_buy.price, order_buy.volume, client_order_id, position_close,
-                        benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price, order_buy.volume, client_order_id,
+                        position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
 
@@ -338,7 +339,7 @@ namespace actuary {
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 bool position_close = false;
-                bool adjusted_price = false;
+                bool price_is_adjusted = false;
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_LONG
                     && order_size > (*position).positionAmt) {
@@ -349,13 +350,14 @@ namespace actuary {
                     }
                 }
 
-                double sell_price = follower_ticker->bid_price * (1 - config.order_price_margin);
+                double original_sell_price = follower_ticker->bid_price * (1 - config.order_price_margin);
+                double adjusted_sell_price = original_sell_price;
 				// make sure sell price not lower than the threshold
-                if (sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
-					sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
-                    adjusted_price = true;
+                if (original_sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
+					adjusted_sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
+                    adjusted_sell_price = decimal_process(adjusted_sell_price, follower_exchange_info.pricePrecision);
+                    price_is_adjusted = true;
 				}
-                sell_price = decimal_process(sell_price, follower_exchange_info.pricePrecision);
 
                 shm_mng::OrderShm order_sell;
                 strcpy(order_sell.inst_id, follower_inst_id.c_str());
@@ -364,15 +366,15 @@ namespace actuary {
                 // strcpy(order_buy.pos_side, binance::PositionSide_SHORT.c_str());
                 strcpy(order_sell.pos_side, binance::PositionSide_BOTH.c_str());
                 strcpy(order_sell.time_in_force, binance::TimeInForce_IOC.c_str());
-                order_sell.price = sell_price;
+                order_sell.price = adjusted_sell_price;
                 order_sell.volume = order_size;
                 order_sell.reduce_only = reduce_only;
-                std::string client_order_id = gen_client_order_id(false, adjusted_price, ticker_delay_millis);
+                std::string client_order_id = gen_client_order_id(false, price_is_adjusted, ticker_delay_millis);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 order_sell.update_time = now;
                 
                 bool same_make_order = false;
-                if (sell_price == latest_sell_order_price && latest_sell_order_millis + config.same_price_pause_time_millis > now) {
+                if (adjusted_sell_price == latest_sell_order_price && latest_sell_order_millis + config.same_price_pause_time_millis > now) {
                     // price is same with latest, should reduce order making ratio
                     if (reduce_only == 1) {
                         // close position
@@ -384,7 +386,7 @@ namespace actuary {
                 }
 
                 if (same_make_order) {
-                    latest_sell_order_price = sell_price;
+                    latest_sell_order_price = adjusted_sell_price;
                     latest_sell_order_millis = now;
                 }
 
@@ -400,9 +402,9 @@ namespace actuary {
                 }
 
                 if (should_write_log) {
-                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_sell, shm_updated, follower_inst_id, order_sell.price, order_sell.volume, client_order_id, position_close,
-                        benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_sell, shm_updated, follower_inst_id, original_sell_price, order_sell.price, order_sell.volume, client_order_id,
+                        position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
         }
