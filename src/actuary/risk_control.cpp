@@ -29,13 +29,19 @@ namespace actuary {
                 }
                 err_log("stop make order as meta info is expired, latest update time {} now is {}", meta.updateTimeMillis, now);
                 continue;
+            } else {
+                if (context.get_dynamic_config()->is_stop_make_order_as_reason(STOP_REASON_ACCOUNT_META)) {
+                    context.get_dynamic_config()->resume_make_order(STOP_REASON_ACCOUNT_META);
+                    send_warning_message(config, context, string("resume make order: account meta refresh time is normal."));
+                    err_log("resume make order as meta info is normal, latest update time {} now is {}", meta.updateTimeMillis, now);
+                }
             }
 
 			double marginUseRatio;
 			if (meta.totalCrossWalletBalance <= 0) {
 				marginUseRatio = 1;
 			} else {
-				marginUseRatio = meta.totalInitialMargin/ meta.totalCrossWalletBalance;
+				marginUseRatio = meta.totalInitialMargin / meta.totalCrossWalletBalance;
 			}
 
             if (marginUseRatio > config.margin_ratio_thresholds[1]) {
@@ -85,6 +91,12 @@ namespace actuary {
                 }
                 err_log("stop make order as balance of bnb is expired, latest update time {} now is {}", (*balance).updateTimeMillis, now);
                 continue;
+            } else {
+                if (context.get_dynamic_config()->is_stop_make_order_as_reason(STOP_REASON_BNB)) {
+                    context.get_dynamic_config()->resume_make_order(STOP_REASON_BNB);
+                    send_warning_message(config, context, string("resume make order: balance of bnb refresh time is normal."));
+                    err_log("resume make order as balance of bnb refresh time is normal, latest update time {} now is {}", (*balance).updateTimeMillis, now);
+                }
             }
 
             if ((*balance).crossWalletBalance < config.bnb_balance_thresholds[0]) {
