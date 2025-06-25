@@ -272,7 +272,7 @@ namespace actuary {
                 original_buy_price = decimal_process(original_buy_price, follower_exchange_info.pricePrecision);
 				double adjusted_buy_price = original_buy_price;
                 // make sure buy price not higher than the threshold
-                if (original_buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
+                if (adjusted_buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
 					adjusted_buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
                     adjusted_buy_price = decimal_process(adjusted_buy_price, follower_exchange_info.pricePrecision);
                     price_is_adjusted = true;
@@ -356,7 +356,7 @@ namespace actuary {
                 original_sell_price = decimal_process(original_sell_price, follower_exchange_info.pricePrecision);
                 double adjusted_sell_price = original_sell_price;
 				// make sure sell price not lower than the threshold
-                if (original_sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
+                if (adjusted_sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
 					adjusted_sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
                     adjusted_sell_price = decimal_process(adjusted_sell_price, follower_exchange_info.pricePrecision);
                     price_is_adjusted = true;
