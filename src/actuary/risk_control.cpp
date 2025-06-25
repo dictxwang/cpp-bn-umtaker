@@ -33,7 +33,7 @@ namespace actuary {
                 if (context.get_dynamic_config()->is_stop_make_order_as_reason(STOP_REASON_ACCOUNT_META)) {
                     context.get_dynamic_config()->resume_make_order(STOP_REASON_ACCOUNT_META);
                     send_warning_message(config, context, string("resume make order: account meta refresh time is normal."));
-                    err_log("resume make order as meta info is normal, latest update time {} now is {}", meta.updateTimeMillis, now);
+                    err_log("resume make order as meta refresh time is normal, latest update time {} now is {}", meta.updateTimeMillis, now);
                 }
             }
 

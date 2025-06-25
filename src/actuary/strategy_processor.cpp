@@ -319,11 +319,12 @@ namespace actuary {
                     should_write_log = rand_order_log_number < 1;
                 }
 
+                float price_adjusted_ratio = adjusted_buy_price / original_buy_price;
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price, order_buy.volume, client_order_id,
-                        position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                    info_log("update buy order: config_make_order={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price, price_adjusted_ratio, order_buy.volume,
+                        client_order_id, position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
 
@@ -403,10 +404,11 @@ namespace actuary {
                     should_write_log = rand_order_log_number < 1;
                 }
 
+                float price_adjusted_ratio = adjusted_sell_price / original_sell_price;
                 if (should_write_log) {
-                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, same_make_order, stop_sell, shm_updated, follower_inst_id, original_sell_price, order_sell.price, order_sell.volume, client_order_id,
-                        position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                    info_log("update sell order: config_make_order={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} position_close={} ticker_version={}/{} threshold_version={}/{}/{}",
+                        config_make_order, same_make_order, stop_sell, shm_updated, follower_inst_id, original_sell_price, order_sell.price, price_adjusted_ratio, order_sell.volume,
+                        client_order_id, position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
             }
         }
