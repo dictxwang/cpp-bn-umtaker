@@ -17,6 +17,8 @@ bool InstConfig::loadInstConfig(std::string& inputfile) {
             item.beta = binance::str_to_dobule(info_list[i]["beta"]);
             item.min_ticker_size = binance::str_to_dobule(info_list[i]["min_ticker_size"]);
             item.max_ticker_size = binance::str_to_dobule(info_list[i]["max_ticker_size"]);
+            item.min_ticker_notional = info_list[i]["min_ticker_notional"].asDouble();
+            item.min_ticker_notional_multiple = info_list["min_ticker_notional_multiple"].asDouble();
             item.order_size = binance::str_to_dobule(info_list[i]["order_size"]);
             item.max_position = binance::str_to_dobule(info_list[i]["max_position"]);
             item.position_adjust_step_ratio = info_list[i]["position_adjust_step_ratio"].asDouble();

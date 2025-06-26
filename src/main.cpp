@@ -317,6 +317,13 @@ int main(int argc, char const *argv[]) {
             std::cout << "futures balance: " << bal.asset << "," << bal.crossWalletBalance << std::endl;
         }
     }
+
+    binance::CommonRestResponse<binance::FuturesCommissionRate> furuesCommissionResponse;
+    binanceRestFutures.get_commissionRate("BTCUSDC", furuesCommissionResponse);
+    std::cout << "Commission Response code: " << furuesCommissionResponse.code << std::endl;
+    std::cout << "Maker Commission Rate: " << furuesCommissionResponse.data.makerCommissionRate << std::endl;
+    std::cout << "Taker Commission Rate: " << furuesCommissionResponse.data.takerCommissionRate << std::endl;
+
     // Example: get_multiAssetMargin
     // binance::CommonRestResponse<bool> futuresMultiAssetResponse;
     // binanceRestFutures.get_multiAssetMargin(futuresMultiAssetResponse);

@@ -13,6 +13,8 @@ struct InstConfigItem {
     double beta = 0;
     double min_ticker_size = 0;
     double max_ticker_size = 0;
+    double min_ticker_notional = 1000;
+    double min_ticker_notional_multiple = 10;
     double order_size = 0;
     double max_position = 0;
     double position_adjust_step_ratio = 0;

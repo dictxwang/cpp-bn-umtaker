@@ -83,7 +83,7 @@ namespace actuary {
 
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
-        
+
         while (true) {
 
             if (config.loop_pause_time_millis > 0) {
@@ -251,8 +251,8 @@ namespace actuary {
             
             if ((benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold * (1 + position_reduce_ratio))) 
                 >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold * (1 + position_reduce_ratio)))
-                && (*benchmark_ticker).bid_size > inst_config.min_ticker_size
-                && (*follower_ticker).ask_size < inst_config.max_ticker_size
+                && benchmark_ticker->bid_price * benchmark_ticker->bid_size >= inst_config.min_ticker_notional
+                && benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple
             ) {
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
@@ -271,9 +271,11 @@ namespace actuary {
                 double original_buy_price = follower_ticker->ask_price * (1 + config.order_price_margin);
                 original_buy_price = decimal_process(original_buy_price, follower_exchange_info.pricePrecision);
 				double adjusted_buy_price = original_buy_price;
-                // make sure buy price not higher than the threshold
-                if (adjusted_buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
-					adjusted_buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
+                // make sure buy price not higher than the threshold when give little profit
+                if (config.order_price_margin > 0 &&
+                    adjusted_buy_price > benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median) {
+					
+                    adjusted_buy_price = benchmark_ticker->bid_price / (1 + inst_config.beta) - early_run_threshold->bid_ask_median;
                     adjusted_buy_price = decimal_process(adjusted_buy_price, follower_exchange_info.pricePrecision);
                     price_is_adjusted = true;
 				}
@@ -333,10 +335,10 @@ namespace actuary {
 				(okxTicker.BidPrice+earlyRunThreshold.BnAskOkxBidPriceDiffMedian)/(1+instdBetaThreshold.BidBetaThreshold*(1-positionReduceRatio))) &&
 				bnTicker.AskVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.BidVolume < instConfig.MaxTickerSize
             */
-            if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio))) 
+             else if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio))) 
                 <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold * (1 - position_reduce_ratio)))
-                && benchmark_ticker->ask_size > inst_config.min_ticker_size
-                && follower_ticker->bid_size < inst_config.max_ticker_size
+                && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional
+                && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
             ) {
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
@@ -355,9 +357,11 @@ namespace actuary {
                 double original_sell_price = follower_ticker->bid_price * (1 - config.order_price_margin);
                 original_sell_price = decimal_process(original_sell_price, follower_exchange_info.pricePrecision);
                 double adjusted_sell_price = original_sell_price;
-				// make sure sell price not lower than the threshold
-                if (adjusted_sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
-					adjusted_sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
+				// make sure sell price not lower than the threshold when give little profit
+                if (config.order_price_margin > 0 &&
+                    adjusted_sell_price < benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median) {
+					
+                    adjusted_sell_price = benchmark_ticker->ask_price * (1 + inst_config.beta) - early_run_threshold->ask_bid_median;
                     adjusted_sell_price = decimal_process(adjusted_sell_price, follower_exchange_info.pricePrecision);
                     price_is_adjusted = true;
 				}
