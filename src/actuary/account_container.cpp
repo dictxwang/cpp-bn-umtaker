@@ -101,6 +101,7 @@ namespace actuary {
         if (original != this->positionThresholdWrapper.threshold_map.end()) {
             PositionThresholdInfo item;
             item.symbol = threshold.symbol;
+            item.positionSide = threshold.positionSide;
             item.positionReduceRatio = threshold.positionReduceRatio;
             item.totalNotional = threshold.totalNotional;
             item.updateTimeMillis = threshold.updateTimeMillis;

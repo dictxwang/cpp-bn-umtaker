@@ -253,10 +253,9 @@ namespace actuary {
                 bool position_close = false;
                 bool price_is_adjusted = false;
                 int reduce_only = 0;
-                if ((*position).positionSide == binance::PositionSide_SHORT
-                    && order_size > (*position).positionAmt) {
+                if ((*position).positionSide == binance::PositionSide_SHORT) {
                     position_close = true;
-                    if (config.enable_order_reduce_only) {
+                    if (config.enable_order_reduce_only && order_size > (*position).positionAmt) {
                         reduce_only = 1;
                         order_size = (*position).positionAmt;
                     }
@@ -332,10 +331,9 @@ namespace actuary {
                 bool position_close = false;
                 bool price_is_adjusted = false;
                 int reduce_only = 0;
-                if ((*position).positionSide == binance::PositionSide_LONG
-                    && order_size > (*position).positionAmt) {
+                if ((*position).positionSide == binance::PositionSide_LONG) {
                     position_close = true;
-                    if (config.enable_order_reduce_only) {
+                    if (config.enable_order_reduce_only && order_size > (*position).positionAmt) {
                         order_size = (*position).positionAmt;
                         reduce_only = 1;
                     }

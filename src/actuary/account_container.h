@@ -50,6 +50,7 @@ namespace actuary {
 
     struct PositionThresholdInfo {
         string symbol;
+        string positionSide;
         double positionReduceRatio = 0;
         double totalNotional = 0;
         bool reachMaxPosition = false;
