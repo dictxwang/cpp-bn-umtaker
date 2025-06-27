@@ -240,6 +240,10 @@ namespace actuary {
     bool GlobalContext::dynamic_could_make_order() {
         return !(*(this->dynamic_config)).is_stop_make_order();
     }
+
+    bool GlobalContext::dynamic_could_make_open_position_order() {
+        return !this->dynamic_config->is_stop_make_open_order();
+    }
     
     shared_ptr<db_source::MySQLConnectionPool> GlobalContext::get_mysql_source() {
         return this->mysql_source;

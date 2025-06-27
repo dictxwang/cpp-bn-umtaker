@@ -46,4 +46,22 @@ namespace actuary {
 
         return stopped;
     }
+
+    void DynamicConfig::stop_make_open_order() {
+
+        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
+        this->stop_open_order = true;
+        w_lock.unlock();
+    }
+
+    void DynamicConfig::resume_make_open_order() {
+
+        std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
+        this->stop_open_order = false;
+        w_lock.unlock();
+    }
+
+    bool DynamicConfig::is_stop_make_open_order() {
+        return this->stop_open_order;
+    }
 }

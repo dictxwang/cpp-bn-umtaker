@@ -83,6 +83,7 @@ namespace actuary {
         tgbot::TgApi& get_tg_bot();
         shared_ptr<DynamicConfig> get_dynamic_config();
         bool dynamic_could_make_order();
+        bool dynamic_could_make_open_position_order();
         shared_ptr<db_source::MySQLConnectionPool> get_mysql_source();
     };
 }

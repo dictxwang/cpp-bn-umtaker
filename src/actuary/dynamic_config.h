@@ -11,7 +11,7 @@ using namespace std;
 namespace actuary {
 
     const string STOP_REASON_ACCOUNT_META = "STOP_ORDER_ACCOUNT_META";
-    const string STOP_REASON_MARGIN_LIMITED = "STOP_REASON_MARGIN_LIMITED";
+    // const string STOP_REASON_MARGIN_LIMITED = "STOP_REASON_MARGIN_LIMITED";
     const string STOP_REASON_BNB = "STOP_REASON_BNB";
     const string STOP_REASON_BNB_SHORTAGE = "STOP_REASON_BNB_SHORTAGE";
 
@@ -19,11 +19,13 @@ namespace actuary {
     public:
         DynamicConfig() {
             this->stop_order = false;
+            this->stop_open_order = false;
         }
         ~DynamicConfig() {}
     
     private:
         bool stop_order;
+        bool stop_open_order;
         set<string> stop_reasons;
         shared_mutex rw_lock;
     
@@ -32,6 +34,10 @@ namespace actuary {
         bool resume_make_order(const string& stopReason);
         bool is_stop_make_order();
         bool is_stop_make_order_as_reason(string stopReason);
+
+        void stop_make_open_order();
+        void resume_make_open_order();
+        bool is_stop_make_open_order();
     };
 }
 #endif
