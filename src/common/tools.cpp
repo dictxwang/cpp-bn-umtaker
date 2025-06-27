@@ -10,16 +10,15 @@ bool str_ends_with(const std::string& str, const std::string& suffix) {
     return str.rfind(suffix) == (str.size() - suffix.size());
 }
 
-std::string gen_client_order_id(bool is_buy_side, bool adjusted_price, int ticker_delay_millis) {
+std::string gen_client_order_id(bool is_buy_side, bool adjusted_price, int ticker_delay_millis, bool is_close_position) {
     struct timeval tv;
     gettimeofday(&tv, NULL); 
     uint64_t now = tv.tv_sec * 1000 + tv.tv_usec / 1000 ;
     char adjusted = adjusted_price ? 'y' : 'n';
-    if (is_buy_side) {
-        return 'b' + std::to_string(now) + "_" + adjusted + "_" + std::to_string(ticker_delay_millis);
-    } else {
-        return 's' + std::to_string(now) + "_" + adjusted + "_" + std::to_string(ticker_delay_millis);
-    }
+    char close = is_close_position ? 'y' : 'n';
+    std::string side = is_buy_side ? "b" : "s";
+
+    std::string client_id = side + "_" + close + "_" + std::to_string(now) + "_" + adjusted + "_" + std::to_string(ticker_delay_millis);
 }
 
 double decimal_process(double value, int precision) {

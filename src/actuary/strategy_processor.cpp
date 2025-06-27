@@ -242,12 +242,6 @@ namespace actuary {
                     stop_sell = true;
                 }
             }
-
-            /*
-            if (bnTicker.BidPrice/(1+benchmarkThreshold.BidBetaThreshold*(1+positionReduceRatio)) >=
-				(okxTicker.AskPrice+earlyRunThreshold.BnBidOkxAskPriceDiffMedian)*(1+instdBetaThreshold.AskBetaThreshold*(1+positionReduceRatio))) &&
-				bnTicker.BidVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.AskVolume < instConfig.MaxTickerSize
-            */
             
             if ((benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold * (1 + position_reduce_ratio))) 
                 >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold * (1 + position_reduce_ratio)))
@@ -290,7 +284,7 @@ namespace actuary {
                 order_buy.price = adjusted_buy_price;
                 order_buy.volume = order_size;
                 order_buy.reduce_only = reduce_only;
-                std::string client_order_id = gen_client_order_id(true, price_is_adjusted, ticker_delay_millis);
+                std::string client_order_id = gen_client_order_id(true, price_is_adjusted, ticker_delay_millis, position_close);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
                 order_buy.update_time = now;
 
@@ -328,14 +322,7 @@ namespace actuary {
                         config_make_order, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price, price_adjusted_ratio, order_buy.volume,
                         client_order_id, position_close, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
-            }
-
-            /*
-             (bnTicker.AskPrice*(1+benchmarkThreshold.AskBetaThreshold*(1-positionReduceRatio)) <=
-				(okxTicker.BidPrice+earlyRunThreshold.BnAskOkxBidPriceDiffMedian)/(1+instdBetaThreshold.BidBetaThreshold*(1-positionReduceRatio))) &&
-				bnTicker.AskVolume > instConfig.MinTickerSize*instConfig.ContractValue && okxTicker.BidVolume < instConfig.MaxTickerSize
-            */
-             else if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio))) 
+            } else if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio))) 
                 <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold * (1 - position_reduce_ratio)))
                 && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional
                 && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
@@ -376,7 +363,7 @@ namespace actuary {
                 order_sell.price = adjusted_sell_price;
                 order_sell.volume = order_size;
                 order_sell.reduce_only = reduce_only;
-                std::string client_order_id = gen_client_order_id(false, price_is_adjusted, ticker_delay_millis);
+                std::string client_order_id = gen_client_order_id(false, price_is_adjusted, ticker_delay_millis, position_close);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
                 order_sell.update_time = now;
                 
