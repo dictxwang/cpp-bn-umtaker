@@ -10,7 +10,7 @@
       "max_ticker_size": 800,
       "min_ticker_notional": 50000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 0.002,
       "max_position": 0.02
@@ -25,7 +25,7 @@
       "max_ticker_size": 8000,
       "min_ticker_notional": 20000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 0.05,
       "max_position": 0.5
@@ -40,7 +40,7 @@
       "max_ticker_size": 80000,
       "min_ticker_notional": 5000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 0.15,
       "max_position": 1.5
@@ -55,7 +55,7 @@
       "max_ticker_size": 800000,
       "min_ticker_notional": 20000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 0.5,
       "max_position": 5
@@ -70,7 +70,7 @@
       "max_ticker_size": 8000000,
       "min_ticker_notional": 8000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 25,
       "max_position": 250
@@ -85,7 +85,7 @@
       "max_ticker_size": 500000,
       "min_ticker_notional": 6000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 200,
       "max_position": 2000
@@ -100,7 +100,7 @@
       "max_ticker_size": 100000,
       "min_ticker_notional": 2000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 15,
       "max_position": 150
@@ -115,7 +115,7 @@
       "max_ticker_size": 100000,
       "min_ticker_notional": 3000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 3,
       "max_position": 30
@@ -130,7 +130,7 @@
       "max_ticker_size": 100000,
       "min_ticker_notional": 1500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 5,
       "max_position": 50
@@ -145,7 +145,7 @@
       "max_ticker_size": 8000000,
       "min_ticker_notional": 1500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 4000,
       "max_position": 40000
@@ -160,7 +160,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 2000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 35,
       "max_position": 350
@@ -175,7 +175,7 @@
       "max_ticker_size": 100000,
       "min_ticker_notional": 3000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 2,
       "max_position": 20
@@ -190,7 +190,7 @@
       "max_ticker_size": 8000000,
       "min_ticker_notional": 1000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 2500,
       "max_position": 25000
@@ -205,7 +205,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 1500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 40,
       "max_position": 450
@@ -220,7 +220,7 @@
       "max_ticker_size": 10000,
       "min_ticker_notional": 500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 0.1,
       "max_position": 1
@@ -235,7 +235,7 @@
       "max_ticker_size": 10000,
       "min_ticker_notional": 3500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 0.5,
       "max_position": 5
@@ -250,7 +250,7 @@
       "max_ticker_size": 10000000,
       "min_ticker_notional": 5000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 20,
       "max_position": 200
@@ -265,7 +265,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 3500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 100,
       "max_position": 1000
@@ -280,7 +280,7 @@
       "max_ticker_size": 100000,
       "min_ticker_notional": 500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 5,
       "max_position": 6
@@ -295,7 +295,7 @@
       "max_ticker_size": 10000000,
       "min_ticker_notional": 10000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 15,
       "max_position": 150
@@ -310,7 +310,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 500,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 15,
       "max_position": 150
@@ -325,7 +325,7 @@
       "max_ticker_size": 20000000,
       "min_ticker_notional": 2000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 20000,
       "max_position": 200000
@@ -340,7 +340,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 10000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 100,
       "max_position": 1000
@@ -355,7 +355,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 10000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 35,
       "max_position": 350
@@ -370,7 +370,7 @@
       "max_ticker_size": 10000000,
       "min_ticker_notional": 10000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 2000,
       "max_position": 20000
@@ -385,7 +385,7 @@
       "max_ticker_size": 3000000,
       "min_ticker_notional": 10000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 50,
       "max_position": 500
@@ -400,7 +400,7 @@
       "max_ticker_size": 500000,
       "min_ticker_notional": 200,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 20,
       "max_position": 200
@@ -415,7 +415,7 @@
       "max_ticker_size": 200000,
       "min_ticker_notional": 100,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 10,
       "max_position": 100
@@ -430,7 +430,7 @@
       "max_ticker_size": 70000,
       "min_ticker_notional": 2000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 3.5,
       "max_position": 35
@@ -445,7 +445,7 @@
       "max_ticker_size": 1000000,
       "min_ticker_notional": 10000,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 50,
       "max_position": 500
@@ -460,7 +460,7 @@
       "max_ticker_size": 5000000,
       "min_ticker_notional": 200,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 150,
       "max_position": 1500
@@ -475,7 +475,7 @@
       "max_ticker_size": 4000000,
       "min_ticker_notional": 200,
       "min_ticker_notional_multiple": 10,
-      "position_adjust_step_ratio": 0.005,
+      "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
       "order_size": 200,
       "max_position": 2000
