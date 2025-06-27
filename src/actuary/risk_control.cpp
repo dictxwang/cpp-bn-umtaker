@@ -61,7 +61,7 @@ namespace actuary {
                 }
             }
 
-            info_log("finish to watch account margin ratio");
+            info_log("finish to watch account margin ratio, current value is {}", marginUseRatio);
         }
     }
 
