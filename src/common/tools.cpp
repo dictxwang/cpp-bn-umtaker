@@ -19,6 +19,8 @@ std::string gen_client_order_id(bool is_buy_side, bool adjusted_price, int ticke
     std::string side = is_buy_side ? "b" : "s";
 
     std::string client_id = side + "_" + close + "_" + std::to_string(now) + "_" + adjusted + "_" + std::to_string(ticker_delay_millis);
+
+    return client_id;
 }
 
 double decimal_process(double value, int precision) {
