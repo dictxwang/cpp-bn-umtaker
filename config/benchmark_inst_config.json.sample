@@ -35,7 +35,7 @@
       "volatility_a": 1,
       "volatility_b": 300,
       "volatility_c": 0,
-      "beta": 0.0003,
+      "beta": 0.0004,
       "min_ticker_size": 0.01,
       "max_ticker_size": 80000,
       "min_ticker_notional": 5000,
