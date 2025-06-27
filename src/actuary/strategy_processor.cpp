@@ -84,6 +84,9 @@ namespace actuary {
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
 
+        std::this_thread::sleep_for(std::chrono::seconds(10));
+        info_log("sleep a while before signal calculation");
+
         while (true) {
 
             if (config.loop_pause_time_millis > 0) {
@@ -235,7 +238,7 @@ namespace actuary {
 
             // dynamic adjust threshold with position amount
             bool stop_buy, stop_sell = false;
-            if ((*position).positionAmt >= inst_config.max_position * config.max_position_zoom) {
+            if ((*position).positionAmountAbs >= inst_config.max_position * config.max_position_zoom) {
                 if ((*position).positionSide == binance::PositionSide_LONG) {
                     stop_buy = true;
                 } else {
@@ -255,9 +258,9 @@ namespace actuary {
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_SHORT) {
                     position_close = true;
-                    if (config.enable_order_reduce_only && order_size > (*position).positionAmt) {
+                    if (config.enable_order_reduce_only && order_size > (*position).positionAmountAbs) {
                         reduce_only = 1;
-                        order_size = (*position).positionAmt;
+                        order_size = (*position).positionAmountAbs;
                     }
                 }
 
@@ -333,8 +336,8 @@ namespace actuary {
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_LONG) {
                     position_close = true;
-                    if (config.enable_order_reduce_only && order_size > (*position).positionAmt) {
-                        order_size = (*position).positionAmt;
+                    if (config.enable_order_reduce_only && order_size > (*position).positionAmountAbs) {
+                        order_size = (*position).positionAmountAbs;
                         reduce_only = 1;
                     }
                 }

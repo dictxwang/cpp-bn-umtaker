@@ -44,7 +44,8 @@ namespace actuary {
         double unrealizedProfit = 0;
         double entryPrice = 0;
         string positionSide;
-        double positionAmt = 0;
+        double positionAmount = 0;
+        double positionAmountAbs = 0;
         uint64_t updateTimeMillis = 0;
     };
 

@@ -79,7 +79,8 @@ namespace actuary {
                     item.positionSide = binance::PositionSide_LONG;
                 }
             }
-            item.positionAmt = std::abs(position.positionAmt);
+            item.positionAmount = position.positionAmt;
+            item.positionAmountAbs = std::abs(position.positionAmt);
             item.updateTimeMillis = position.updateTime;
 
             std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
@@ -158,7 +159,8 @@ namespace actuary {
                     item.positionSide = binance::PositionSide_LONG;
                 }
             }
-            item.positionAmt = std::abs(event.positionAmout);
+            item.positionAmount = event.positionAmout;
+            item.positionAmountAbs = std::abs(event.positionAmout);
             item.updateTimeMillis = binance::get_current_ms_epoch();
 
             std::unique_lock<std::shared_mutex> w_lock(this->positionWrapper.rw_lock);
@@ -212,7 +214,8 @@ namespace actuary {
             info.unrealizedProfit = (*item).second.unrealizedProfit;
             info.entryPrice = (*item).second.entryPrice;
             info.positionSide = (*item).second.positionSide;
-            info.positionAmt = (*item).second.positionAmt;
+            info.positionAmount = (*item).second.positionAmount;
+            info.positionAmountAbs = (*item).second.positionAmountAbs;
             info.updateTimeMillis = (*item).second.updateTimeMillis;
             return info;
         } else {

@@ -398,13 +398,13 @@ namespace actuary {
             return nullopt;
         }
 
-        double totalNotional = position.value().positionAmt * ((follower_ticker->ask_price + follower_ticker->bid_price) / 2);
+        double totalNotional = position.value().positionAmount * ((follower_ticker->ask_price + follower_ticker->bid_price) / 2);
         PositionThresholdInfo threshold;
         threshold.symbol = follower_symbol;
         threshold.positionSide = position.value().positionSide;
         threshold.totalNotional = totalNotional;
         threshold.positionReduceRatio = (totalNotional / inst_config->second.position_adjust_step_notional) * inst_config->second.position_adjust_step_ratio;
-        threshold.reachMaxPosition = position.value().positionAmt >= inst_config->second.max_position;
+        threshold.reachMaxPosition = position.value().positionAmountAbs >= inst_config->second.max_position;
         threshold.updateTimeMillis = binance::get_current_ms_epoch();
 
         return threshold;
