@@ -139,25 +139,6 @@ namespace actuary {
                 continue;
             }
 
-
-            // if ((*benchmark_ticker).version_number == benchmark_ticker_version && (*follower_ticker).version_number == follower_ticker_version ||
-            //     (*benchmark_ticker).version_number < benchmark_ticker_version || (*follower_ticker).version_number < follower_ticker_version) {
-                
-            //     if ((*benchmark_ticker).version_number > benchmark_ticker_version) {
-            //         benchmark_ticker_version = (*benchmark_ticker).version_number;
-            //     }
-            //     if ((*follower_ticker).version_number > follower_ticker_version) {
-            //         follower_ticker_version = (*follower_ticker).version_number;
-            //     }
-            //     if (rand_log_number < 10) {
-            //         warn_log("ticker version is old in share memory for {}", base_asset);
-            //     }
-            //     continue;
-            // }
-
-            // benchmark_ticker_version = (*benchmark_ticker).version_number;
-            // follower_ticker_version = (*follower_ticker).version_number;
-
             std::shared_ptr<shm_mng::EarlyRunThresholdShm> early_run_threshold = shm_mng::early_run_shm_reader_get(context.get_shm_store_info().early_run_start, threshold_shm_index);
             std::shared_ptr<shm_mng::BetaThresholdShm> benchmark_beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().benchmark_beta_start, threshold_shm_index);
             std::shared_ptr<shm_mng::BetaThresholdShm> follower_beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().follower_beta_start, threshold_shm_index);
@@ -224,32 +205,6 @@ namespace actuary {
                 continue;
             }
 
-            // info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
-            //     base_asset,
-            //     (*benchmark_ticker).bid_price,
-            //     (*follower_ticker).ask_price,
-            //     (*early_run_threshold).bid_ask_median,
-            //     (*follower_beta_threshold).volatility_multiplier,
-            //     inst_config.beta,
-            //     (*benchmark_ticker).bid_size,
-            //     inst_config.max_ticker_size,
-            //     (*follower_ticker).ask_size,
-            //     inst_config.min_ticker_size
-            // );
-
-            // info_log("parameters: {} {}, {}, {}, {}, {}, {}, {}, {}, {}",
-            //     base_asset,
-            //     (*benchmark_ticker).ask_price,
-            //     (*follower_ticker).bid_price,
-            //     (*early_run_threshold).ask_bid_median,
-            //     (*follower_beta_threshold).volatility_multiplier,
-            //     inst_config.beta,
-            //     (*benchmark_ticker).ask_size,
-            //     inst_config.max_ticker_size,
-            //     (*follower_ticker).bid_size,
-            //     inst_config.min_ticker_size
-            // );
-
             optional<AccountPositionInfo> position = context.get_balance_position_composite().copy_position(follower_inst_id);
             if (!position.has_value()) {
                 warn_log("position not found for {}", follower_inst_id);
@@ -279,6 +234,20 @@ namespace actuary {
                 && benchmark_ticker->bid_price * benchmark_ticker->bid_size >= inst_config.min_ticker_notional
                 && benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple
             ) {
+
+                // info_log("parameters: base_asset={}, benchmark_ticker_bid={}, follower_ticker_ask={}, bid_beta_threshold={}, bid_ask_median={}, ask_beta_threshold={}, beta={}, benchmark_bid_size={}, min_ticker_notional={}, follower_ask_size={}",
+                //     base_asset,
+                //     (*benchmark_ticker).bid_price,
+                //     (*follower_ticker).ask_price,
+                //     (*benchmark_beta_threshold).bid_beta_threshold,
+                //     (*early_run_threshold).bid_ask_median,
+                //     (*follower_beta_threshold).ask_beta_threshold,
+                //     inst_config.beta,
+                //     (*benchmark_ticker).bid_size,
+                //     inst_config.min_ticker_notional,
+                //     (*follower_ticker).ask_size
+                // );
+
                 // make buy-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 bool position_close = false;
@@ -360,6 +329,20 @@ namespace actuary {
                 && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional
                 && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
             ) {
+
+                // info_log("parameters: base_asset={} benchmark_ticker_ask={}, follower_ticker_bid={}, ask_beta_threshold={}, ask_bid_median={}, volatility_multiplier={}, beta={}, benchmark_ask_size={}, min_ticker_notional={}, follower_bid_size={}",
+                //     base_asset,
+                //     (*benchmark_ticker).ask_price,
+                //     (*follower_ticker).bid_price,
+                //     benchmark_beta_threshold->ask_beta_threshold,
+                //     (*early_run_threshold).ask_bid_median,
+                //     (*follower_beta_threshold).volatility_multiplier,
+                //     inst_config.beta,
+                //     (*benchmark_ticker).ask_size,
+                //     inst_config.min_ticker_notional,
+                //     (*follower_ticker).bid_size
+                // );
+
                 // make sell-side order
                 double order_size = inst_config.order_size * config.order_size_zoom;
                 bool position_close = false;

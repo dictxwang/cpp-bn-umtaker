@@ -235,9 +235,9 @@ namespace receiver {
             double avg_volatility = (min_max_result.max_avg_price - min_max_result.min_avg_price) / min_max_result.min_avg_price;
             double avg_volatility_multiplier = calculate_volatility_multiplier(avg_volatility, inst_config);
 
-            double bid_beta_threshold = calculate_beta_threshold(bid_volatility, inst_config);
-            double ask_beta_threshold = calculate_beta_threshold(ask_volatility, inst_config);
-            double avg_beta_threshold = calculate_beta_threshold(avg_volatility, inst_config);
+            double bid_beta_threshold = calculate_beta_threshold(bid_volatility_multiplier, inst_config);
+            double ask_beta_threshold = calculate_beta_threshold(ask_volatility_multiplier, inst_config);
+            double avg_beta_threshold = calculate_beta_threshold(avg_volatility_multiplier, inst_config);
 
             BetaThreshold threshold;
             // TODO not found how to set parameter of sam
@@ -288,8 +288,6 @@ namespace receiver {
             }
 
             if (rand_value < 20) {
-                // shared_ptr<shm_mng::BetaThresholdShm> shared_shm = shm_mng::beta_shm_reader_get(shm_start, (*address).second);
-                // std::cout << "shm asset: " << (*shared_shm).asset << "," << (*shared_shm).bid_beta_threshold << "," << (*shared_shm).time_mills << std::endl;
                 info_log("process beta threshold: runtime={} role={} inst_id={} base={} bid_volatility={} bid_volatility_multiplier={} bid_beta_threshold={} ask_volatility={} ask_volatility_multiplier={} ask_beta_threshold={} volatility={} volatility_multiplier={} beta_threshold={} update_shm={}",
                     runtime, strHelper::toString(role), inst_id, base_asset, threshold.bid_volatility, threshold.bid_volatility_multiplier,
                     threshold.bid_beta_threshold, threshold.ask_volatility, threshold.ask_volatility_multiplier,
