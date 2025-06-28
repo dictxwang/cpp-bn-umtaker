@@ -38,6 +38,8 @@ namespace actuary {
         bool rest_use_intranet;
         string rest_local_ip;
 
+        bool enable_benchmark_ticker_trigger;
+        bool enable_follower_ticker_trigger;
         uint64_t benchmark_ticker_validity_millis;
         uint64_t follower_ticker_validity_millis;
         uint64_t threshold_validity_millis;

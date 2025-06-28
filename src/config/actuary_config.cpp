@@ -34,8 +34,9 @@ namespace actuary {
         this->api_key_hmac = this->doc_["api_key_hmac"].asString();
         this-> secret_key_hmac = this->doc_["secret_key_hmac"].asString();
         this->rest_use_intranet = this->doc_["rest_use_intranet"].asBool();
-        this->rest_local_ip = this->doc_["rest_local_ip"].asString();
 
+        this->enable_benchmark_ticker_trigger = this->doc_["enable_benchmark_ticker_trigger"].asBool();        this->rest_local_ip = this->doc_["rest_local_ip"].asString();
+        this->enable_follower_ticker_trigger = this->doc_["enable_follower_ticker_trigger"].asBool();
         this->benchmark_ticker_validity_millis = this->doc_["benchmark_ticker_validity_millis"].asUInt64();
         this->follower_ticker_validity_millis = this->doc_["follower_ticker_validity_millis"].asUInt64();
         this->threshold_validity_millis = this->doc_["threshold_validity_millis"].asUInt64();

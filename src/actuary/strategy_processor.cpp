@@ -112,23 +112,51 @@ namespace actuary {
                 continue;
             }
 
-            if ((*benchmark_ticker).version_number == benchmark_ticker_version && (*follower_ticker).version_number == follower_ticker_version ||
-                (*benchmark_ticker).version_number < benchmark_ticker_version || (*follower_ticker).version_number < follower_ticker_version) {
-                
-                if ((*benchmark_ticker).version_number > benchmark_ticker_version) {
-                    benchmark_ticker_version = (*benchmark_ticker).version_number;
-                }
-                if ((*follower_ticker).version_number > follower_ticker_version) {
-                    follower_ticker_version = (*follower_ticker).version_number;
-                }
+            long benchmark_ticker_new_version = benchmark_ticker->version_number;
+            long follower_ticker_new_version = follower_ticker->version_number;
+            if (benchmark_ticker_new_version < benchmark_ticker_version || follower_ticker_new_version < follower_ticker_version) {
                 if (rand_log_number < 10) {
                     warn_log("ticker version is old in share memory for {}", base_asset);
                 }
                 continue;
             }
 
-            benchmark_ticker_version = (*benchmark_ticker).version_number;
-            follower_ticker_version = (*follower_ticker).version_number;
+            bool benchmark_ticker_changed, follower_ticker_changed = false;
+            if (benchmark_ticker_new_version > benchmark_ticker_version) {
+                benchmark_ticker_version = benchmark_ticker_new_version;
+                benchmark_ticker_changed = true;
+            }
+            if (follower_ticker_new_version > follower_ticker_version) {
+                follower_ticker_version = follower_ticker_new_version;
+                follower_ticker_changed = true;
+            }
+
+            if ((!config.enable_benchmark_ticker_trigger || !benchmark_ticker_changed)
+                && (!config.enable_follower_ticker_trigger || !follower_ticker_changed)) {
+                if (rand_log_number < 10) {
+                    warn_log("enabled trigger ticker version is not change in share memory for {}", base_asset);
+                }
+                continue;
+            }
+
+
+            // if ((*benchmark_ticker).version_number == benchmark_ticker_version && (*follower_ticker).version_number == follower_ticker_version ||
+            //     (*benchmark_ticker).version_number < benchmark_ticker_version || (*follower_ticker).version_number < follower_ticker_version) {
+                
+            //     if ((*benchmark_ticker).version_number > benchmark_ticker_version) {
+            //         benchmark_ticker_version = (*benchmark_ticker).version_number;
+            //     }
+            //     if ((*follower_ticker).version_number > follower_ticker_version) {
+            //         follower_ticker_version = (*follower_ticker).version_number;
+            //     }
+            //     if (rand_log_number < 10) {
+            //         warn_log("ticker version is old in share memory for {}", base_asset);
+            //     }
+            //     continue;
+            // }
+
+            // benchmark_ticker_version = (*benchmark_ticker).version_number;
+            // follower_ticker_version = (*follower_ticker).version_number;
 
             std::shared_ptr<shm_mng::EarlyRunThresholdShm> early_run_threshold = shm_mng::early_run_shm_reader_get(context.get_shm_store_info().early_run_start, threshold_shm_index);
             std::shared_ptr<shm_mng::BetaThresholdShm> benchmark_beta_threshold = shm_mng::beta_shm_reader_get(context.get_shm_store_info().benchmark_beta_start, threshold_shm_index);

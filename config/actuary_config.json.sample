@@ -28,6 +28,8 @@
     "rest_use_intranet": false,
     "rest_local_ip": "",
 
+    "enable_benchmark_ticker_trigger": true,
+    "enable_follower_ticker_trigger": false,
     "benchmark_ticker_validity_millis": 1000,
     "follower_ticker_validity_millis": 1000,
     "threshold_validity_millis": 2000,
