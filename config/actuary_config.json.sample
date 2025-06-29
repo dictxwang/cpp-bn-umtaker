@@ -38,6 +38,7 @@
     "enable_position_threshold": true,
     "enable_order_reduce_only": false,
     "same_price_pause_time_millis": 500,
+    "enable_write_parameter_log": false,
 
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",

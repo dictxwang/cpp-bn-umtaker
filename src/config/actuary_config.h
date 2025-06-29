@@ -48,6 +48,7 @@ namespace actuary {
         bool enable_position_threshold;
         bool enable_order_reduce_only;
         long same_price_pause_time_millis;
+        bool enable_write_parameter_log;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

@@ -46,6 +46,8 @@ namespace actuary {
         this->enable_order_reduce_only = this->doc_["enable_order_reduce_only"].asBool();
         this->same_price_pause_time_millis = this->doc_["same_price_pause_time_millis"].asInt64();
 
+        this->enable_write_parameter_log = this->doc_["enable_write_parameter_log"].asBool();
+
         this->benchmark_quote_asset = this->doc_["benchmark_quote_asset"].asString();
         this->follower_quote_asset = this->doc_["follower_quote_asset"].asString();
 
