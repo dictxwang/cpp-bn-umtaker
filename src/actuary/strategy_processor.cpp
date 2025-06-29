@@ -260,10 +260,10 @@ namespace actuary {
                     inst_config.min_ticker_notional,
                     (*follower_ticker).bid_size,
                     position_reduce_ratio,
-                    (benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold * (1 + position_reduce_ratio))) 
-                        >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold * (1 + position_reduce_ratio))),
-                    benchmark_ticker->bid_price * benchmark_ticker->bid_size >= inst_config.min_ticker_notional,
-                    benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple
+                    (benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio)))
+                        <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold * (1 - position_reduce_ratio))),
+                   benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional,
+                   benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
                 );
             }
             
