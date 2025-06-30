@@ -230,7 +230,7 @@ namespace actuary {
             }
 
             if (config.enable_write_parameter_log) {
-                info_log("check buy order parameters: base_asset={}, benchmark_ticker_bid={}, follower_ticker_ask={}, bid_beta_threshold={}, bid_ask_median={}, ask_beta_threshold={}, beta={}, benchmark_bid_size={}, min_ticker_notional={}, follower_ask_size={} position_reduce_ratio={} {} {} {}",
+                info_log("check buy order parameters: base_asset={}, benchmark_ticker_bid={}, follower_ticker_ask={}, bid_beta_threshold={}, bid_ask_median={}, ask_beta_threshold={}, beta={}, benchmark_bid_size={}, min_ticker_notional={}, follower_ask_size={} position_reduce_ratio={} {}>={}?{} {} {}",
                     base_asset,
                     (*benchmark_ticker).bid_price,
                     (*follower_ticker).ask_price,
@@ -242,33 +242,37 @@ namespace actuary {
                     inst_config.min_ticker_notional,
                     (*follower_ticker).ask_size,
                     position_reduce_ratio,
-                    (benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold * (1 + position_reduce_ratio))) 
-                        >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold * (1 + position_reduce_ratio))),
+                    (benchmark_ticker->bid_price/(1 + (benchmark_beta_threshold->bid_beta_threshold + follower_beta_threshold->ask_beta_threshold) * (1 + position_reduce_ratio))),
+                    ((follower_ticker->ask_price+early_run_threshold->bid_ask_median)),
+                    (benchmark_ticker->bid_price/(1 + (benchmark_beta_threshold->bid_beta_threshold + follower_beta_threshold->ask_beta_threshold) * (1 + position_reduce_ratio))) 
+                        >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median)),
                     benchmark_ticker->bid_price * benchmark_ticker->bid_size >= inst_config.min_ticker_notional,
                     benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple
                 );
 
-                info_log("check sell order parameters: base_asset={} benchmark_ticker_ask={}, follower_ticker_bid={}, ask_beta_threshold={}, ask_bid_median={}, volatility_multiplier={}, beta={}, benchmark_ask_size={}, min_ticker_notional={}, follower_bid_size={} position_reduce_ratio={} {} {} {}",
+                info_log("check sell order parameters: base_asset={} benchmark_ticker_ask={}, follower_ticker_bid={}, ask_beta_threshold={}, ask_bid_median={}, bid_beta_threshold={}, beta={}, benchmark_ask_size={}, min_ticker_notional={}, follower_bid_size={} position_reduce_ratio={} {}<={}?{} {} {}",
                     base_asset,
                     (*benchmark_ticker).ask_price,
                     (*follower_ticker).bid_price,
                     benchmark_beta_threshold->ask_beta_threshold,
                     (*early_run_threshold).ask_bid_median,
-                    (*follower_beta_threshold).volatility_multiplier,
+                    follower_beta_threshold->bid_beta_threshold,
                     inst_config.beta,
                     (*benchmark_ticker).ask_size,
                     inst_config.min_ticker_notional,
                     (*follower_ticker).bid_size,
                     position_reduce_ratio,
-                    (benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio)))
-                        <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold * (1 - position_reduce_ratio))),
+                    (benchmark_ticker->ask_price*(1 + (benchmark_beta_threshold->ask_beta_threshold + follower_beta_threshold->bid_beta_threshold) * (1 - position_reduce_ratio))),
+                    ((follower_ticker->bid_price + early_run_threshold->ask_bid_median)),
+                    (benchmark_ticker->ask_price*(1 + (benchmark_beta_threshold->ask_beta_threshold + follower_beta_threshold->bid_beta_threshold) * (1 - position_reduce_ratio)))
+                        <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median)),
                    benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional,
                    benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
                 );
             }
             
-            if ((benchmark_ticker->bid_price/(1 + benchmark_beta_threshold->bid_beta_threshold * (1 + position_reduce_ratio))) 
-                >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median) * (1 + follower_beta_threshold->ask_beta_threshold * (1 + position_reduce_ratio)))
+            if ((benchmark_ticker->bid_price/(1 + (benchmark_beta_threshold->bid_beta_threshold + follower_beta_threshold->ask_beta_threshold) * (1 + position_reduce_ratio))) 
+                    >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median))
                 && benchmark_ticker->bid_price * benchmark_ticker->bid_size >= inst_config.min_ticker_notional
                 && benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple
             ) {
@@ -349,8 +353,8 @@ namespace actuary {
                         config_make_order, config_make_open_position_order, position_close, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price,
                         price_adjusted_ratio, order_buy.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
                 }
-            } else if ((benchmark_ticker->ask_price*(1 + benchmark_beta_threshold->ask_beta_threshold * (1 - position_reduce_ratio))) 
-                <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median) / (1 + follower_beta_threshold->bid_beta_threshold * (1 - position_reduce_ratio)))
+            } else if ((benchmark_ticker->ask_price*(1 + (benchmark_beta_threshold->ask_beta_threshold + follower_beta_threshold->bid_beta_threshold) * (1 - position_reduce_ratio)))
+                    <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median))
                 && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional
                 && benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
             ) {
