@@ -60,7 +60,7 @@ namespace trader {
 
             if ((*shm_order).version_number <= order_version) {
                 if (log_rand_number < 10) {
-                    warn_log("order version in share memory is old for {} {} {} {}:{}", base_asset, shm_mapping_index, (*shm_order).inst_id, (*shm_order).version_number, order_version);
+                    // warn_log("order version in share memory is old for {} {} {} {}:{}", base_asset, shm_mapping_index, (*shm_order).inst_id, (*shm_order).version_number, order_version);
                 }
                 continue;
             }
