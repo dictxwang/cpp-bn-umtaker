@@ -187,7 +187,7 @@ namespace actuary {
 
             if (now > (*benchmark_ticker).update_time + config.benchmark_ticker_validity_millis ||
                 now > (*follower_ticker).update_time + config.follower_ticker_validity_millis) {
-                if (rand_log_number < 10) {
+                if (rand_log_number < 1) {
                     warn_log("ticker timestamp expired for {}", base_asset);
                 }
                 continue;
