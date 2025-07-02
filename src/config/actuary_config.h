@@ -47,6 +47,8 @@ namespace actuary {
         double order_price_margin;
         bool enable_position_threshold;
         bool enable_order_reduce_only;
+        bool enable_ticker_size_compare;
+
         long same_price_pause_time_millis;
         bool enable_write_parameter_log;
 
