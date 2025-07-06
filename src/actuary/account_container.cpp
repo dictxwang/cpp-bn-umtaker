@@ -60,7 +60,7 @@ namespace actuary {
 
     bool AccountBalancePositionComposite::update_exist_position(binance::FuturesAccountPosition& position) {
 
-        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        std::shared_lock<std::shared_mutex> r_lock(this->positionWrapper.rw_lock);
         auto original = this->positionWrapper.position_map.find(position.symbol);
         r_lock.unlock();
 
@@ -95,7 +95,7 @@ namespace actuary {
 
     bool AccountBalancePositionComposite::update_exist_position_threshold(PositionThresholdInfo& threshold) {
         
-        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        std::shared_lock<std::shared_mutex> r_lock(this->positionThresholdWrapper.rw_lock);
         auto original = this->positionThresholdWrapper.threshold_map.find(threshold.symbol);
         r_lock.unlock();
 
@@ -142,7 +142,7 @@ namespace actuary {
 
     bool AccountBalancePositionComposite::update_exist_position_event(binance::WsFuturesAccountUpdatePositionEvent& event) {
 
-        std::shared_lock<std::shared_mutex> r_lock(this->balanceWrapper.rw_lock);
+        std::shared_lock<std::shared_mutex> r_lock(this->positionWrapper.rw_lock);
         auto original = this->positionWrapper.position_map.find(event.symbol);
         r_lock.unlock();
 

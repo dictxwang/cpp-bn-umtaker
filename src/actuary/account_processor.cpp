@@ -199,7 +199,6 @@ namespace actuary {
                         warn_log("no mysql connection created");
                     }
                 }
-
             }
             info_log("finish polling turn of loading balance and position");
             std::this_thread::sleep_for(std::chrono::seconds(turn_interval));
