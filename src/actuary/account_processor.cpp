@@ -201,6 +201,7 @@ namespace actuary {
                 }
 
             }
+            info_log("finish polling turn of loading balance and position");
             std::this_thread::sleep_for(std::chrono::seconds(turn_interval));
         }
     }
