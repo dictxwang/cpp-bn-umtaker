@@ -333,6 +333,10 @@ namespace actuary {
                             // ignore not taker strategy orders
                             continue;
                         }
+                        if (!strHelper::endsWith(event.symbol, config.follower_quote_asset)) {
+                            // ignore not match quote asset orders
+                            continue;
+                        }
                         if (event.filledVolume == 0) {
                             // ignore no filled order
                             continue;
@@ -382,6 +386,10 @@ namespace actuary {
         std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, follower_shm->second);
         if (follower_ticker == nullptr) {
             warn_log("follower ticker not found from shm for position threshold calculation of {}", follower_symbol);
+            return nullopt;
+        }
+        if (follower_ticker->bid_price <= 0 || follower_ticker->ask_price <= 0) {
+            warn_log("follower ticker price is valid of {}", follower_symbol);
             return nullopt;
         }
         

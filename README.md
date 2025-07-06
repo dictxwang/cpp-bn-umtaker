@@ -34,11 +34,15 @@ https://web.telegram.org/a/#-4958151325
 
 ## Start Udp Ticker Processor
 
-taskset -c 16 ./main_ws ./ws_test.conf > /data/dc/ticker/test.nohup
+taskset -c 16 ./main_ws ./ws_taker_um.conf > /data/dc/ticker/taker_um.out
+nohup ./udp_client udp_bn_uperp_client.conf > out.log
 
 
 
 ## About Debug
+
+##### open coredump file output
+ulimit -c unlimited
 
 ##### if use apport, the core dump files path is:
 /var/lib/apport/coredump/
