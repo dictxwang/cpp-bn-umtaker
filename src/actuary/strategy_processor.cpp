@@ -82,7 +82,7 @@ namespace actuary {
         rand_order_log.init(0, 100);
 
         InstConfigItem inst_config = (*inst_config_auto).second;
-        long benchmark_ticker_version, follower_ticker_version, early_run_version, benchmark_beta_version, follower_beta_version = 0;
+        long benchmark_ticker_version = 0, follower_ticker_version = 0, early_run_version = 0, benchmark_beta_version = 0, follower_beta_version = 0;
 
         std::this_thread::sleep_for(std::chrono::seconds(10));
         info_log("sleep a while before signal calculation");
@@ -121,7 +121,7 @@ namespace actuary {
                 continue;
             }
 
-            bool benchmark_ticker_changed, follower_ticker_changed = false;
+            bool benchmark_ticker_changed = false, follower_ticker_changed = false;
             if (benchmark_ticker_new_version > benchmark_ticker_version) {
                 benchmark_ticker_version = benchmark_ticker_new_version;
                 benchmark_ticker_changed = true;
@@ -133,9 +133,9 @@ namespace actuary {
 
             if ((!config.enable_benchmark_ticker_trigger || !benchmark_ticker_changed)
                 && (!config.enable_follower_ticker_trigger || !follower_ticker_changed)) {
-                if (rand_log_number < 10) {
-                    warn_log("enabled trigger ticker version is not change in share memory for {}", base_asset);
-                }
+                // if (rand_log_number < 10) {
+                //     warn_log("enabled trigger ticker version is not change in share memory for {}", base_asset);
+                // }
                 continue;
             }
 

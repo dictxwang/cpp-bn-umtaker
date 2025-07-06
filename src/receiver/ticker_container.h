@@ -45,13 +45,13 @@ namespace receiver {
     private:
         deque<UmTickerInfo> ticker_list;
 
-        double min_bid_price;
-        double max_bid_price;
-        double min_ask_price;
-        double max_ask_price;
-        double min_avg_price;
-        double max_avg_price;
-        bool validity_min_max;
+        double min_bid_price = std::numeric_limits<double>::max();
+        double max_bid_price = std::numeric_limits<double>::min();
+        double min_ask_price = std::numeric_limits<double>::max();
+        double max_ask_price = std::numeric_limits<double>::min();
+        double min_avg_price = std::numeric_limits<double>::max();
+        double max_avg_price = std::numeric_limits<double>::min();
+        bool validity_min_max = false;
 
         shared_mutex rw_lock;
     private:
