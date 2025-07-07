@@ -55,6 +55,7 @@ namespace trader {
                 if (log_rand_number < 10) {
                     warn_log("order in share memory not found for {}", base_asset);
                 }
+                this_thread::sleep_for(chrono::microseconds(1));
                 continue;
             }
 
@@ -62,6 +63,7 @@ namespace trader {
                 if (log_rand_number < 10) {
                     // warn_log("order version in share memory is old for {} {} {} {}:{}", base_asset, shm_mapping_index, (*shm_order).inst_id, (*shm_order).version_number, order_version);
                 }
+                this_thread::sleep_for(chrono::microseconds(1));
                 continue;
             }
             order_version = (*shm_order).version_number;
@@ -70,7 +72,7 @@ namespace trader {
             int order_delay_micros = 0;
 
             if (now > (*shm_order).update_time + config.order_validity_micros) {
-                warn_log("order is expired for {} {} {}", base_asset, shm_order->client_order_id, now - shm_order->update_time);
+                warn_log("order is expired for {} {} {}-{}={}", base_asset, shm_order->client_order_id, now, shm_order->update_time, now - shm_order->update_time);
                 continue;
             } else {
                 if (now > shm_order->update_time) {
