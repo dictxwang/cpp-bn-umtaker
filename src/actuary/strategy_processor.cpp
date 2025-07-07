@@ -251,7 +251,7 @@ namespace actuary {
                     benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple
                 );
 
-                info_log("check sell order parameters: base_asset={} benchmark_ticker_ask={}, follower_ticker_bid={}, ask_beta_threshold={}, ask_bid_median={}, bid_beta_threshold={}, beta={}, benchmark_ask_size={}, min_ticker_notional={}, follower_bid_size={} position_reduce_ratio={} {}<={}?{} {} {} {} {}",
+                info_log("check sell order parameters: base_asset={} benchmark_ticker_ask={}, follower_ticker_bid={}, ask_beta_threshold={}, ask_bid_median={}, bid_beta_threshold={}, beta={}, benchmark_ask_size={}, min_ticker_notional={}, follower_bid_size={} position_reduce_ratio={} {}<={}?{} {} {} {}",
                     base_asset,
                     (*benchmark_ticker).ask_price,
                     (*follower_ticker).bid_price,
