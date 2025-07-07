@@ -44,8 +44,8 @@ namespace trader {
 
         while (true) {
 
-            if (config.loop_pause_time_millis > 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
+            if (config.loop_pause_time_micros > 0) {
+                std::this_thread::sleep_for(std::chrono::microseconds(config.loop_pause_time_micros));
             }
 
             int log_rand_number = log_rand.randInt();
@@ -66,19 +66,19 @@ namespace trader {
             }
             order_version = (*shm_order).version_number;
 
-            uint64_t now = binance::get_current_ms_epoch();
-            int order_delay_millis = 0;
+            uint64_t now = binance::get_current_micro_epoch();
+            int order_delay_micros = 0;
 
-            if (now > (*shm_order).update_time + config.order_validity_millis) {
+            if (now > (*shm_order).update_time + config.order_validity_micros) {
                 warn_log("order is expired for {} {} {}", base_asset, shm_order->client_order_id, now - shm_order->update_time);
                 continue;
             } else {
                 if (now > shm_order->update_time) {
-                    order_delay_millis = int(now - shm_order->update_time);
+                    order_delay_micros = int(now - shm_order->update_time);
                 }
             }
 
-            string client_order_id = std::string(shm_order->client_order_id) + "_" + std::to_string(order_delay_millis);
+            string client_order_id = std::string(shm_order->client_order_id) + "_" + std::to_string(order_delay_micros);
 
             binance::FuturesNewOrder order;
             order.symbol = follower_inst_id;

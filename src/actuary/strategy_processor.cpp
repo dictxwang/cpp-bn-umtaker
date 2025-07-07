@@ -95,6 +95,7 @@ namespace actuary {
             int rand_log_number = rand_log.randInt();
             int rand_order_log_number = rand_order_log.randInt();
             uint64_t now = binance::get_current_ms_epoch();
+            uint64_t now_micros = binance::get_current_micro_epoch();
             int ticker_delay_millis = 0;
 
             std::shared_ptr<shm_mng::TickerInfoShm> benchmark_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().benchmark_start, benchmark_shm_index);
@@ -118,6 +119,7 @@ namespace actuary {
                 if (rand_log_number < 10) {
                     warn_log("ticker version is old in share memory for {}", base_asset);
                 }
+                this_thread::sleep_for(chrono::microseconds(1));
                 continue;
             }
 
@@ -136,6 +138,7 @@ namespace actuary {
                 // if (rand_log_number < 10) {
                 //     warn_log("enabled trigger ticker version is not change in share memory for {}", base_asset);
                 // }
+                this_thread::sleep_for(chrono::microseconds(1));
                 continue;
             }
 
@@ -316,7 +319,7 @@ namespace actuary {
                 order_buy.reduce_only = reduce_only;
                 std::string client_order_id = gen_client_order_id(true, price_is_adjusted, ticker_delay_millis, position_close);
                 strcpy(order_buy.client_order_id, client_order_id.c_str());
-                order_buy.update_time = now;
+                order_buy.update_time = now_micros;
 
                 bool same_make_order = false;
                 if (adjusted_buy_price == latest_buy_order_price && latest_buy_order_millis + config.same_price_pause_time_millis > now) {
@@ -335,6 +338,7 @@ namespace actuary {
                     latest_buy_order_millis = now;
                 }
 
+                int calculate_cost_millis = binance::get_current_ms_epoch() - now;
                 int shm_updated = 0;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool config_make_open_position_order = context.dynamic_could_make_open_position_order();
@@ -351,9 +355,9 @@ namespace actuary {
                 float price_adjusted_ratio = adjusted_buy_price / original_buy_price;
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
+                    info_log("update buy order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{} calculate_cost={}",
                         config_make_order, config_make_open_position_order, position_close, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price,
-                        price_adjusted_ratio, order_buy.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                        price_adjusted_ratio, order_buy.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version, calculate_cost_millis);
                 }
             } else if ((benchmark_ticker->ask_price*(1 + (benchmark_beta_threshold->ask_beta_threshold + follower_beta_threshold->bid_beta_threshold) * (1 - position_reduce_ratio)))
                     <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median))
@@ -398,7 +402,7 @@ namespace actuary {
                 order_sell.reduce_only = reduce_only;
                 std::string client_order_id = gen_client_order_id(false, price_is_adjusted, ticker_delay_millis, position_close);
                 strcpy(order_sell.client_order_id, client_order_id.c_str());
-                order_sell.update_time = now;
+                order_sell.update_time = now_micros;
                 
                 bool same_make_order = false;
                 if (adjusted_sell_price == latest_sell_order_price && latest_sell_order_millis + config.same_price_pause_time_millis > now) {
@@ -417,6 +421,7 @@ namespace actuary {
                     latest_sell_order_millis = now;
                 }
 
+                int calculate_cost_millis = binance::get_current_ms_epoch() - now;
                 int shm_updated = 0;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool config_make_open_position_order = context.dynamic_could_make_open_position_order();
@@ -433,9 +438,9 @@ namespace actuary {
 
                 float price_adjusted_ratio = adjusted_sell_price / original_sell_price;
                 if (should_write_log) {
-                    info_log("update sell order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{}",
-                        config_make_order, config_make_open_position_order, position_close, same_make_order, stop_sell, shm_updated, follower_inst_id, original_sell_price, order_sell.price, price_adjusted_ratio, order_sell.volume,
-                        client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version);
+                    info_log("update sell order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{} calculate_cost={}",
+                        config_make_order, config_make_open_position_order, position_close, same_make_order, stop_sell, shm_updated, follower_inst_id, original_sell_price, order_sell.price, price_adjusted_ratio,
+                        order_sell.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version, calculate_cost_millis);
                 }
             }
         }

@@ -3,7 +3,7 @@
     {
       "asset": "BTC",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 50000,
@@ -16,7 +16,7 @@
     {
       "asset": "ETH",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 25000,
@@ -29,7 +29,7 @@
     {
       "asset": "BNB",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 5000,
@@ -42,7 +42,7 @@
     {
       "asset": "SOL",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 8000,
@@ -55,7 +55,7 @@
     {
       "asset": "XRP",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 8000,
@@ -68,7 +68,7 @@
     {
       "asset": "DOGE",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 6000,
@@ -81,7 +81,7 @@
     {
       "asset": "SUI",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -94,7 +94,7 @@
     {
       "asset": "LINK",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 3000,
@@ -107,7 +107,7 @@
     {
       "asset": "ORDI",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -120,7 +120,7 @@
     {
       "asset": "1000PEPE",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -133,7 +133,7 @@
     {
       "asset": "WLD",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -146,7 +146,7 @@
     {
       "asset": "AVAX",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 3000,
@@ -159,7 +159,7 @@
     {
       "asset": "1000SHIB",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 1000,
@@ -172,7 +172,7 @@
     {
       "asset": "WIF",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -185,7 +185,7 @@
     {
       "asset": "BCH",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 500,
@@ -198,7 +198,7 @@
     {
       "asset": "LTC",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 4000,
@@ -211,7 +211,7 @@
     {
       "asset": "NEAR",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 5000,
@@ -224,7 +224,7 @@
     {
       "asset": "ARB",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 3500,
@@ -237,7 +237,7 @@
     {
       "asset": "NEO",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 500,
@@ -250,7 +250,7 @@
     {
       "asset": "FIL",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 10000,
@@ -263,7 +263,7 @@
     {
       "asset": "TIA",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 500,
@@ -276,7 +276,7 @@
     {
       "asset": "BOME",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -289,7 +289,7 @@
     {
       "asset": "ENA",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 10000,
@@ -302,7 +302,7 @@
     {
       "asset": "ETHFI",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 10000,
@@ -315,7 +315,7 @@
     {
       "asset": "1000BONK",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 10000,
@@ -328,7 +328,7 @@
     {
       "asset": "CRV",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 10000,
@@ -341,7 +341,7 @@
     {
       "asset": "KAITO",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 200,
@@ -354,7 +354,7 @@
     {
       "asset": "IP",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 100,
@@ -367,7 +367,7 @@
     {
       "asset": "TRUMP",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 2000,
@@ -380,7 +380,7 @@
     {
       "asset": "ADA",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 1000,
@@ -393,7 +393,7 @@
     {
       "asset": "PNUT",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 500,
@@ -406,7 +406,7 @@
     {
       "asset": "HBAR",
       "volatility_a": 1,
-      "volatility_b": 0,
+      "volatility_b": 150,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 300,

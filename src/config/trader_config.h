@@ -22,8 +22,8 @@ namespace trader {
         string trade_local_ip;
 
         bool open_place_order;
-        uint64_t order_validity_millis;
-        long loop_pause_time_millis;
+        long order_validity_micros;
+        long loop_pause_time_micros;
         uint64_t place_order_interval_millis;
 
         int order_account_limit_per_minute;
