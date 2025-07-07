@@ -422,7 +422,7 @@ namespace actuary {
                 }
 
                 int shm_updated = 0;
-                int calculate_cost_micros = binance::get_current_micro_epoch() - now;
+                int calculate_cost_micros = binance::get_current_micro_epoch() - now_micros;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool config_make_open_position_order = context.dynamic_could_make_open_position_order();
                 bool should_write_log = false;
