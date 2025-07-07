@@ -338,8 +338,8 @@ namespace actuary {
                     latest_buy_order_millis = now;
                 }
 
-                int calculate_cost_millis = binance::get_current_ms_epoch() - now;
                 int shm_updated = 0;
+                int calculate_cost_micros = binance::get_current_micro_epoch() - now_micros;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool config_make_open_position_order = context.dynamic_could_make_open_position_order();
                 bool should_write_log = false;
@@ -355,9 +355,9 @@ namespace actuary {
                 float price_adjusted_ratio = adjusted_buy_price / original_buy_price;
                 if (should_write_log) {
                     // reduce log frequency
-                    info_log("update buy order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{} calculate_cost={}",
+                    info_log("update buy order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_buy={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{} calculate_cost_micros={}",
                         config_make_order, config_make_open_position_order, position_close, same_make_order, stop_buy, shm_updated, follower_inst_id, original_buy_price, order_buy.price,
-                        price_adjusted_ratio, order_buy.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version, calculate_cost_millis);
+                        price_adjusted_ratio, order_buy.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version, calculate_cost_micros);
                 }
             } else if ((benchmark_ticker->ask_price*(1 + (benchmark_beta_threshold->ask_beta_threshold + follower_beta_threshold->bid_beta_threshold) * (1 - position_reduce_ratio)))
                     <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median))
@@ -421,8 +421,8 @@ namespace actuary {
                     latest_sell_order_millis = now;
                 }
 
-                int calculate_cost_millis = binance::get_current_ms_epoch() - now;
                 int shm_updated = 0;
+                int calculate_cost_micros = binance::get_current_micro_epoch() - now;
                 bool config_make_order = context.dynamic_could_make_order();
                 bool config_make_open_position_order = context.dynamic_could_make_open_position_order();
                 bool should_write_log = false;
@@ -438,9 +438,9 @@ namespace actuary {
 
                 float price_adjusted_ratio = adjusted_sell_price / original_sell_price;
                 if (should_write_log) {
-                    info_log("update sell order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{} calculate_cost={}",
+                    info_log("update sell order: config_make_order={} config_make_open_position_order={} position_close={} same_make_order={} stop_sell={} shm_updated={} inst_id={} price={}/{}/{} size={} client_id={} ticker_version={}/{} threshold_version={}/{}/{} calculate_cost_micros={}",
                         config_make_order, config_make_open_position_order, position_close, same_make_order, stop_sell, shm_updated, follower_inst_id, original_sell_price, order_sell.price, price_adjusted_ratio,
-                        order_sell.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version, calculate_cost_millis);
+                        order_sell.volume, client_order_id, benchmark_ticker_version, follower_ticker_version, benchmark_beta_version, follower_beta_version, early_run_version, calculate_cost_micros);
                 }
             }
         }
