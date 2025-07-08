@@ -119,6 +119,7 @@ namespace actuary {
         int turn_interval = 10;
         int polling_times = 0;
         while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(turn_interval));
             binance::CommonRestResponse<binance::FuturesAccount> response;
             context.get_furures_rest_client().get_account_v2(response);
             
@@ -201,7 +202,6 @@ namespace actuary {
                 }
             }
             info_log("finish polling turn of loading balance and position");
-            std::this_thread::sleep_for(std::chrono::seconds(turn_interval));
         }
     }
 
