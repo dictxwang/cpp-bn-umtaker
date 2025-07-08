@@ -52,7 +52,9 @@ namespace actuary {
     struct PositionThresholdInfo {
         string symbol;
         string positionSide;
+        double positionReduceRatioV1 = 0;
         double positionReduceRatio = 0;
+        double positionFullRate = 0;
         double totalNotional = 0;
         bool reachMaxPosition = false;
         uint64_t updateTimeMillis = 0;

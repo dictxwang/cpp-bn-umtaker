@@ -165,8 +165,8 @@ namespace actuary {
                             auto threshold = calculcate_position_threshold(config, context, response.data.positions[i].symbol);
                             if (threshold != nullopt) {
                                 updated = context.get_balance_position_composite().update_exist_position_threshold(threshold.value());
-                                info_log("update position threshold: symbol={} positionSide={} positionReduceRatio={} totalNotional={} reachMaxPosition={} updateTimeMillis={} updated={}",
-                                    threshold->symbol, threshold->positionSide, threshold->positionReduceRatio, threshold->totalNotional, threshold->reachMaxPosition, threshold->updateTimeMillis, updated
+                                info_log("update position threshold: symbol={} positionSide={} positionReduceRatioV1={} positionReduceRatio={} totalNotional={} positionFullRate={} reachMaxPosition={} updateTimeMillis={} updated={}",
+                                    threshold->symbol, threshold->positionSide, threshold->positionReduceRatioV1, threshold->positionReduceRatio, threshold->totalNotional, threshold->positionFullRate, threshold->reachMaxPosition, threshold->updateTimeMillis, updated
                                 );
                             }
                         }
@@ -316,8 +316,8 @@ namespace actuary {
                                     auto threshold = calculcate_position_threshold(config, context, event.positions[i].symbol);
                                     if (threshold != nullopt) {
                                         updated = context.get_balance_position_composite().update_exist_position_threshold(threshold.value());
-                                        info_log("update position threshold by event: symbol={} positionSide={} positionReduceRatio={} totalNotional={} reachMaxPosition={} updateTimeMillis={} updated={}",
-                                            threshold->symbol, threshold->positionSide, threshold->positionReduceRatio, threshold->totalNotional, threshold->reachMaxPosition, threshold->updateTimeMillis, updated
+                                        info_log("update position threshold by event: symbol={} positionSide={} positionReduceRatioV1={} positionReduceRatio={} totalNotional={} positionFullRate={} reachMaxPosition={} updateTimeMillis={} updated={}",
+                                            threshold->symbol, threshold->positionSide, threshold->positionReduceRatioV1, threshold->positionReduceRatio, threshold->totalNotional, threshold->positionFullRate, threshold->reachMaxPosition, threshold->updateTimeMillis, updated
                                         );
                                     }
                                 }
@@ -411,7 +411,17 @@ namespace actuary {
         threshold.symbol = follower_symbol;
         threshold.positionSide = position.value().positionSide;
         threshold.totalNotional = totalNotional;
-        threshold.positionReduceRatio = (totalNotional / inst_config->second.position_adjust_step_notional) * inst_config->second.position_adjust_step_ratio;
+        // ln(x*x+1)*0.45 x is position amount ratio, use opposite if position side is short
+        // max reduce ratio is below 0.312 and min is above -0.312
+        double position_full_rate = position.value().positionAmountAbs / inst_config->second.max_position;
+        position_full_rate = std::min(position_full_rate, 1.0);
+        double reduce_ratio = std::log(position_full_rate*position_full_rate+1) * 0.45;
+        if (position.value().positionSide == binance::PositionSide_SHORT) {
+            reduce_ratio = 0 - reduce_ratio;
+        }
+        threshold.positionReduceRatioV1 = (totalNotional / inst_config->second.position_adjust_step_notional) * inst_config->second.position_adjust_step_ratio;
+        threshold.positionReduceRatio = reduce_ratio;
+        threshold.positionFullRate = position_full_rate;
         threshold.reachMaxPosition = position.value().positionAmountAbs >= inst_config->second.max_position;
         threshold.updateTimeMillis = binance::get_current_ms_epoch();
 
