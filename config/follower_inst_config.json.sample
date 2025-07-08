@@ -3,7 +3,7 @@
     {
       "asset": "BTC",
       "volatility_a": 1,
-      "volatility_b": 150,
+      "volatility_b": 80,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 50000,
@@ -16,7 +16,7 @@
     {
       "asset": "ETH",
       "volatility_a": 1,
-      "volatility_b": 150,
+      "volatility_b": 80,
       "volatility_c": 0,
       "beta": 0.00006,
       "min_ticker_notional": 25000,

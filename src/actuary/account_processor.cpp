@@ -343,8 +343,8 @@ namespace actuary {
                         }
 
                         if (config.dt_group_main_node) {
-                            string sql = fmt::format("insert ignore into tb_bnum_order(account_flag, symbol, order_side, order_id, client_order_id, order_type, order_status, order_size, filled_size, average_price) values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {})",
-                                config.account_flag, event.symbol, event.side, event.id, event.clientOrderId, event.originalOrderType, event.orderStatus, event.volume, event.filledVolume, event.averagePrice
+                            string sql = fmt::format("insert into tb_bnum_order(account_flag, symbol, order_side, order_id, client_order_id, order_type, order_status, order_size, filled_size, average_price) values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {}) on duplicate key update order_status='{}', filled_size={}, average_price={}",
+                                config.account_flag, event.symbol, event.side, event.id, event.clientOrderId, event.originalOrderType, event.orderStatus, event.volume, event.filledVolume, event.averagePrice, event.orderStatus, event.filledVolume, event.averagePrice
                             );
 
                             info_log("save order sql: {}", sql);
