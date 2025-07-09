@@ -413,7 +413,7 @@ namespace actuary {
         threshold.totalNotional = totalNotional;
         // ln(x*x+1)*0.45 x is position amount ratio, use opposite if position side is short
         // max reduce ratio is below 0.312 and min is above -0.312
-        double position_full_rate = position.value().positionAmountAbs / inst_config->second.max_position;
+        double position_full_rate = position.value().positionAmountAbs / (inst_config->second.max_position * config.max_position_zoom);
         position_full_rate = std::min(position_full_rate, 1.0);
         double reduce_ratio = std::log(position_full_rate*position_full_rate+1) * 0.45;
         if (position.value().positionSide == binance::PositionSide_SHORT) {
@@ -422,7 +422,7 @@ namespace actuary {
         threshold.positionReduceRatioV1 = (totalNotional / inst_config->second.position_adjust_step_notional) * inst_config->second.position_adjust_step_ratio;
         threshold.positionReduceRatio = reduce_ratio;
         threshold.positionFullRate = position_full_rate;
-        threshold.reachMaxPosition = position.value().positionAmountAbs >= inst_config->second.max_position;
+        threshold.reachMaxPosition = position.value().positionAmountAbs >= (inst_config->second.max_position * config.max_position_zoom);
         threshold.updateTimeMillis = binance::get_current_ms_epoch();
 
         return threshold;
