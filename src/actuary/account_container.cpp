@@ -3,6 +3,40 @@
 using namespace std;
 
 namespace actuary {
+
+    void CommissionRateComposite::update_commission_rate(CommissionRate& rate) {
+
+        CommissionRate item;
+        item.symbol = rate.symbol;
+        item.makerRate = rate.makerRate;
+        item.takerRate = rate.takerRate;
+
+        std::unique_lock<std::shared_mutex> w_lock(rw_lock);
+        auto original = this->commission_map.find(rate.symbol);
+        if (original != this->commission_map.end()) {
+            if (original->second.makerRate < item.makerRate || original->second.takerRate < item.takerRate) {
+                item.rateRaised = true;
+            }
+        }
+        this->commission_map[item.symbol] = item;
+    }
+
+    optional<CommissionRate> CommissionRateComposite::get_commission_rate(string symbol) {
+
+        std::shared_lock<std::shared_mutex> r_lock(this->rw_lock);
+        auto original = this->commission_map.find(symbol);
+        if (original == this->commission_map.end()) {
+            return nullopt;
+        } else {
+            CommissionRate rate;
+            rate.symbol = symbol;
+            rate.makerRate = original->second.makerRate;
+            rate.takerRate = original->second.takerRate;
+            rate.rateRaised = original->second.rateRaised;
+            return rate;
+        }
+    }
+    
     void AccountBalancePositionComposite::init(vector<string>& assets, vector<string>& inst_ids) {
         for (string asset : assets) {
             AccountBalanceInfo balance;
