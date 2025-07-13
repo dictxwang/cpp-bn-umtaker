@@ -337,7 +337,7 @@ namespace actuary {
                             // ignore not match quote asset orders
                             continue;
                         }
-                        if (event.filledVolume == 0) {
+                        if (!config.enable_save_no_volume_order && event.filledVolume == 0) {
                             // ignore no filled order
                             continue;
                         }

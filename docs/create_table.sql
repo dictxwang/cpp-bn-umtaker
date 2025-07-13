@@ -11,12 +11,16 @@ CREATE TABLE `tb_bnum_order` (
   `order_size` decimal(16,8) DEFAULT '0.00000000',
   `filled_size` decimal(16,8) DEFAULT '0.00000000',
   `average_price` decimal(16,8) DEFAULT '0.00000000',
+  `system_timestamp` bigint DEFAULT '0',
+  `commission_rate` decimal(8,6) DEFAULT '0.000000',
+  `has_trading_volume` char(1) DEFAULT 'Y',
   `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`tid`),
   UNIQUE KEY `uidx_corder_id` (`client_order_id`),
   KEY `idx_af` (`account_flag`),
   KEY `idx_ct` (`create_time`),
-  KEY `idx_afos` (`account_flag`,`order_status`)
+  KEY `idx_afos` (`account_flag`,`order_status`),
+  KEY `idx_systs` (`system_timestamp`)
 );
 
 CREATE TABLE `tb_bnum_pnl` (
@@ -34,4 +38,50 @@ CREATE TABLE `tb_bnum_pnl` (
   KEY `ct_idx` (`create_time`) USING BTREE,
   KEY `idx_ctaf` (`account_flag`,`create_time`),
   KEY `idx_af` (`account_flag`)
+);
+
+CREATE TABLE `tb_bnum_order_pnl` (
+  `tid` bigint NOT NULL AUTO_INCREMENT,
+  `account_flag` varchar(32) NOT NULL DEFAULT '',
+  `symbol` varchar(64) NOT NULL,
+  `order_side` varchar(8) NOT NULL DEFAULT '',
+  `client_order_id` varchar(64) NOT NULL,
+  `average_price` decimal(16,8) DEFAULT '0.00000000',
+  `filled_size` decimal(16,8) DEFAULT '0.00000000',
+  `system_timestamp` bigint DEFAULT '0',
+  `price_after_1s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_5s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_10s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_20s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_30s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_40s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_50s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_60s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_120s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_180s` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_15min` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_30min` decimal(16,8) DEFAULT '0.00000000',
+  `price_after_1hour` decimal(16,8) DEFAULT '0.00000000',
+  `pnl_1s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_5s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_10s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_20s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_30s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_40s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_50s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_60s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_120s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_180s_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_15min_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_30min_percentage` decimal(8,5) DEFAULT '0.00000',
+  `pnl_1hour_percentage` decimal(8,5) DEFAULT '0.00000',
+  `commission_rate` decimal(8,6) DEFAULT '0.000000',
+  `has_trading_volume` char(1) DEFAULT 'Y',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`tid`),
+  UNIQUE KEY `uidx_corder_id` (`client_order_id`),
+  KEY `idx_af` (`account_flag`),
+  KEY `idx_ct` (`create_time`),
+  KEY `idx_systs` (`system_timestamp`)
 );
