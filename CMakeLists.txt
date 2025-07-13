@@ -6,6 +6,7 @@ set(PROCESS_MAIN "test_main")
 set(PROCESS_TICKER_RECEIVER "bn_umtaker_receiver")
 set(PROCESS_OPPORTUNITY_ACTUARY "bn_umtaker_actuary")
 set(PROCESS_ORDER_TRADER "bn_umtaker_trader")
+set(PROCESS_PNL_EVALUATOR "bn_umtaker_evaluator")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
@@ -116,6 +117,23 @@ target_link_libraries(trader
     shm
 )
 
+# evaluator
+FILE(GLOB_RECURSE LIB_EVALUATOR_SRC RELATIVE ${CMAKE_SOURCE_DIR}
+    "src/evaluator/*")
+add_library(evaluator ${LIB_EVALUATOR_SRC})
+target_link_libraries(evaluator
+
+    ${_LIB_BINANCECPP}
+    ${_LIB_SPDLOG}
+    ${_LIB_MYSQL}
+    ${_LIB_ZMQ}
+    CURL::libcurl
+    OpenSSL::SSL OpenSSL::Crypto
+    common
+    config
+    dbsource
+)
+
 
 add_executable(${PROCESS_MAIN} "src/main.cpp")
 target_link_libraries(${PROCESS_MAIN}
@@ -157,4 +175,9 @@ target_link_libraries(${PROCESS_OPPORTUNITY_ACTUARY}
 add_executable(${PROCESS_ORDER_TRADER} "src/bn_umtaker_trader.cpp")
 target_link_libraries(${PROCESS_ORDER_TRADER}
     trader
+)
+
+add_executable(${PROCESS_PNL_EVALUATOR} "src/bn_sumtaker_evaluator.cpp")
+target_link_libraries(${PROCESS_PNL_EVALUATOR}
+    evaluator
 )

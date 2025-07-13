@@ -1,0 +1,20 @@
+{
+    "logger_name": "Evaluator",
+    "logger_file_path": "logs/output_evaluator.log",
+    "logger_level": 2,
+    "logger_max_files": 7,
+
+    "db_host": "",
+    "db_port": 3306,
+    "db_username": "",
+    "db_password": "",
+    "db_database": "",
+    
+    "order_stat_zmq_ipcs": [
+    ],
+
+    "accounts_need_statistics": [
+    ],
+
+    "normal_ticker_local_ip": ""
+}
