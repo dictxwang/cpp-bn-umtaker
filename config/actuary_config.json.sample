@@ -60,6 +60,9 @@
 
     "shm_group_main_node": true,
     "dt_group_main_node": true,
+    "zmq_ipc_order_stat": "tcp://127.0.0.1:38801",
+    "enable_load_order_to_zmq": false,
+    "enable_save_no_volume_order": true,
     "node_base_assets": [
         "BTC",
         "ETH",

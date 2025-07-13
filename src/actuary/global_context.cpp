@@ -64,6 +64,8 @@ namespace actuary {
 
         this->init_db_source(config);
         info_log("finish init db source of mysql");
+
+        this->stat_order_channel = make_shared<moodycamel::ConcurrentQueue<StatOrderLite>>();
     }
 
     void GlobalContext::init_db_source(ActuaryConfig &config) {
