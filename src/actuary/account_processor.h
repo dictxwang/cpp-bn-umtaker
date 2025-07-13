@@ -16,6 +16,9 @@ namespace actuary {
     bool change_multi_assets_margin(ActuaryConfig &config, GlobalContext &context);
     bool change_position_side_dual(ActuaryConfig &config, GlobalContext &context);
 
+    void start_polling_commission_rate(ActuaryConfig &config, GlobalContext &context);
+    void load_commission_rate(ActuaryConfig &config, GlobalContext &context);
+
     void start_polling_load_balance_position(ActuaryConfig &config, GlobalContext &context);
     void load_balance_position(ActuaryConfig &config, GlobalContext &context);
 

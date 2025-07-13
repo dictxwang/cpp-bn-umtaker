@@ -33,6 +33,9 @@ int main(int argc, char const *argv[]) {
     // account prepare
     actuary::prepare_account_settings(config, context);
 
+    // refresh commission rate
+    actuary::start_polling_commission_rate(config, context);
+
     // refresh account balance and position
     actuary::start_polling_load_balance_position(config, context);
 

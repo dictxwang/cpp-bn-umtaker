@@ -110,6 +110,35 @@ namespace actuary {
         return true;
     }
 
+    void start_polling_commission_rate(ActuaryConfig &config, GlobalContext &context) {
+        std::thread polling_thread(load_commission_rate, std::ref(config), std::ref(context));
+        polling_thread.detach();
+    }
+
+    void load_commission_rate(ActuaryConfig &config, GlobalContext &context) {
+        int turn_interval = 60;
+        while (true) {
+
+            for (string symbol : context.get_follower_inst_ids()) {
+                binance::CommonRestResponse<binance::FuturesCommissionRate> response;
+                context.get_furures_rest_client().get_commissionRate(symbol, response);
+                if (response.code != binance::RestCodeOK) {
+                    err_log("fail to load commission rate: {} {}", response.code, response.msg);
+                } else {
+                    CommissionRate rate;
+                    rate.symbol = symbol;
+                    rate.makerRate = response.data.makerCommissionRate;
+                    rate.takerRate = response.data.takerCommissionRate;
+
+                    context.get_commission_rate_composite().update_commission_rate(rate);
+                    info_log("load commission rate: {} {} {}", symbol, rate.makerRate, rate.takerRate);
+                }
+                std::this_thread::sleep_for(std::chrono::milliseconds(20));
+            }
+            std::this_thread::sleep_for(std::chrono::seconds(turn_interval));
+        }
+    }
+
     void start_polling_load_balance_position(ActuaryConfig &config, GlobalContext &context) {
         std::thread polling_thread(load_balance_position, std::ref(config), std::ref(context));
         polling_thread.detach();
