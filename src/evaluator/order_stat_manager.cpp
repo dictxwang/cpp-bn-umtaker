@@ -27,7 +27,7 @@ namespace evaluator {
             " price_after_60s, price_after_120s, price_after_180s, price_after_15min, price_after_30min, price_after_1hour, "
             " pnl_1s_percentage, pnl_5s_percentage, pnl_10s_percentage, pnl_20s_percentage, pnl_30s_percentage, pnl_40s_percentage, pnl_50s_percentage, "
             " pnl_60s_percentage, pnl_120s_percentage, pnl_180s_percentage, pnl_15min_percentage, pnl_30min_percentage, pnl_1hour_percentage, "
-            " commission_rate from tb_bnsum_order_pnl where system_timestamp >= {} and account_flag in ({}) order by system_timestamp",
+            " commission_rate from tb_bnum_order_pnl where system_timestamp >= {} and account_flag in ({}) order by system_timestamp",
         system_timestamp_condition, account_flag_condition);
 
         info_log("sql for select recent order stat: {}", sql);
@@ -224,7 +224,7 @@ namespace evaluator {
                     has_trading_volume = "Y";
                 }
 
-                string sql = fmt::format("insert into tb_bnsum_order_pnl ("
+                string sql = fmt::format("insert into tb_bnum_order_pnl ("
                     " account_flag, symbol, order_side, client_order_id, average_price, filled_size, system_timestamp, create_time, "
                     " price_after_1s, price_after_5s, price_after_10s, price_after_20s, price_after_30s, price_after_40s, price_after_50s, "
                     " price_after_60s, price_after_120s, price_after_180s, price_after_15min, price_after_30min, price_after_1hour, "
