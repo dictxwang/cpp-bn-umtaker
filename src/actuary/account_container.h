@@ -18,6 +18,21 @@ using namespace std;
 
 namespace actuary {
     
+    struct CommissionRate {
+        string symbol;
+        double makerRate = 0;
+        double takerRate = 0;
+        bool rateRaised = false;
+    };
+
+    struct CommissionRateComposite {
+        unordered_map<string, CommissionRate> commission_map;
+        shared_mutex rw_lock;
+
+        void update_commission_rate(CommissionRate& rate);
+        optional<CommissionRate> get_commission_rate(string symbol);
+    };
+
     struct AccountMetaInfo {
         bool multiAssetsMargin;
         double totalInitialMargin = 0;

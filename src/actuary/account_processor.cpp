@@ -343,8 +343,26 @@ namespace actuary {
                         }
 
                         if (config.dt_group_main_node) {
-                            string sql = fmt::format("insert into tb_bnum_order(account_flag, symbol, order_side, order_id, client_order_id, order_type, order_status, order_size, filled_size, average_price) values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {}) on duplicate key update order_status='{}', filled_size={}, average_price={}",
-                                config.account_flag, event.symbol, event.side, event.id, event.clientOrderId, event.originalOrderType, event.orderStatus, event.volume, event.filledVolume, event.averagePrice, event.orderStatus, event.filledVolume, event.averagePrice
+
+                            auto commission = context.get_commission_rate_composite().get_commission_rate(event.symbol);
+                            double commission_rate = 0;
+                            if (commission.has_value()) {
+                                commission_rate = commission.value().takerRate;
+                            }
+
+                            string has_trading_volume = "N";
+                            double order_price = event.price;
+                            if (event.filledVolume > 0) {
+                                has_trading_volume = "Y";
+                                order_price = event.averagePrice;
+                            }
+
+                            string sql = fmt::format("insert into tb_bnum_order"
+                                "(account_flag, symbol, order_side, order_id, client_order_id, order_type, order_status, order_size, filled_size, average_price, system_timestamp, commission_rate, has_trading_volume) "
+                                " values ('{}', '{}', '{}', '{}', '{}', '{}', '{}', {}, {}, {}, {}, {}, '{}') "
+                                " on duplicate key update order_status='{}', filled_size={}, average_price={}, has_trading_volume='{}'",
+                                config.account_flag, event.symbol, event.side, event.id, event.clientOrderId, event.originalOrderType, event.orderStatus, event.volume, event.filledVolume, order_price, binance::get_current_epoch(), commission_rate, has_trading_volume,
+                                event.orderStatus, event.filledVolume, order_price, has_trading_volume
                             );
 
                             info_log("save order sql: {}", sql);
@@ -355,6 +373,22 @@ namespace actuary {
                                         int my_no = mysql_errno(my_conn);
                                         string my_err = mysql_error(my_conn);
                                         err_log("fail to insert order: {} {}", my_no, my_err);
+                                    } else {
+                                        // send order lite to zmq
+                                        StatOrderLite lite;
+                                        lite.accountFlag = config.account_flag;
+                                        lite.symbol = event.symbol;
+                                        lite.orderSide = event.side;
+                                        lite.clientOrderId = event.clientOrderId;
+                                        lite.averagePrice = strHelper::toString(order_price);
+                                        lite.filledSize = strHelper::toString(event.filledVolume);
+                                        lite.commissionRate = strHelper::toString(commission_rate);
+                                        lite.systemTimestamp = binance::get_current_epoch();
+
+                                        bool enqueue_result = context.get_stat_order_channel()->try_enqueue(lite);
+                                        if (!enqueue_result) {
+                                            warn_log("can not enqueue stat order {} {}", lite.symbol, lite.clientOrderId);
+                                        }
                                     }
                                 } catch (exception &exp) {
                                     err_log("exception occur while insert order: {}", string(exp.what()));

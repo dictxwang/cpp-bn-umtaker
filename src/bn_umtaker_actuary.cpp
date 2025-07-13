@@ -4,6 +4,7 @@
 #include "actuary/strategy_processor.h"
 #include "actuary/account_processor.h"
 #include "actuary/risk_control.h"
+#include "actuary/stat_dispatch.h"
 
 /*
     loop scan ticker and threshold like 'early-run' 'beta' from share memory
@@ -37,6 +38,11 @@ int main(int argc, char const *argv[]) {
 
     // subscribe user data steam
     actuary::start_subscribe_balance_position(config, context);
+
+    // start listen stat zmq
+    actuary::start_stat_zmq_server(config, context);
+    // load orders which stat data has not finished
+    actuary::load_recent_orders_to_zmq(config, context);
 
     // create threads for per asset
     actuary::start_strategy_processors(config, context);

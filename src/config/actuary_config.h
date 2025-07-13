@@ -57,6 +57,10 @@ namespace actuary {
 
         bool shm_group_main_node; // only main node of group should init share memory
         bool dt_group_main_node; // only main node of group should do data stat
+        string zmq_ipc_order_stat;
+        bool enable_load_order_to_zmq;
+        bool enable_save_no_volume_order;
+
         std::vector<string> node_base_assets;
         std::vector<string> all_base_assets; // all assets which support taker strategy
         

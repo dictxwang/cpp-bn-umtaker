@@ -48,6 +48,8 @@ namespace actuary {
 
         binance::BinanceFuturesRestClient furures_rest_client;
         AccountBalancePositionComposite balance_position_composite;
+
+        CommissionRateComposite commission_rate_composite;
     
         shared_ptr<moodycamel::ConcurrentQueue<string>> account_info_channel;
         shared_ptr<string> user_stream_listen_key;
@@ -57,6 +59,7 @@ namespace actuary {
         shared_ptr<DynamicConfig> dynamic_config;
 
         shared_ptr<db_source::MySQLConnectionPool> mysql_source;
+        shared_ptr<moodycamel::ConcurrentQueue<StatOrderLite>> stat_order_channel;
 
     public:
         void init(ActuaryConfig& config);
@@ -76,6 +79,7 @@ namespace actuary {
         unordered_map<string, int>& get_shm_order_mapping();
         binance::BinanceFuturesRestClient& get_furures_rest_client();
         AccountBalancePositionComposite& get_balance_position_composite();
+        CommissionRateComposite& get_commission_rate_composite();
 
         shared_ptr<moodycamel::ConcurrentQueue<string>> get_account_info_channel();
         string get_listen_key();
@@ -85,6 +89,7 @@ namespace actuary {
         bool dynamic_could_make_order();
         bool dynamic_could_make_open_position_order();
         shared_ptr<db_source::MySQLConnectionPool> get_mysql_source();
+        shared_ptr<moodycamel::ConcurrentQueue<StatOrderLite>> get_stat_order_channel();
     };
 }
 #endif

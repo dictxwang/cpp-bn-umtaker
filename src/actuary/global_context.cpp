@@ -219,6 +219,11 @@ namespace actuary {
     AccountBalancePositionComposite& GlobalContext::get_balance_position_composite() {
         return this->balance_position_composite;
     }
+
+    CommissionRateComposite& GlobalContext::get_commission_rate_composite() {
+        return this->commission_rate_composite;
+    }
+
     shared_ptr<moodycamel::ConcurrentQueue<string>> GlobalContext::get_account_info_channel() {
         return this->account_info_channel;
     }
@@ -247,5 +252,9 @@ namespace actuary {
     
     shared_ptr<db_source::MySQLConnectionPool> GlobalContext::get_mysql_source() {
         return this->mysql_source;
+    }
+
+    shared_ptr<moodycamel::ConcurrentQueue<StatOrderLite>> GlobalContext::get_stat_order_channel() {
+        return this->stat_order_channel;
     }
 }

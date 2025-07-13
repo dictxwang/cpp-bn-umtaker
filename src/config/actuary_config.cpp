@@ -54,6 +54,10 @@ namespace actuary {
 
         this->shm_group_main_node = this->doc_["shm_group_main_node"].asBool();
         this->dt_group_main_node = this->doc_["dt_group_main_node"].asBool();
+        this->zmq_ipc_order_stat = this->doc_["zmq_ipc_order_stat"].asString();
+        this->enable_load_order_to_zmq = this->doc_["enable_load_order_to_zmq"].asBool();
+        this->enable_save_no_volume_order = this->doc_["enable_save_no_volume_order"].asBool();
+
         for (int i = 0; i < this->doc_["node_base_assets"].size(); i++) {
             this->node_base_assets.push_back(this->doc_["node_base_assets"][i].asString());
         }

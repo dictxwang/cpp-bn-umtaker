@@ -18,6 +18,17 @@ namespace actuary {
         double minQty = 0;
         double stepSize = 0;
     };
+
+    struct StatOrderLite {
+        string accountFlag;
+        string symbol;
+        string orderSide;
+        string clientOrderId;
+        string averagePrice;
+        string filledSize;
+        string commissionRate;
+        uint64_t systemTimestamp = 0;
+    };
 }
 
 #endif
