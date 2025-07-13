@@ -48,3 +48,4 @@ test_main
 bn_umtaker_receiver
 bn_umtaker_actuary
 bn_umtaker_trader
+bn_umtaker_evaluator
