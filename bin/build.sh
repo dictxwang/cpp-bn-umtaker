@@ -57,6 +57,7 @@ function link_process_files() {
     rm -f bn_umtaker_receiver
     rm -f bn_umtaker_actuary
     rm -f bn_umtaker_trader
+    rm -f bn_umtaker_evaluator
 
     if [[ -e build/test_main ]]; then
         ln -s build/test_main test_main
@@ -69,6 +70,9 @@ function link_process_files() {
     fi
     if [[ -e build/bn_umtaker_trader ]]; then
         ln -s build/bn_umtaker_trader bn_umtaker_trader
+    fi
+    if [[ -e build/bn_umtaker_evaluator ]]; then
+        ln -s build/bn_umtaker_evaluator bn_umtaker_evaluator
     fi
 }
 
