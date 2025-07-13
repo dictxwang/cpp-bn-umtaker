@@ -177,7 +177,7 @@ target_link_libraries(${PROCESS_ORDER_TRADER}
     trader
 )
 
-add_executable(${PROCESS_PNL_EVALUATOR} "src/bn_sumtaker_evaluator.cpp")
+add_executable(${PROCESS_PNL_EVALUATOR} "src/bn_umtaker_evaluator.cpp")
 target_link_libraries(${PROCESS_PNL_EVALUATOR}
     evaluator
 )
