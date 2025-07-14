@@ -157,7 +157,7 @@ namespace actuary {
                     }
                 }
 
-                string sql = fmt::format("insert into tb_bnsum_exchange_info "
+                string sql = fmt::format("insert into tb_bnum_exchange_info "
                     " (account_flag, symbol, ticker_price, ticker_size, step_size, price_precision, quantity_precision, create_time) values "
                     " ('{}', '{}', {}, {}, {}, {}, {}, now()) on duplicate key update "
                     " ticker_price={}, ticker_size={}, step_size={}, price_precision={}, quantity_precision={}, enabled='Y'",
