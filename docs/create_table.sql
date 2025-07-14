@@ -85,3 +85,21 @@ CREATE TABLE `tb_bnum_order_pnl` (
   KEY `idx_ct` (`create_time`),
   KEY `idx_systs` (`system_timestamp`)
 );
+
+CREATE TABLE `tb_bnum_exchange_info` (
+  `tid` bigint NOT NULL AUTO_INCREMENT,
+  `account_flag` varchar(32) NOT NULL DEFAULT '',
+  `symbol` varchar(64) NOT NULL,
+  `ticker_price` decimal(16,8) DEFAULT '0.00000000',
+  `ticker_size` decimal(16,8) DEFAULT '0.00000000',
+  `step_size` decimal(16,8) DEFAULT '0.00000000',
+  `price_precision` int NOT NULL DEFAULT '0',
+  `quantity_precision` int NOT NULL DEFAULT '0',
+  `enabled` char(1) NOT NULL DEFAULT 'Y',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`tid`),
+  UNIQUE KEY `uidx_af_symbol` (`account_flag`, `symbol`),
+  KEY `idx_af` (`account_flag`),
+  KEY `idx_af_enable` (`account_flag`, `enabled`)
+);

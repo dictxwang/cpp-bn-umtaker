@@ -42,6 +42,9 @@ int main(int argc, char const *argv[]) {
     // subscribe user data steam
     actuary::start_subscribe_balance_position(config, context);
 
+    // start delay task for save follower exchange info
+    actuary::start_delay_save_exchange_info(config, context);
+
     // start listen stat zmq
     actuary::start_stat_zmq_server(config, context);
     // load orders which stat data has not finished

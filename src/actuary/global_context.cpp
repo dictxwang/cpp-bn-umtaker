@@ -9,8 +9,9 @@ namespace actuary {
             string follower_inst = base + config.follower_quote_asset;
             this->benchmark_inst_ids.push_back(benchmark_inst);
             this->follower_inst_ids.push_back(follower_inst);
-            this->inst_ids_set.insert(benchmark_inst);
-            this->inst_ids_set.insert(follower_inst);
+            this->all_inst_ids_set.insert(benchmark_inst);
+            this->all_inst_ids_set.insert(follower_inst);
+            this->follower_inst_ids_set.insert(follower_inst);
         }
 
         for (string base : config.all_base_assets) {
@@ -37,7 +38,7 @@ namespace actuary {
         // load exchange info
         vector<ExchangeInfoLite> exchangeLites = load_exchangeInfo(config, this->furures_rest_client);
         for (int i = 0; i < exchangeLites.size(); i++) {
-            if (this->inst_ids_set.find(exchangeLites[i].symbol) != this->inst_ids_set.end()) {
+            if (this->all_inst_ids_set.find(exchangeLites[i].symbol) != this->all_inst_ids_set.end()) {
                 info_log("put exchange info of {} into map", exchangeLites[i].symbol);
                 this->exchange_info_map.insert({exchangeLites[i].symbol, exchangeLites[i]});
             }
@@ -181,8 +182,12 @@ namespace actuary {
         return this->follower_inst_ids;
     }
 
-    set<string>& GlobalContext::get_inst_ids_set() {
-        return this->inst_ids_set;
+    set<string>& GlobalContext::get_all_inst_ids_set() {
+        return this->all_inst_ids_set;
+    }
+
+    set<string>& GlobalContext::get_follower_inst_ids_set() {
+        return this->follower_inst_ids_set;
     }
 
     optional<ExchangeInfoLite> GlobalContext::get_exchange_info(const string& symbol) {
