@@ -474,11 +474,11 @@ namespace actuary {
         threshold.symbol = follower_symbol;
         threshold.positionSide = position.value().positionSide;
         threshold.totalNotional = totalNotional;
-        // ln(x*x+1)*0.45 x is position amount ratio, use opposite if position side is short
-        // max reduce ratio is below 0.312 and min is above -0.312
+        // ln(x*x+1)*0.25 x is position amount ratio, use opposite if position side is short
+        // max reduce ratio is below 0.174 and min is above -0.174
         double position_full_rate = position.value().positionAmountAbs / (inst_config->second.max_position * config.max_position_zoom);
         position_full_rate = std::min(position_full_rate, 1.0);
-        double reduce_ratio = std::log(position_full_rate*position_full_rate+1) * 0.45;
+        double reduce_ratio = std::log(position_full_rate*position_full_rate+1) * config.position_threshold_margin;
         if (position.value().positionSide == binance::PositionSide_SHORT) {
             reduce_ratio = 0 - reduce_ratio;
         }

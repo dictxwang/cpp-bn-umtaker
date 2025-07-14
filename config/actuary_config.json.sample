@@ -36,6 +36,7 @@
     "loop_pause_time_millis": 5,
     "order_price_margin": 0.00002,
     "enable_position_threshold": true,
+    "position_threshold_margin": 0.25,
     "enable_order_reduce_only": false,
     "enable_ticker_size_compare": true,
     "same_price_pause_time_millis": 500,
