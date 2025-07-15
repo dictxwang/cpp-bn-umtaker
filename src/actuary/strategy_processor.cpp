@@ -84,8 +84,8 @@ namespace actuary {
         InstConfigItem inst_config = (*inst_config_auto).second;
         long benchmark_ticker_version = 0, follower_ticker_version = 0, early_run_version = 0, benchmark_beta_version = 0, follower_beta_version = 0;
 
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        info_log("sleep a while before signal calculation");
+        std::this_thread::sleep_for(std::chrono::seconds(60));
+        info_log("sleep a while of 60 seconds before signal calculation");
 
         while (true) {
 
