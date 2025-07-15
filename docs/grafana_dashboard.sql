@@ -1,3 +1,46 @@
+-- Trading Volume
+select sum(filled_size*average_price) as total_volume from tb_bnum_order 
+where 1 = 1 
+  AND (COALESCE('$Account', '') = '' OR account_flag = '$Account') 
+  AND (COALESCE('$Symbol', '') = '' OR COALESCE('$Symbol', '1A-ALL') = '1A-ALL' OR symbol = '$Symbol') 
+  AND (COALESCE('$OrderSide', '') = '' OR COALESCE('$OrderSide', 'ALL') = 'ALL' OR order_side = '$OrderSide') 
+  AND (COALESCE('$OrderStatus', '') = '' OR COALESCE('$OrderStatus', 'ALL') = 'ALL' OR order_status = '$OrderStatus') 
+  AND $__timeFilter(create_time);
+
+-- Filled Order Percentage
+select round(t2.filled_order/GREATEST(t1.total_order, 1), 5) as order_percentage from 
+(select count(*) as total_order from tb_bnum_order 
+where 1 = 1 
+  AND (COALESCE('$Account', '') = '' OR account_flag = '$Account') 
+  AND (COALESCE('$Symbol', '') = '' OR COALESCE('$Symbol', '1A-ALL') = '1A-ALL' OR symbol = '$Symbol') 
+  AND (COALESCE('$OrderSide', '') = '' OR COALESCE('$OrderSide', 'ALL') = 'ALL' OR order_side = '$OrderSide') 
+  AND $__timeFilter(create_time)
+) as t1 join 
+(select count(*) as filled_order from tb_bnum_order 
+where has_trading_volume = 'Y' 
+  AND (COALESCE('$Account', '') = '' OR account_flag = '$Account') 
+  AND (COALESCE('$Symbol', '') = '' OR COALESCE('$Symbol', '1A-ALL') = '1A-ALL' OR symbol = '$Symbol') 
+  AND (COALESCE('$OrderSide', '') = '' OR COALESCE('$OrderSide', 'ALL') = 'ALL' OR order_side = '$OrderSide') 
+  AND $__timeFilter(create_time)
+) as t2;
+
+-- Filled Volume Percentage
+select round(t2.filled_volume/GREATEST(t1.total_volume, 1), 5) as volume_percentage from 
+(select sum(order_size*average_price) as total_volume from tb_bnum_order 
+where 1 = 1 
+  AND (COALESCE('$Account', '') = '' OR account_flag = '$Account') 
+  AND (COALESCE('$Symbol', '') = '' OR COALESCE('$Symbol', '1A-ALL') = '1A-ALL' OR symbol = '$Symbol') 
+  AND (COALESCE('$OrderSide', '') = '' OR COALESCE('$OrderSide', 'ALL') = 'ALL' OR order_side = '$OrderSide') 
+  AND $__timeFilter(create_time)
+) as t1 join 
+(select sum(filled_size*average_price) as filled_volume from tb_bnum_order 
+where 1 = 1 
+  AND (COALESCE('$Account', '') = '' OR account_flag = '$Account') 
+  AND (COALESCE('$Symbol', '') = '' OR COALESCE('$Symbol', '1A-ALL') = '1A-ALL' OR symbol = '$Symbol') 
+  AND (COALESCE('$OrderSide', '') = '' OR COALESCE('$OrderSide', 'ALL') = 'ALL' OR order_side = '$OrderSide') 
+  AND $__timeFilter(create_time)
+) as t2;
+
 -- Equity
 select 
   cross_balance, usdc_balance as usdc_margin_balance, usdc_cross_balance, corss_un_pnl as cross_un_pnl, create_time 
