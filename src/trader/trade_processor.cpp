@@ -41,9 +41,9 @@ namespace trader {
         long order_version = 0;
         RandomIntGen log_rand;
         log_rand.init(0, 100000);
-        
+
         // sleep wait actuary init order share memory
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::this_thread::sleep_for(std::chrono::seconds(30));
 
         while (true) {
 
