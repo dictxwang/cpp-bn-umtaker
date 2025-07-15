@@ -3,9 +3,9 @@
     {
       "asset": "BTC",
       "volatility_a": 1,
-      "volatility_b": 20,
+      "volatility_b": 50,
       "volatility_c": 0,
-      "beta": 0.000075,
+      "beta": 0.000085,
       "min_ticker_notional": 50000,
       "min_ticker_notional_multiple": 3,
       "position_adjust_step_ratio": 0.001,
