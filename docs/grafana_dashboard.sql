@@ -26,7 +26,7 @@ select
  group by symbol 
  order by symbol; 
 -- current version
-select t1.*, t2.total_pnl_1s, t2.total_pnl_5s, t2.total_pnl_10s, t2.total_pnl_20s, t2.total_pnl_30s, t2.total_pnl_50s, t2.total_pnl_60s, t2.total_pnl_120s, t2.total_pnl_180s, t2.total_pnl_15min, t2.total_pnl_30min, t2.total_pnl_1hour from 
+select t1.*, t2.total_pnl_1s*100 as total_pnl_1s, t2.total_pnl_5s*100 as total_pnl_5s, t2.total_pnl_10s*100 as total_pnl_10s, t2.total_pnl_20s*100 as total_pnl_20s, t2.total_pnl_30s*100 as total_pnl_30s, t2.total_pnl_50s*100 as total_pnl_50s, t2.total_pnl_60s*100 as total_pnl_60s, t2.total_pnl_120s*100 as total_pnl_120s, t2.total_pnl_180s*100 as total_pnl_180s, t2.total_pnl_15min*100 as total_pnl_15min, t2.total_pnl_30min*100 as total_pnl_30min, t2.total_pnl_1hour*100 as total_pnl_1hour from 
 (
  select tmp_1.symbol, tmp_1.price_precision, tmp_1.quantity_precision, tmp_2.total_order, tmp_2.total_notional
   from tb_bnum_exchange_info as tmp_1 left join 
@@ -70,9 +70,9 @@ select t1.*, t2.total_pnl_1s, t2.total_pnl_5s, t2.total_pnl_10s, t2.total_pnl_20
 -- Orders
 select 
  t1.symbol, t1.client_order_id, t1.order_side, t1.order_type, t1.order_status, t1.order_size, t1.filled_size, t1.average_price, t1.create_time,
- t2.price_after_1s, t2.pnl_1s_percentage, t2.price_after_5s, t2.pnl_5s_percentage, t2.price_after_10s, t2.pnl_10s_percentage, t2.price_after_20s, t2.pnl_20s_percentage,
- t2.price_after_30s, t2.pnl_30s_percentage, t2.price_after_50s, t2.pnl_50s_percentage, t2.price_after_60s, t2.pnl_60s_percentage, t2.price_after_120s, t2.pnl_120s_percentage,
- t2.price_after_180s, t2.pnl_180s_percentage, t2.price_after_15min, t2.pnl_15min_percentage, t2.price_after_30min, t2.pnl_30min_percentage, t2.price_after_1hour, t2.pnl_1hour_percentage
+ t2.price_after_1s, t2.pnl_1s_percentage*100 as pnl_1s_percentage, t2.price_after_5s, t2.pnl_5s_percentage*100 as pnl_5s_percentage, t2.price_after_10s, t2.pnl_10s_percentage*100 as pnl_10s_percentage, t2.price_after_20s, t2.pnl_20s_percentage*100 as pnl_20s_percentage,
+ t2.price_after_30s, t2.pnl_30s_percentage*100 as pnl_30s_percentage, t2.price_after_50s, t2.pnl_50s_percentage*100 as pnl_50s_percentage, t2.price_after_60s, t2.pnl_60s_percentage*100 as pnl_60s_percentage, t2.price_after_120s, t2.pnl_120s_percentage*100 as pnl_120s_percentage,
+ t2.price_after_180s, t2.pnl_180s_percentage*100 as pnl_180s_percentage, t2.price_after_15min, t2.pnl_15min_percentage*100 as pnl_15min_percentage, t2.price_after_30min, t2.pnl_30min_percentage*100 as pnl_30min_percentage, t2.price_after_1hour, t2.pnl_1hour_percentage*100 as pnl_1hour_percentage
 from tb_bnum_order as t1 left join tb_bnum_order_pnl as t2 on t1.client_order_id = t2.client_order_id
 where 1 = 1
   AND (COALESCE('$Account', '') = '' OR t1.account_flag = '$Account') 
