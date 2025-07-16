@@ -5,7 +5,7 @@
       "volatility_a": 1,
       "volatility_b": 50,
       "volatility_c": 0,
-      "beta": 0.000075,
+      "beta": 0.00008,
       "min_ticker_notional": 50000,
       "min_ticker_notional_multiple": 3,
       "position_adjust_step_ratio": 0.001,
@@ -23,8 +23,8 @@
       "min_ticker_notional_multiple": 3,
       "position_adjust_step_ratio": 0.001,
       "position_adjust_step_notional": 1000,
-      "order_size": 0.05,
-      "max_position": 0.5
+      "order_size": 0.1,
+      "max_position": 1
     },
     {
       "asset": "BNB",
