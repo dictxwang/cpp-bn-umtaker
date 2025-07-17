@@ -59,7 +59,7 @@ namespace actuary {
 
         this->tg_bot.init_default_endpoint(config.tg_bot_token);
 
-        this->dynamic_config = make_shared<DynamicConfig>();
+        this->dynamic_config = make_shared<DynamicConfig>(config.stop_make_order);
 
         this->account_info_channel = make_shared<moodycamel::ConcurrentQueue<string>>();
 
