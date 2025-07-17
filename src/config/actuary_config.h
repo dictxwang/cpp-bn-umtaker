@@ -52,6 +52,7 @@ namespace actuary {
 
         long same_price_pause_time_millis;
         bool enable_write_parameter_log;
+        bool enable_write_sampling_log;
 
         string benchmark_quote_asset;
         string follower_quote_asset;

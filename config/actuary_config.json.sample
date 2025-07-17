@@ -41,6 +41,7 @@
     "enable_ticker_size_compare": true,
     "same_price_pause_time_millis": 500,
     "enable_write_parameter_log": false,
+    "enable_write_sampling_log": false,
 
     "benchmark_quote_asset": "USDT",
     "follower_quote_asset": "USDC",

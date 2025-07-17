@@ -232,6 +232,40 @@ namespace actuary {
                 }
             }
 
+            if (config.enable_write_sampling_log) {
+                // info_log("sampling ticker: asset={} benchmark_ticker_changed={} follower_ticker_changed={} "
+                //     "benchmark_bid_price={} benchmark_bid_size={} benchmark_ask_price={} benchmark_ask_size={} "
+                //     "follower_bid_price={} follower_bid_size={} follower_ask_price={} follower_ask_size={} "
+                //     "benchmark_bid_notional={} benchmark_ask_notional={} "
+                //     "follower_bid_notional={} follower_ask_notional={} "
+                //     "bid_multiple={} ask_multiple={} "
+                //     "bid_price_greater={} bid_size_greater={} bid_zise_smaller={} "
+                //     "ask_price_smaller={} ask_size_greater={} ask_size_smaller={}",
+                info_log("sampling ticker: {} {} {} "
+                    "{} {} {} {} "
+                    "{} {} {} {} "
+                    "{} {} "
+                    "{} {} "
+                    "{} {} "
+                    "{} {} {} "
+                    "{} {} {}",
+                    base_asset, benchmark_ticker_changed, follower_ticker_changed,
+                    std::to_string(benchmark_ticker->bid_price), std::to_string(benchmark_ticker->bid_size), std::to_string(benchmark_ticker->ask_price), std::to_string(benchmark_ticker->ask_size),
+                    std::to_string(follower_ticker->bid_price), std::to_string(follower_ticker->bid_size), std::to_string(follower_ticker->ask_price), std::to_string(follower_ticker->ask_size),
+                    std::to_string(benchmark_ticker->bid_price*benchmark_ticker->bid_size), std::to_string(benchmark_ticker->ask_price*benchmark_ticker->ask_size),
+                    std::to_string(follower_ticker->bid_price*follower_ticker->bid_size), std::to_string(follower_ticker->ask_price*follower_ticker->ask_size),
+                    int(benchmark_ticker->bid_size/follower_ticker->ask_size), int(benchmark_ticker->ask_size/follower_ticker->bid_size),
+                    (benchmark_ticker->bid_price/(1 + (benchmark_beta_threshold->bid_beta_threshold + follower_beta_threshold->ask_beta_threshold) * (1 + position_reduce_ratio))) 
+                        >= ((follower_ticker->ask_price+early_run_threshold->bid_ask_median)),
+                    benchmark_ticker->bid_price * benchmark_ticker->bid_size >= inst_config.min_ticker_notional,
+                    benchmark_ticker->bid_price * benchmark_ticker->bid_size >= follower_ticker->ask_price * follower_ticker->ask_size * inst_config.min_ticker_notional_multiple,
+                    (benchmark_ticker->ask_price*(1 + (benchmark_beta_threshold->ask_beta_threshold + follower_beta_threshold->bid_beta_threshold) * (1 - position_reduce_ratio)))
+                        <= ((follower_ticker->bid_price + early_run_threshold->ask_bid_median)),
+                    benchmark_ticker->ask_price * benchmark_ticker->ask_size >= inst_config.min_ticker_notional,
+                    benchmark_ticker->ask_price * benchmark_ticker->ask_size >= follower_ticker->bid_price * follower_ticker->bid_size * inst_config.min_ticker_notional_multiple
+                );
+            }
+
             if (config.enable_write_parameter_log) {
                 info_log("check buy order parameters: base_asset={}, benchmark_ticker_bid={}, follower_ticker_ask={}, bid_beta_threshold={}, bid_ask_median={}, ask_beta_threshold={}, beta={}, benchmark_bid_size={}, min_ticker_notional={}, follower_ask_size={} position_reduce_ratio={} {}>={}?{} {} {} {}",
                     base_asset,
