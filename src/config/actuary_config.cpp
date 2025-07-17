@@ -8,6 +8,7 @@ namespace actuary {
         }
 
         // Parse own configuration properties
+        this->stop_make_order = this->doc_["stop_make_order"].asBool();
         this->account_flag = this->doc_["account_flag"].asString();
         this->db_host = this->doc_["db_host"].asString();
         this->db_port = this->doc_["db_port"].asUInt();

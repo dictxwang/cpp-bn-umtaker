@@ -14,6 +14,7 @@ namespace actuary {
         bool loadActuaryConfig(const char* inputfile);
     
     public:
+        bool stop_make_order;
         string account_flag;
         string db_host;
         unsigned int db_port;

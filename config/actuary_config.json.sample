@@ -4,6 +4,8 @@
     "logger_level": 2,
     "logger_max_files": 7,
 
+    "stop_make_order": false,
+
     "account_flag": "test001",
     "db_host": "",
     "db_port": 3306,

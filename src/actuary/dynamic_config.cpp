@@ -3,6 +3,18 @@
 using namespace std;
 
 namespace actuary {
+
+    DynamicConfig::DynamicConfig(bool stop_make_order) {
+        if (stop_make_order) {
+            this->stop_reasons.insert(STOP_REASON_STATIC_CONFIG);
+            this->stop_order = true;
+            this->stop_open_order = true;
+        } else {
+            this->stop_order = false;
+            this->stop_open_order = false;
+        }
+    }
+    
     void DynamicConfig::stop_make_order(const string& stopReason) {
 
         std::unique_lock<std::shared_mutex> w_lock(this->rw_lock);
