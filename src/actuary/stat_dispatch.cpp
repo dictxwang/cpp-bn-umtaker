@@ -22,7 +22,7 @@ namespace actuary {
             warn_log("disable load recent order to zmq at beginning.");
             return;
         }
-        thread zmq_thread(stat_zmq_server_listen, ref(config), ref(context));
+        thread zmq_thread(load_recent_orders_to_zmq, ref(config), ref(context));
         zmq_thread.detach();
         info_log("start delay task of load order stat to zmq");
     }
