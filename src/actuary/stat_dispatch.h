@@ -15,6 +15,7 @@ namespace actuary {
     void start_stat_zmq_server(ActuaryConfig &config, GlobalContext &context);
     void stat_zmq_server_listen(ActuaryConfig &config, GlobalContext &context);
 
+    void start_delay_load_orders_to_zmq(ActuaryConfig &config, GlobalContext &context);
     void load_recent_orders_to_zmq(ActuaryConfig &config, GlobalContext &context);
 
     void start_delay_save_exchange_info(ActuaryConfig &config, GlobalContext &context);

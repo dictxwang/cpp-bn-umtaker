@@ -24,6 +24,8 @@ namespace evaluator {
                 err_log("error occur while zmq subscribe connection to {}: {}", order_stat_zmq_ipc, std::string(exp.what()));
             }
 
+            info_log("success subscribe order stat zmq message");
+
             while (true) {
                 try {
                     std::string message = zmq_client.Receive();

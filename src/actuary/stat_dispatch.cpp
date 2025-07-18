@@ -13,8 +13,7 @@ namespace actuary {
         }
     }
 
-    void load_recent_orders_to_zmq(ActuaryConfig &config, GlobalContext &context) {
-
+    void start_delay_load_orders_to_zmq(ActuaryConfig &config, GlobalContext &context) {
         if (!config.dt_group_main_node) {
             info_log("only dt main node enable load recent order to zmq");
             return;
@@ -23,7 +22,15 @@ namespace actuary {
             warn_log("disable load recent order to zmq at beginning.");
             return;
         }
+        thread zmq_thread(stat_zmq_server_listen, ref(config), ref(context));
+        zmq_thread.detach();
+        info_log("start delay task of load order stat to zmq");
+    }
 
+    void load_recent_orders_to_zmq(ActuaryConfig &config, GlobalContext &context) {
+
+        // TODO wait subscriber establish connection
+        std::this_thread::sleep_for(std::chrono::seconds(30));
         // load orders which in one hour
         uint64_t system_timestamp_start = binance::get_current_epoch() - 3600;
         string sql = fmt::format("select account_flag, symbol, order_side, client_order_id, average_price, filled_size, system_timestamp, commission_rate from tb_bnum_order where system_timestamp >= {} and account_flag = '{}'", system_timestamp_start, config.account_flag);

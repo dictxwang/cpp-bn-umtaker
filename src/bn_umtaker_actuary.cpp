@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]) {
     // start listen stat zmq
     actuary::start_stat_zmq_server(config, context);
     // load orders which stat data has not finished
-    actuary::load_recent_orders_to_zmq(config, context);
+    actuary::start_delay_load_orders_to_zmq(config, context);
 
     // create threads for per asset
     actuary::start_strategy_processors(config, context);
