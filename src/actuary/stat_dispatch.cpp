@@ -26,7 +26,7 @@ namespace actuary {
 
         // load orders which in one hour
         uint64_t system_timestamp_start = binance::get_current_epoch() - 3600;
-        string sql = fmt::format("select account_flag, symbol, order_side, client_order_id, average_price, filled_size, system_timestamp, commission_rate from tb_bnum_order where system_timestamp >= {}", system_timestamp_start);
+        string sql = fmt::format("select account_flag, symbol, order_side, client_order_id, average_price, filled_size, system_timestamp, commission_rate from tb_bnum_order where system_timestamp >= {} and account_flag = '{}'", system_timestamp_start, config.account_flag);
         
         info_log("select order for stat sql: {}", sql);
         
