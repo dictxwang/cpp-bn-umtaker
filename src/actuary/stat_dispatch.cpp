@@ -30,7 +30,7 @@ namespace actuary {
     void load_recent_orders_to_zmq(ActuaryConfig &config, GlobalContext &context) {
 
         // TODO wait subscriber establish connection
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        std::this_thread::sleep_for(std::chrono::seconds(50));
         // load orders which in one hour
         uint64_t system_timestamp_start = binance::get_current_epoch() - 3600;
         string sql = fmt::format("select account_flag, symbol, order_side, client_order_id, average_price, filled_size, system_timestamp, commission_rate from tb_bnum_order where system_timestamp >= {} and account_flag = '{}'", system_timestamp_start, config.account_flag);
