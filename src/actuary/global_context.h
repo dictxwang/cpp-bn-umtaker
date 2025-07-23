@@ -38,6 +38,7 @@ namespace actuary {
         vector<std::string> all_benchmark_inst_ids;
         vector<std::string> all_follower_inst_ids;
         set<string> follower_inst_ids_set;
+        set<string> follower_close_inst_ids_set;
         set<string> all_inst_ids_set;
         unordered_map<string, ExchangeInfoLite> follower_exchange_info_map;
         unordered_map<string, ExchangeInfoLite> benchmark_exchange_info_map;

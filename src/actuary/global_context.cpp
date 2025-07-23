@@ -14,6 +14,11 @@ namespace actuary {
             this->follower_inst_ids_set.insert(follower_inst);
         }
 
+        for (string base : config.node_close_base_assets) {
+            string follower_inst = base + config.follower_quote_asset;
+            this->follower_close_inst_ids_set.insert(follower_inst);
+        }
+
         for (string base : config.all_base_assets) {
             string benchmark_inst = base + config.benchmark_quote_asset;
             string follower_inst = base + config.follower_quote_asset;
@@ -41,6 +46,9 @@ namespace actuary {
         for (int i = 0; i < follower_exchangeLites.size(); i++) {
             if (this->all_inst_ids_set.find(follower_exchangeLites[i].symbol) != this->all_inst_ids_set.end()) {
                 info_log("put exchange info of {} into map", follower_exchangeLites[i].symbol);
+                if (this->follower_close_inst_ids_set.find(follower_exchangeLites[i].symbol) != this->follower_close_inst_ids_set.end()) {
+                    follower_exchangeLites[i].positionCloseOnly = true;
+                }
                 this->follower_exchange_info_map.insert({follower_exchangeLites[i].symbol, follower_exchangeLites[i]});
 
                 auto benchmark_exchangeInfo = benchmark_exchangeLiteMap.find(follower_exchangeLites[i].baseAsset);

@@ -29,6 +29,11 @@ namespace actuary {
             exit(-1);
         }
         ExchangeInfoLite follower_exchange_info = exchange_opt.value();
+        bool follower_position_close_only = follower_exchange_info.positionCloseOnly;
+
+        if (follower_position_close_only) {
+            info_log("follower position close only for {}", follower_inst_id);
+        }
 
         int benchmark_shm_index = -1;
         int follower_shm_index = -1;
@@ -323,7 +328,7 @@ namespace actuary {
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_SHORT) {
                     position_close = true;
-                    if (config.make_position_close_only && order_size > (*position).positionAmountAbs) {
+                    if ((config.make_position_close_only || follower_position_close_only) && order_size > (*position).positionAmountAbs) {
                         reduce_only = 1;
                         order_size = (*position).positionAmountAbs;
                     }
@@ -379,7 +384,7 @@ namespace actuary {
                 bool should_write_log = false;
                 if (!stop_buy && config_make_order && same_price_make_order) {
                     should_write_log = true;
-                    if (position_close || config_make_open_position_order) {
+                    if (position_close || !follower_position_close_only && config_make_open_position_order) {
                         shm_updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_buy);
                     }
                 } else {
@@ -406,7 +411,7 @@ namespace actuary {
                 int reduce_only = 0;
                 if ((*position).positionSide == binance::PositionSide_LONG) {
                     position_close = true;
-                    if (config.make_position_close_only && order_size > (*position).positionAmountAbs) {
+                    if ((config.make_position_close_only || follower_position_close_only) && order_size > (*position).positionAmountAbs) {
                         order_size = (*position).positionAmountAbs;
                         reduce_only = 1;
                     }
@@ -462,7 +467,7 @@ namespace actuary {
                 bool should_write_log = false;
                 if (!stop_sell && config_make_order && same_price_make_order) {
                     should_write_log = true;
-                    if (position_close || config_make_open_position_order) {
+                    if (position_close || !follower_position_close_only && config_make_open_position_order) {
                         shm_updated = shm_mng::order_shm_writer_update(context.get_shm_store_info().order_start, order_shm_index, order_sell);
                     }
                 } else {

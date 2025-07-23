@@ -75,7 +75,34 @@
         "XRP",
         "DOGE",
         "SUI",
-        "LINK"
+        "LINK",
+        "ORDI",
+        "1000PEPE",
+        "WLD",
+        "AVAX",
+        "1000SHIB",
+        "WIF",
+        "BCH",
+        "LTC",
+        "NEAR",
+        "ARB",
+        "NEO",
+        "FIL",
+        "TIA",
+        "BOME",
+        "ENA",
+        "ETHFI",
+        "1000BONK",
+        "CRV",
+        "KAITO",
+        "IP",
+        "TRUMP",
+        "ADA",
+        "PNUT",
+        "HBAR"
+    ],
+    
+    "node_close_base_assets": [
     ],
 
     "all_base_assets": [

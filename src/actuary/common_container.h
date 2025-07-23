@@ -18,6 +18,7 @@ namespace actuary {
         double tickSize = 0;
         double minQty = 0;
         double stepSize = 0;
+        bool positionCloseOnly = false;
     };
 
     struct StatOrderLite {

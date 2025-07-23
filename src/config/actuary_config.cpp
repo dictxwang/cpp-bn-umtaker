@@ -65,6 +65,9 @@ namespace actuary {
         for (int i = 0; i < this->doc_["node_base_assets"].size(); i++) {
             this->node_base_assets.push_back(this->doc_["node_base_assets"][i].asString());
         }
+        for (int i = 0; i < this->doc_["node_close_base_assets"].size(); i++) {
+            this->node_close_base_assets.push_back(this->doc_["node_close_base_assets"][i].asString());
+        }
         for (int i = 0; i < this->doc_["all_base_assets"].size(); i++) {
             this->all_base_assets.push_back(this->doc_["all_base_assets"][i].asString());
         }

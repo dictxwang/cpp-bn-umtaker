@@ -66,6 +66,7 @@ namespace actuary {
         bool enable_save_no_volume_order;
 
         std::vector<string> node_base_assets;
+        std::vector<string> node_close_base_assets;
         std::vector<string> all_base_assets; // all assets which support taker strategy
         
         bool process_account_settings;
