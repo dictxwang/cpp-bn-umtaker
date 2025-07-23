@@ -22,7 +22,7 @@ namespace actuary {
         std::string benchmark_inst_id = base_asset + config.benchmark_quote_asset;
         std::string follower_inst_id = base_asset + config.follower_quote_asset;
 
-        optional<ExchangeInfoLite> exchange_opt = context.get_exchange_info(follower_inst_id);
+        optional<ExchangeInfoLite> exchange_opt = context.get_follower_exchange_info(follower_inst_id);
         if (!exchange_opt.has_value()) {
             err_log("exchange info not found for {}", follower_inst_id);
             this_thread::sleep_for(chrono::seconds(3));

@@ -41,12 +41,13 @@ namespace actuary {
         for (int i = 0; i < follower_exchangeLites.size(); i++) {
             if (this->all_inst_ids_set.find(follower_exchangeLites[i].symbol) != this->all_inst_ids_set.end()) {
                 info_log("put exchange info of {} into map", follower_exchangeLites[i].symbol);
-                this->exchange_info_map.insert({follower_exchangeLites[i].symbol, follower_exchangeLites[i]});
+                this->follower_exchange_info_map.insert({follower_exchangeLites[i].symbol, follower_exchangeLites[i]});
 
                 auto benchmark_exchangeInfo = benchmark_exchangeLiteMap.find(follower_exchangeLites[i].baseAsset);
                 if (benchmark_exchangeInfo == benchmark_exchangeLiteMap.end()) {
                     warn_log("not found benchmark exchange info for {}", follower_exchangeLites[i].symbol);
                 } else {
+                    this->benchmark_exchange_info_map.insert({benchmark_exchangeInfo->second.symbol, benchmark_exchangeInfo->second});
                     info_log("compare exchange info price precision: follower_symbol={} benchmark_symbol={} follower_precision={} benchmark_precision={} equals={}",
                         follower_exchangeLites[i].symbol, benchmark_exchangeInfo->second.symbol,
                         follower_exchangeLites[i].pricePrecision, benchmark_exchangeInfo->second.pricePrecision,
@@ -202,9 +203,18 @@ namespace actuary {
         return this->follower_inst_ids_set;
     }
 
-    optional<ExchangeInfoLite> GlobalContext::get_exchange_info(const string& symbol) {
-        auto original = this->exchange_info_map.find(symbol);
-        if (original == this->exchange_info_map.end()) {
+    optional<ExchangeInfoLite> GlobalContext::get_benchmark_exchange_info(const string& symbol) {
+        auto original = this->benchmark_exchange_info_map.find(symbol);
+        if (original == this->benchmark_exchange_info_map.end()) {
+            return nullopt;
+        } else {
+            return original->second;
+        }
+    }
+
+    optional<ExchangeInfoLite> GlobalContext::get_follower_exchange_info(const string& symbol) {
+        auto original = this->follower_exchange_info_map.find(symbol);
+        if (original == this->follower_exchange_info_map.end()) {
             return nullopt;
         } else {
             return original->second;

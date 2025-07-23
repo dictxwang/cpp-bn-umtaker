@@ -143,21 +143,31 @@ namespace actuary {
         MYSQL* my_conn = context.get_mysql_source()->getConnection();
         if (my_conn != nullptr) {
             for (string baseAsset : config.node_base_assets) {
-                string inst_id = baseAsset + config.follower_quote_asset;
-                auto exchange = context.get_exchange_info(inst_id);
-                if (exchange == nullopt) {
-                    warn_log("not found exchange info for {}", inst_id);
+                string follower_inst_id = baseAsset + config.follower_quote_asset;
+                auto follower_exchange = context.get_follower_exchange_info(follower_inst_id);
+                if (follower_exchange == nullopt) {
+                    warn_log("not found follower exchange info for {}", follower_inst_id);
                     continue;
                 }
 
+                int benchmark_pricePrecision = 0;
+                string benchmark_inst_id = baseAsset + config.benchmark_quote_asset;
+                auto benchmark_exchange = context.get_benchmark_exchange_info(benchmark_inst_id);
+                if (benchmark_exchange == nullopt) {
+                    warn_log("not found benchmark exchange info for {}", benchmark_inst_id);
+                    continue;
+                } else {
+                    benchmark_pricePrecision = benchmark_exchange.value().pricePrecision;
+                }
+
                 double ticker_price = 0;
-                auto ticker_shm_index = context.get_shm_follower_ticker_mapping().find(inst_id);
+                auto ticker_shm_index = context.get_shm_follower_ticker_mapping().find(follower_inst_id);
                 if (ticker_shm_index == context.get_shm_follower_ticker_mapping().end()) {
-                    warn_log("not found ticker shm index for {}", inst_id);
+                    warn_log("not found ticker shm index for {}", follower_inst_id);
                 } else {
                     std::shared_ptr<shm_mng::TickerInfoShm> follower_ticker = shm_mng::ticker_shm_reader_get(context.get_shm_store_info().follower_start, ticker_shm_index->second);
                     if (follower_ticker == nullptr) {
-                        warn_log("not found ticker in shm for {}", inst_id);
+                        warn_log("not found ticker in shm for {}", follower_inst_id);
                     } else {
                         // use bid as ticker price for judgement
                         ticker_price = follower_ticker->bid_price;
@@ -165,18 +175,18 @@ namespace actuary {
                 }
 
                 string sql = fmt::format("insert into tb_bnum_exchange_info "
-                    " (account_flag, symbol, ticker_price, ticker_size, step_size, price_precision, quantity_precision, create_time) values "
-                    " ('{}', '{}', {}, {}, {}, {}, {}, now()) on duplicate key update "
-                    " ticker_price={}, ticker_size={}, step_size={}, price_precision={}, quantity_precision={}, enabled='Y'",
-                    config.account_flag, exchange.value().symbol, ticker_price, exchange.value().tickSize, exchange.value().stepSize, exchange.value().pricePrecision, exchange.value().quantityPrecision,
-                    ticker_price, exchange.value().tickSize, exchange.value().stepSize, exchange.value().pricePrecision, exchange.value().quantityPrecision
+                    " (account_flag, symbol, ticker_price, ticker_size, step_size, benchmark_price_precision, follower_price_precision, quantity_precision, create_time) values "
+                    " ('{}', '{}', {}, {}, {}, {}, {}, {}, now()) on duplicate key update "
+                    " ticker_price={}, ticker_size={}, step_size={}, benchmark_price_precision={}, follower_price_precision={}, quantity_precision={}, enabled='Y'",
+                    config.account_flag, follower_exchange.value().symbol, ticker_price, follower_exchange.value().tickSize, follower_exchange.value().stepSize, benchmark_pricePrecision, follower_exchange.value().pricePrecision, follower_exchange.value().quantityPrecision,
+                    ticker_price, follower_exchange.value().tickSize, follower_exchange.value().stepSize, benchmark_pricePrecision, follower_exchange.value().pricePrecision, follower_exchange.value().quantityPrecision
                 );
                 info_log("save exchange info sql: {}", sql);
                 try {
                     if (mysql_query(my_conn, sql.c_str()) != 0) {
                         int my_no = mysql_errno(my_conn);
                         string my_err = mysql_error(my_conn);
-                        err_log("fail to save exchange info: {} {} {}", exchange.value().symbol ,my_no, my_err);
+                        err_log("fail to save exchange info: {} {} {}", follower_exchange.value().symbol ,my_no, my_err);
                     } else {
                         saved_number++;
                     }
