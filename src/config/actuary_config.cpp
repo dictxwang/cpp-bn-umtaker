@@ -9,6 +9,8 @@ namespace actuary {
 
         // Parse own configuration properties
         this->stop_make_order = this->doc_["stop_make_order"].asBool();
+        this->make_position_close_only = this->doc_["make_position_close_only"].asBool();
+
         this->account_flag = this->doc_["account_flag"].asString();
         this->db_host = this->doc_["db_host"].asString();
         this->db_port = this->doc_["db_port"].asUInt();
@@ -45,7 +47,6 @@ namespace actuary {
         this->order_price_margin = this->doc_["order_price_margin"].asDouble();
         this->enable_position_threshold = this->doc_["enable_position_threshold"].asBool();
         this->position_threshold_margin = this->doc_["position_threshold_margin"].asDouble();
-        this->enable_order_reduce_only = this->doc_["enable_order_reduce_only"].asBool();
         this->enable_ticker_size_compare = this->doc_["enable_ticker_size_compare"].asBool();
         this->same_price_pause_time_millis = this->doc_["same_price_pause_time_millis"].asInt64();
 

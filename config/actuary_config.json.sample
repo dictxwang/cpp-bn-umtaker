@@ -5,6 +5,7 @@
     "logger_max_files": 7,
 
     "stop_make_order": false,
+    "make_position_close_only": false,
 
     "account_flag": "test001",
     "db_host": "",
@@ -39,7 +40,6 @@
     "order_price_margin": 0.00002,
     "enable_position_threshold": true,
     "position_threshold_margin": 0.25,
-    "enable_order_reduce_only": false,
     "enable_ticker_size_compare": true,
     "same_price_pause_time_millis": 500,
     "enable_write_parameter_log": false,

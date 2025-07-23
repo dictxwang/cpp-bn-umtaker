@@ -15,6 +15,8 @@ namespace actuary {
     
     public:
         bool stop_make_order;
+        bool make_position_close_only;
+
         string account_flag;
         string db_host;
         unsigned int db_port;
@@ -48,7 +50,6 @@ namespace actuary {
         double order_price_margin;
         bool enable_position_threshold;
         double position_threshold_margin;
-        bool enable_order_reduce_only;
         bool enable_ticker_size_compare;
 
         long same_price_pause_time_millis;

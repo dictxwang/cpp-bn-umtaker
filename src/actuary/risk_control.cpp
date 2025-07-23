@@ -45,8 +45,8 @@ namespace actuary {
 			}
 
             if (marginUseRatio > config.margin_ratio_thresholds[1]) {
-                if (!(*(context.get_dynamic_config())).is_stop_make_open_order()) {
-                    (*(context.get_dynamic_config())).stop_make_open_order();
+                if (!context.get_dynamic_config()->is_stop_make_open_order_as_reason(STOP_REASON_MARGIN_LIMITED)) {
+                    context.get_dynamic_config()->stop_make_open_order(STOP_REASON_MARGIN_LIMITED);
                     send_warning_message(config, context, string("stop make open position order: margin ratio exceeds limit."));
                 }
                 err_log("stop make open position order as margin ratio exceeds limit {}", config.margin_ratio_thresholds[1]);
@@ -54,10 +54,12 @@ namespace actuary {
             }
 
             if (marginUseRatio < config.margin_ratio_thresholds[0]) {
-                if ((*(context.get_dynamic_config())).is_stop_make_open_order()) {
-                    (*(context.get_dynamic_config())).resume_make_open_order();
-                    send_warning_message(config, context, string("resume make open position order: margin ratio has been recovery."));
-                    err_log("resume make open position order as margin ratio has been recovery {}", config.margin_ratio_thresholds[0]);
+                if (context.get_dynamic_config()->is_stop_make_open_order_as_reason(STOP_REASON_MARGIN_LIMITED)) {
+                    bool resumed = context.get_dynamic_config()->resume_make_open_order(STOP_REASON_MARGIN_LIMITED);
+                    if (resumed) {
+                        send_warning_message(config, context, string("resume make open position order: margin ratio has been recovery."));
+                    }
+                    err_log("resume make open position order as margin ratio has been recovery {} resumed={}", config.margin_ratio_thresholds[0], resumed);
                 }
             }
 
@@ -113,7 +115,7 @@ namespace actuary {
                     if (resumed) {
                         send_warning_message(config, context, string("resume make order: has enough balance of bnb."));
                     }
-                    err_log("resume make order as has enough balance of bnb {} {}", (*balance).crossWalletBalance, resumed);
+                    info_log("resume make order as has enough balance of bnb {} {}", (*balance).crossWalletBalance, resumed);
                 }
             }
         }
