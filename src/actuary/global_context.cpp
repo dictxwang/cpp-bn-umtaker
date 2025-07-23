@@ -36,11 +36,23 @@ namespace actuary {
         this->furures_rest_client.init(config.api_key_hmac, config.secret_key_hmac, config.rest_use_intranet);
 
         // load exchange info
-        vector<ExchangeInfoLite> exchangeLites = load_exchangeInfo(config, this->furures_rest_client);
-        for (int i = 0; i < exchangeLites.size(); i++) {
-            if (this->all_inst_ids_set.find(exchangeLites[i].symbol) != this->all_inst_ids_set.end()) {
-                info_log("put exchange info of {} into map", exchangeLites[i].symbol);
-                this->exchange_info_map.insert({exchangeLites[i].symbol, exchangeLites[i]});
+        vector<ExchangeInfoLite> follower_exchangeLites = load_follower_exchangeInfo(config, this->furures_rest_client);
+        unordered_map<string, ExchangeInfoLite> benchmark_exchangeLiteMap = load_benchmark_exchangeInfo(config, this->furures_rest_client);
+        for (int i = 0; i < follower_exchangeLites.size(); i++) {
+            if (this->all_inst_ids_set.find(follower_exchangeLites[i].symbol) != this->all_inst_ids_set.end()) {
+                info_log("put exchange info of {} into map", follower_exchangeLites[i].symbol);
+                this->exchange_info_map.insert({follower_exchangeLites[i].symbol, follower_exchangeLites[i]});
+
+                auto benchmark_exchangeInfo = benchmark_exchangeLiteMap.find(follower_exchangeLites[i].baseAsset);
+                if (benchmark_exchangeInfo == benchmark_exchangeLiteMap.end()) {
+                    warn_log("not found benchmark exchange info for {}", follower_exchangeLites[i].symbol);
+                } else {
+                    info_log("compare exchange info price precision: follower_symbol={} benchmark_symbol={} follower_precision={} benchmark_precision={} equals={}",
+                        follower_exchangeLites[i].symbol, benchmark_exchangeInfo->second.symbol,
+                        follower_exchangeLites[i].pricePrecision, benchmark_exchangeInfo->second.pricePrecision,
+                        follower_exchangeLites[i].pricePrecision == benchmark_exchangeInfo->second.pricePrecision
+                    );
+                }
             }
         }
         info_log("finish load exchange info map");

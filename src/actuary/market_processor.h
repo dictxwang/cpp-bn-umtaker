@@ -9,7 +9,8 @@
 #include "common/tools.h"
 
 namespace actuary {
-    std::vector<ExchangeInfoLite> load_exchangeInfo(ActuaryConfig &config, binance::BinanceFuturesRestClient &restClient);
+    vector<ExchangeInfoLite> load_follower_exchangeInfo(ActuaryConfig &config, binance::BinanceFuturesRestClient &restClient);
+    unordered_map<string, ExchangeInfoLite> load_benchmark_exchangeInfo(ActuaryConfig &config, binance::BinanceFuturesRestClient &restClient);
 }
 
 #endif

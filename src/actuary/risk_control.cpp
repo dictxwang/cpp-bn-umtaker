@@ -33,7 +33,7 @@ namespace actuary {
                 if (context.get_dynamic_config()->is_stop_make_order_as_reason(STOP_REASON_ACCOUNT_META)) {
                     context.get_dynamic_config()->resume_make_order(STOP_REASON_ACCOUNT_META);
                     send_warning_message(config, context, string("resume make order: account meta refresh time is normal."));
-                    err_log("resume make order as meta refresh time is normal, latest update time {} now is {}", meta.updateTimeMillis, now);
+                    info_log("resume make order as meta refresh time is normal, latest update time {} now is {}", meta.updateTimeMillis, now);
                 }
             }
 
@@ -59,7 +59,7 @@ namespace actuary {
                     if (resumed) {
                         send_warning_message(config, context, string("resume make open position order: margin ratio has been recovery."));
                     }
-                    err_log("resume make open position order as margin ratio has been recovery {} resumed={}", config.margin_ratio_thresholds[0], resumed);
+                    info_log("resume make open position order as margin ratio has been recovery {} resumed={}", config.margin_ratio_thresholds[0], resumed);
                 }
             }
 
@@ -95,7 +95,7 @@ namespace actuary {
                 if (context.get_dynamic_config()->is_stop_make_order_as_reason(STOP_REASON_BNB)) {
                     context.get_dynamic_config()->resume_make_order(STOP_REASON_BNB);
                     send_warning_message(config, context, string("resume make order: balance of bnb refresh time is normal."));
-                    err_log("resume make order as balance of bnb refresh time is normal, latest update time {} now is {}", (*balance).updateTimeMillis, now);
+                    info_log("resume make order as balance of bnb refresh time is normal, latest update time {} now is {}", (*balance).updateTimeMillis, now);
                 }
             }
 

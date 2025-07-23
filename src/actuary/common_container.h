@@ -11,6 +11,7 @@ namespace actuary {
 
     struct ExchangeInfoLite {
         string symbol;
+        string baseAsset;
         int pricePrecision;
         int quantityPrecision;
         double minPrice = 0;
