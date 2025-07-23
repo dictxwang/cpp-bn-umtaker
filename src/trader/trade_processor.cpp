@@ -96,7 +96,7 @@ namespace trader {
             order.newClientOrderId = client_order_id;
             order.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
             // there no need to send reduceOnly, because if oversold occurs, it means that the current market has revered.
-            // order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
+            order.reduceOnly = (*shm_order).reduce_only == 1 ? "true" : "false";
 
             bool has_interval_semaphore = context.get_order_interval_boss()->has_more_semaphore(follower_inst_id);
             pair<bool, string> result;
