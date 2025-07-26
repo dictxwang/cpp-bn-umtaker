@@ -44,3 +44,13 @@ int calculate_precision_by_min_step(double min_step) {
         return precision;
     }
 }
+
+std::string get_utc_time_tring() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
+    std::tm* utc_tm = std::gmtime(&now_c);
+
+    std::ostringstream oss;
+    oss << std::put_time(utc_tm, "%Y-%m-%d %H:%M:%S");
+    return oss.str();
+}

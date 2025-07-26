@@ -490,4 +490,50 @@ namespace actuary {
 
         return threshold;
     }
+
+    void start_polling_save_account_position(ActuaryConfig &config, GlobalContext &context) {
+        if (config.dt_group_main_node) {
+            std::thread save_thread(save_account_position, std::ref(config), std::ref(context));
+            save_thread.detach();
+            info_log("start polling of save account position");
+        }
+    }
+
+    void save_account_position(ActuaryConfig &config, GlobalContext &context) {
+
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::minutes(10));
+            string log_time = get_utc_time_tring();
+
+            for (string base_asset : config.all_base_assets) {
+                string follower_symbol = base_asset + config.follower_quote_asset;
+                auto position = context.get_balance_position_composite().copy_position(follower_symbol);
+                auto threshold = context.get_balance_position_composite().copy_position_threshold(follower_symbol);
+                if (!position.has_value() || !threshold.has_value()) {
+                    warn_log("account position or threshold not found for {}", follower_symbol);
+                    continue;
+                }
+                string sql = fmt::format("insert ignore into tb_bnum_position(account_flag, symbol, position_side, position_amount, position_notional, unrealized_profit, log_time) values ('{}', '{}', '{}', {}, {}, {}, '{}')",
+                    config.account_flag, follower_symbol, position.value().positionSide, position.value().positionAmountAbs, std::abs(threshold.value().totalNotional), position.value().unrealizedProfit, log_time
+                );
+
+                info_log("save account position sql: {}", sql);
+                MYSQL* my_conn = context.get_mysql_source()->getConnection();
+                if (my_conn != nullptr) {
+                    try {
+                        if (mysql_query(my_conn, sql.c_str()) != 0) {
+                            int my_no = mysql_errno(my_conn);
+                            string my_err = mysql_error(my_conn);
+                            err_log("fail to insert account position: {} {}", my_no, my_err);
+                        }
+                    } catch (exception &exp) {
+                        err_log("exception occur while insert account position: {}", string(exp.what()));
+                    }
+                    context.get_mysql_source()->releaseConnection(my_conn);
+                } else {
+                    warn_log("no mysql connection created");
+                }
+            }
+        }
+    }
 }

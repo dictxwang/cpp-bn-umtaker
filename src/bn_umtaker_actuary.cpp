@@ -39,6 +39,9 @@ int main(int argc, char const *argv[]) {
     // refresh account balance and position
     actuary::start_polling_load_balance_position(config, context);
 
+    // start polling of save account position
+    actuary::start_polling_save_account_position(config, context);
+
     // subscribe user data steam
     actuary::start_subscribe_balance_position(config, context);
 

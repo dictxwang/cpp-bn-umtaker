@@ -27,6 +27,9 @@ namespace actuary {
     void subscribe_balance_position(ActuaryConfig &config, GlobalContext &context);
     void process_balance_position(ActuaryConfig &config, GlobalContext &context);
 
+    void start_polling_save_account_position(ActuaryConfig &config, GlobalContext &context);
+    void save_account_position(ActuaryConfig &config, GlobalContext &context);
+
     optional<PositionThresholdInfo> calculcate_position_threshold(ActuaryConfig &config, GlobalContext &context, string &follower_symbol);
 }
 

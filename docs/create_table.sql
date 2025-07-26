@@ -104,3 +104,20 @@ CREATE TABLE `tb_bnum_exchange_info` (
   KEY `idx_af` (`account_flag`),
   KEY `idx_af_enable` (`account_flag`, `enabled`)
 );
+
+CREATE TABLE `tb_bnum_position` (
+  `tid` bigint NOT NULL AUTO_INCREMENT,
+  `account_flag` varchar(32) NOT NULL DEFAULT '',
+  `symbol` varchar(64) NOT NULL,
+  `position_side` varchar(8) NOT NULL DEFAULT '',
+  `position_amount` decimal(16,8) DEFAULT '0.00000000',
+  `position_notional` decimal(16,8) DEFAULT '0.00000000',
+  `unrealized_profit` decimal(16,8) DEFAULT '0.00000000',
+  `log_time` datetime DEFAULT NULL,
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`tid`),
+  UNIQUE KEY `uidx_logts_af` (`account_flag`, `symbol`, `log_time`),
+  KEY `ct_idx` (`create_time`) USING BTREE,
+  KEY `idx_ctaf` (`account_flag`,`create_time`),
+  KEY `idx_af` (`account_flag`)
+);
