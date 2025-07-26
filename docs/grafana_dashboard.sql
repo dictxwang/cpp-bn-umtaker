@@ -113,7 +113,7 @@ select t1.*, t2.total_pnl_1s*100 as total_pnl_1s, t2.total_pnl_5s*100 as total_p
 -- Position
 select log_time, sum(long_position_notional) as long_position_notional, sum(short_position_notional) as short_position_notional from 
  (select log_time, case position_side when 'LONG' then position_notional else 0 end as long_position_notional, case position_side when 'SHORT' then position_notional else 0 end as short_position_notional 
-  from tb_bnsum_position
+  from tb_bnum_position
   where 1=1 AND (COALESCE('$Account', '') = '' OR account_flag = '$Account') AND (COALESCE('$Symbol', '') = '' OR COALESCE('$Symbol', '1A-ALL') = '1A-ALL' OR symbol = '$Symbol') AND $__timeFilter(log_time)
  ) as tmp
  group by log_time
