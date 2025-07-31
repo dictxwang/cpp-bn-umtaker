@@ -107,6 +107,11 @@ namespace actuary {
                 }
                 err_log("stop make order as only few balance of bnb {}", (*balance).crossWalletBalance);
                 continue;
+            } else if (balance->crossWalletBalance < config.bnb_balance_thresholds[1]) {
+                // not enough
+                send_warning_message(config, context, string("balance of bnb is not enough, transfer as soon as possible to avoid trading stopping."));
+                warn_log("balance of bnb is not enough, transfer as soon as possible to avoid trading stopping. balance of bnb is {}", balance->crossWalletBalance);
+                continue;
             }
             if ((*balance).crossWalletBalance > config.bnb_balance_thresholds[1]) {
                 // enough

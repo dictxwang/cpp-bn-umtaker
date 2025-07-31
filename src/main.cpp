@@ -422,12 +422,12 @@ int main(int argc, char const *argv[]) {
 
     // Example: spot order by rest
     // binance::SpotNewOrder newOrder;
-    // newOrder.symbol = "BNBETH";
+    // newOrder.symbol = "BNBUSDT";
     // newOrder.side = binance::ORDER_SIDE_BUY;
     // newOrder.type = "MARKET";
     // // newOrder.type = binance::ORDER_TYPE_LIMIT;
     // // newOrder.timeInForce = binance::TimeInForce_IOC;
-    // newOrder.quantity = 0.1;
+    // newOrder.quantity = 1;
     // // newOrder.price = 12605;
     // newOrder.newOrderRespType = binance::ORDER_RESP_TYPE_RESULT;
     // // newOrder.newClientOrderId = gen_client_order_id(true);
@@ -439,9 +439,9 @@ int main(int argc, char const *argv[]) {
 
     // Example: univals transfer
     // binance::WalletUniversalTransfer transfer;
-    // transfer.type = binance::UT_UMFUTURE_MAIN;
-    // transfer.asset = "USDT";
-    // transfer.amount = 200;
+    // transfer.type = binance::UT_MAIN_UMFUTURE;
+    // transfer.asset = "BNB";
+    // transfer.amount = 1;
     // binance::CommonRestResponse<uint64_t> transferResponse;
     // binanceRestWallet.universal_transfer(transfer, transferResponse);
     // std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;
