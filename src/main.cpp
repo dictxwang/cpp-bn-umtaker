@@ -439,9 +439,9 @@ int main(int argc, char const *argv[]) {
 
     // Example: univals transfer
     // binance::WalletUniversalTransfer transfer;
-    // transfer.type = binance::UT_MAIN_UMFUTURE;
-    // transfer.asset = "BNB";
-    // transfer.amount = 0.1;
+    // transfer.type = binance::UT_UMFUTURE_MAIN;
+    // transfer.asset = "USDT";
+    // transfer.amount = 200;
     // binance::CommonRestResponse<uint64_t> transferResponse;
     // binanceRestWallet.universal_transfer(transfer, transferResponse);
     // std::cout << "code=" << transferResponse.code << ",msg=" << transferResponse.msg << std::endl;

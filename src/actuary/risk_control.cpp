@@ -21,7 +21,7 @@ namespace actuary {
             this_thread::sleep_for(chrono::minutes(5));
             AccountMetaInfo meta = context.get_balance_position_composite().copy_meta();
             uint64_t now = binance::get_current_ms_epoch();
-            if (meta.updateTimeMillis + 300*100 < now) {
+            if (meta.updateTimeMillis + 300*1000 < now) {
                 // expired
                 if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_ACCOUNT_META)) {
                     (*(context.get_dynamic_config())).stop_make_order(STOP_REASON_ACCOUNT_META);
@@ -82,7 +82,7 @@ namespace actuary {
                 continue;
             }
             uint64_t now = binance::get_current_ms_epoch();
-            if ((*balance).updateTimeMillis + 300*100 < now) {
+            if ((*balance).updateTimeMillis + 300*1000 < now) {
 
                 // expired
                 if (!(*(context.get_dynamic_config())).is_stop_make_order_as_reason(STOP_REASON_BNB)) {
