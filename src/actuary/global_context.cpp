@@ -26,9 +26,9 @@ namespace actuary {
             this->all_follower_inst_ids.push_back(follower_inst);
         }
 
-        this->benchmark_inst_config.loadInstConfig(config.benchmark_inst_config_file);
+        this->benchmark_inst_config.loadInstConfig(config.benchmark_inst_config_file, config.make_position_close_only);
         info_log("finiish load benchmark inst config file.");
-        this->follower_inst_config.loadInstConfig(config.follower_inst_config_file);
+        this->follower_inst_config.loadInstConfig(config.follower_inst_config_file, config.make_position_close_only);
         info_log("finiish load follower inst config file.");
 
         this->init_shm_mapping(config);

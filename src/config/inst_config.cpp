@@ -1,6 +1,6 @@
 #include "inst_config.h"
 
-bool InstConfig::loadInstConfig(std::string& inputfile) {
+bool InstConfig::loadInstConfig(std::string& inputfile, bool positionCloseOnly) {
     bool loadFileResult = BaseConfig::load_config_file(inputfile.c_str());
     if (!loadFileResult) {
         return false;
@@ -14,7 +14,12 @@ bool InstConfig::loadInstConfig(std::string& inputfile) {
             item.volatility_a = binance::str_to_dobule(info_list[i]["volatility_a"]);
             item.volatility_b = binance::str_to_dobule(info_list[i]["volatility_b"]);
             item.volatility_c = binance::str_to_dobule(info_list[i]["volatility_c"]);
-            item.beta = binance::str_to_dobule(info_list[i]["beta"]);
+            if (positionCloseOnly) {
+                // make close quickly
+                item.beta = -0.0001;
+            } else {
+                item.beta = binance::str_to_dobule(info_list[i]["beta"]);
+            }
             item.min_ticker_notional = info_list[i]["min_ticker_notional"].asDouble();
             item.min_ticker_notional_multiple = info_list[i]["min_ticker_notional_multiple"].asDouble();
             item.order_size = binance::str_to_dobule(info_list[i]["order_size"]);

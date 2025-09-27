@@ -26,7 +26,7 @@ class InstConfig : public BaseConfig
         ~InstConfig() {}
 
     public:
-        bool loadInstConfig(std::string& inputfile);
+        bool loadInstConfig(std::string& inputfile, bool positionCloseOnly);
     
     public:
         std::unordered_map<string, InstConfigItem> inst_map;

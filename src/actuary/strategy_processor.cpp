@@ -94,8 +94,13 @@ namespace actuary {
 
         while (true) {
 
-            if (config.loop_pause_time_millis > 0) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
+            if (config.make_position_close_only || follower_position_close_only) {
+                // add sleep time when position close only, avoid place more orders and cross position side
+                std::this_thread::sleep_for(std::chrono::seconds(5));
+            } else {
+                if (config.loop_pause_time_millis > 0) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(config.loop_pause_time_millis));
+                }
             }
             int rand_log_number = rand_log.randInt();
             int rand_order_log_number = rand_order_log.randInt();
@@ -225,6 +230,14 @@ namespace actuary {
                 if (position_threshold.has_value()) {
                     position_reduce_ratio = position_threshold.value().positionReduceRatio;
                 }
+            }
+
+            if ((config.make_position_close_only || follower_position_close_only) && position.value().positionAmount == 0) {
+                // no more position for close
+                if (rand_log_number < 1000) {
+                    warn_log("no more psotion sholud close for {}", follower_inst_id);
+                }
+                continue;
             }
 
             // dynamic adjust threshold with position amount
